@@ -1,7 +1,7 @@
 /**
  * =============================================================================
  * FILE: backend/responseUtils.js
- * VERSION: v18.3.9-public-error-sanitization
+ * VERSION: v18.3.10-public-error-sanitization-fix
  * RESPONSIBILITY: Centralized response standardization for all modules.
  * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
  * =============================================================================
@@ -51,7 +51,7 @@ function _sanitizePublicMessage(code, message) {
     const withoutControlChars = raw.replace(/[\r\n\t]+/g, ' ');
     const withoutSecrets = withoutControlChars
         .replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]')
-        .replace(/(?:token|secret|api[_-]?key|password)\s*[:=]\s*[^\s,;]+/gi, '$1=[redacted]')
+        .replace(/(token|secret|api[_-]?key|password)\s*[:=]\s*[^\s,;]+/gi, '$1=[redacted]')
         .replace(/https?:\/\/[^\s]+/gi, '[url-redacted]');
 
     return withoutSecrets.length > MAX_ERROR_MESSAGE_LENGTH
