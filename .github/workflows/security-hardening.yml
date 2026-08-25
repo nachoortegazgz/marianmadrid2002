@@ -1,0 +1,36 @@
+name: Security hardening validation
+
+on:
+  push:
+    branches:
+      - 'hardening/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Syntax checks
+        run: |
+          node --check src/backend/responseUtils.js
+          node --check scripts/remediationAudit.mjs
+
+      - name: ASCII check
+        run: |
+          node -e "const fs=require('fs'); const files=['src/backend/responseUtils.js','scripts/remediationAudit.mjs']; for (const f of files) { const s=fs.readFileSync(f,'utf8'); if (/[^\\x00-\\x7F]/.test(s)) throw new Error('G10 ASCII violation: '+f); }"
+
+      - name: Remediation audit
+        run: node scripts/remediationAudit.mjs
