@@ -1,7 +1,7 @@
 /**
  * =============================================================================
  * MODULE: backend/marianAssistant.web.js
- * VERSION: v20.0.0-mariana-contextual-assistant
+ * VERSION: v20.0.1-assistant-boundary-hardening
  * RESPONSIBILITY: Private management chat for Marian with non-destructive action
  *                 suggestions. It never executes fiscal or cash mutations.
  * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
@@ -10,7 +10,7 @@
 
 import { webMethod, Permissions } from "wix-web-module";
 import { getSecret } from "wix-secrets-backend";
-import { makeTraceId, _safeTrim, withTimeout } from "public/mmUtils";
+import { makeTraceId, _safeTrim, _normalizeIdPart, withTimeout } from "public/mmUtils";
 import { SDK_CONFIG } from "backend/internalConfig";
 import { SECRETS } from "backend/mmSecrets";
 import { requireMarianManager, rateLimiter } from "backend/security";
@@ -47,10 +47,13 @@ const ASSISTANT_INSTRUCTIONS = [
 ].join(" ");
 
 function _toPublicError(error, fallbackCode = "ASSISTANT_ERROR") {
-    return {
-        code: String(error?.code || fallbackCode),
-        message: String(error?.message || "No se pudo completar la consulta del asistente."),
-    };
+    const internalCodes = new Set(["AI_NOT_CONFIGURED", "AI_REQUEST_FAILED", "AI_EMPTY_RESPONSE", "RATE_LIMITED", "INVALID_MESSAGE", "MARIAN_MANAGER_REQUIRED"]);
+    const code = String(error?.code || fallbackCode);
+    if (code === "RATE_LIMITED") return { code, message: "Espera un minuto antes de continuar la conversacion." };
+    if (internalCodes.has(code) && code !== "AI_REQUEST_FAILED") {
+        return { code, message: String(error?.message || "No se pudo completar la consulta del asistente.").slice(0, 240) };
+    }
+    return { code: fallbackCode, message: "No se pudo completar la consulta del asistente." };
 }
 
 function _normalizeMessage(item) {
@@ -87,7 +90,7 @@ function _extractAllowedActions(text) {
 
     return {
         actions,
-        cleanText: String(text || "").replace(expression, "").replace(/\n{3,}/g, "\n\n").trim(),
+        cleanText: String(text || "").replace(expression, "").replace(/\n{3,}/g, "\n\n").trim().slice(0, MAX_OUTPUT_TOKENS * 8),
     };
 }
 
@@ -122,7 +125,7 @@ async function _callAssistant(messages, _traceId) {
 
     const payload = await response.json().catch(() => null);
     if (!response.ok) {
-        const error = new Error(String(payload?.error?.message || `AI request failed (${response.status})`));
+        const error = new Error("AI provider request failed");
         error.code = "AI_REQUEST_FAILED";
         throw error;
     }
@@ -138,7 +141,7 @@ async function _callAssistant(messages, _traceId) {
 }
 
 export const askMarianAssistant = webMethod(Permissions.SiteMember, async (payload = {}) => {
-    const traceId = String(payload?.traceId || makeTraceId("marian-ai"));
+    const traceId = _normalizeIdPart(payload?.traceId || makeTraceId("marian-ai"), 80);
     try {
         const limit = rateLimiter({ surface: "marianAssistant.ask", key: "marian" }, 8, 60000);
         if (!limit.allowed) {
@@ -183,7 +186,6 @@ export const askMarianAssistant = webMethod(Permissions.SiteMember, async (paylo
         log.error("Marian assistant request failed", {
             traceId,
             code: error?.code,
-            message: error?.message,
         });
         return { status: "ERROR", data: null, error: _toPublicError(error) };
     }
