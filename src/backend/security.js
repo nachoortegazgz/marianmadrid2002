@@ -1,13 +1,14 @@
 /**
  * =============================================================================
  * MODULE: backend/security.js
- * VERSION: v19.5.1-rbac-ssot-cleanup
+ * VERSION: v19.6.18-ratelimit-input-bounds
  * RESPONSIBILITY: RBAC (roles + allowlists) and surface-scoped sliding window rate limiter.
  * HISTORIAL DE VERSIONES:
+ *   - v19.6.18-ratelimit-input-bounds: Bounds rate-limit surface/key inputs and window values.
  *   - v19.5.1-rbac-ssot-cleanup: Centralizes cache limits and removes unused Members-role authorization helpers.
  *   - v18.0.0: Version inicial.
-  * - v19.4.4: Removed module-global currentMember memoization to prevent cross-request identity reuse.
- * - v18.9.1: Refactorizacion, optimizacion y cumplimiento G10 ASCII Strict.
+ *   - v19.4.4: Removed module-global currentMember memoization to prevent cross-request identity reuse.
+ *   - v18.9.1: Refactorizacion, optimizacion y cumplimiento G10 ASCII Strict.
  * =============================================================================
  */
 
@@ -35,6 +36,12 @@ const MEMBER_FETCH_TIMEOUT_MS = Number(SDK_CONFIG?.TIMEOUTS?.API_MS) || 15000;
 const _rateLimitCache = new Map();
 const RATE_LIMIT_CLEANUP_TTL_MS = Number(SDK_CONFIG?.SECURITY?.RATE_LIMIT_CACHE_CLEANUP_TTL_MS) || 60000;
 const MAX_RATE_LIMIT_CACHE_SIZE = Number(SDK_CONFIG?.SECURITY?.RATE_LIMIT_CACHE_MAX_ENTRIES) || 5000;
+const RATE_LIMIT_PART_MAX_LENGTH = 80;
+const RATE_LIMIT_KEY_MAX_LENGTH = 180;
+const MIN_RATE_LIMIT_WINDOW_MS = 100;
+const MAX_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const MIN_RATE_LIMIT_REQUESTS = 1;
+const MAX_RATE_LIMIT_REQUESTS = 1000;
 let _rateLimitLastCleanup = 0;
 
 export { generateHMAC, verifyHMAC, timingSafeEqual };
@@ -63,7 +70,6 @@ function _roleMatches(role, allowedNamesUpper, allowedIds) {
 }
 
 async function _getMemberFull(traceId) {
-    // Do not cache currentMember at module scope: a warm serverless instance can serve different users.
     return withTimeout(
         currentMember.getMember({ fieldsets: ['FULL'] }),
         MEMBER_FETCH_TIMEOUT_MS,
@@ -101,16 +107,25 @@ function _ensureRateLimitCapacity(now) {
     if (oldestKey) _rateLimitCache.delete(oldestKey);
 }
 
+function _normalizeRateLimitPart(value, fallback, maxLength = RATE_LIMIT_PART_MAX_LENGTH) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    const normalized = raw.replace(/[^A-Za-z0-9_.:-]/g, '_').slice(0, maxLength);
+    return normalized || fallback;
+}
+
 export function rateLimiter(key, maxRequests, windowMs) {
     const now = Date.now();
 
-    const maxReq = Number.isFinite(maxRequests) ?
-        Number(maxRequests) :
-        Number(SDK_CONFIG?.RATE_LIMIT?.MAX_REQUESTS || 20);
+    const rawMaxReq = Number.isFinite(maxRequests)
+        ? Number(maxRequests)
+        : Number(SDK_CONFIG?.RATE_LIMIT?.MAX_REQUESTS || 20);
+    const rawWinMs = Number.isFinite(windowMs)
+        ? Number(windowMs)
+        : Number(SDK_CONFIG?.RATE_LIMIT?.WINDOW_MS || 5000);
 
-    const winMs = Number.isFinite(windowMs) ?
-        Number(windowMs) :
-        Number(SDK_CONFIG?.RATE_LIMIT?.WINDOW_MS || 5000);
+    const maxReq = Math.min(MAX_RATE_LIMIT_REQUESTS, Math.max(MIN_RATE_LIMIT_REQUESTS, Math.floor(rawMaxReq)));
+    const winMs = Math.min(MAX_RATE_LIMIT_WINDOW_MS, Math.max(MIN_RATE_LIMIT_WINDOW_MS, Math.floor(rawWinMs)));
 
     if (now - _rateLimitLastCleanup > RATE_LIMIT_CLEANUP_TTL_MS) {
         _pruneExpiredRateLimitEntries(now);
@@ -120,12 +135,14 @@ export function rateLimiter(key, maxRequests, windowMs) {
     let rawKey = key;
 
     if (key && typeof key === 'object') {
-        surface = String(key.surface || 'default').trim() || 'default';
+        surface = _normalizeRateLimitPart(key.surface, 'default');
         rawKey = key.key;
+    } else {
+        surface = _normalizeRateLimitPart(surface, 'default');
     }
 
-    const cleanRaw = String(rawKey ?? '').trim() || 'anon:empty';
-    const k = `${surface}:${cleanRaw}`;
+    const cleanRaw = _normalizeRateLimitPart(rawKey, 'anon_empty');
+    const k = `${surface}:${cleanRaw}`.slice(0, RATE_LIMIT_KEY_MAX_LENGTH);
 
     const entry = _rateLimitCache.get(k);
     if (!entry || now - entry.windowStart > entry.windowMs) {
@@ -219,12 +236,18 @@ export async function isCajero(traceId = 'unknown') {
 }
 
 export async function isMarianManager(traceId = 'unknown') {
-    if (!await isAdmin(traceId)) return false;
-
     const member = await _getMemberFull(traceId);
     if (!member) return false;
 
+    const roles = member.roles || [];
+    const adminNames = [String(COLLAB_ROLES.ADMIN || '').toUpperCase()];
+    const adminIds = [];
     const email = String(member.loginEmail || member.email || '').trim().toLowerCase();
+    const adminByRole = Array.isArray(roles) && roles.some((r) => _roleMatches(r, adminNames, adminIds));
+    const cache = adminByRole ? { ok: true } : await _loadCachesIfNeeded(traceId);
+    const adminByAllowlist = cache.ok && _adminsCache.includes(email);
+    if (!adminByRole && !adminByAllowlist) return false;
+
     const staff = await findStaff(email) || await findStaff(member._id);
     return String(staff?.resourceId || '') === String(STAFF_ACCESS.MARIAN_RESOURCE_ID || '');
 }
@@ -249,10 +272,6 @@ export async function isStaffCollaborator(traceId = 'unknown') {
     const allowedIds = [];
     if (roles.some((r) => _roleMatches(r, allowedNames, allowedIds))) return true;
 
-    // Emergency or dashboard access can be granted through the same controlled
-    // allowlists used by requireAdmin() and requireCajero(). This prevents the
-    // frontend panel from rejecting a legitimate manager only because Wix role
-    // propagation has not completed yet.
     const email = String(member.loginEmail || member.email || '').trim().toLowerCase();
     const cache = await _loadCachesIfNeeded(traceId);
     return cache.ok && (_adminsCache.includes(email) || _cajerosCache.includes(email));
