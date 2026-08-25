@@ -1,13 +1,10 @@
-# Marian Madrid - v19.8.0-excellence-consolidated
+# Marian Madrid Booking Engine — v19.8.0-excellence-consolidated
 
-## Overview
-Booking & Financial Engine for Marian Madrid services platform.
+Ecosistema digital integral depurado para Marian Madrid Peluquería y Estética.
 
-## Structure
-- `/src/backend` - Backend modules (bookings, financial, admin)
-- `/src/pages` - Page templates and controllers
-- `/src/public` - Public utilities and helpers
-- `/docs` - Security and configuration documentation
+## Estructura
 
-## Version
-v19.8.0-excellence-consolidated - Consolidated booking core with enhanced reliability
+- `src/backend/`: Módulos Velo de backend, sagas transaccionales, ledger fiscal y RBAC.
+- `src/public/`: Utilidades compartidas, PII masking, widget bridge y helper Veri*Factu.
+- `src/pages/`: Código de páginas Velo (`calendario-2.js`, `only-staff.js`, `administracion.js`).
+- `jobs.config`: Tareas programadas en UTC.
