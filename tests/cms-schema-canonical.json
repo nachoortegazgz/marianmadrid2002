@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": "2026-08-25",
+  "source": "Canonical CMS Schema for the Marian Madrid Booking Engine",
+  "status": "canonical-baseline",
+  "fieldLevelContract": "not-reconstructed-from-omitted-data",
+  "conventions": {
+    "timezone": "Europe/Madrid",
+    "diaKeyPattern": "^\\d{4}-\\d{2}-\\d{2}$",
+    "mesKeyPattern": "^\\d{4}-\\d{2}$",
+    "moneyType": "NUMBER",
+    "moneyScale": 2,
+    "datetimeStorage": "UTC",
+    "localDatetimeType": "TEXT",
+    "identifierType": "TEXT",
+    "businessObjectType": "OBJECT"
+  },
+  "systemFieldsExcluded": ["_id", "_createdDate", "_updatedDate", "_owner"],
+  "collections": {
+    "Import2": {"domain":"catalog","role":"services","businessIndexes":["serviceId unique","slugUrl unique","linkFases"]},
+    "AddonsCatalogo": {"domain":"catalog","role":"bookingAddons","businessIndexes":["bookingsAddonId unique","activo"]},
+    "DualSlotCache": {"domain":"booking","role":"temporary dual pairs","businessIndexes":["phaseOneServiceId + dateYMD","expiresAt","pairToken unique"]},
+    "AvailabilityDaysCache": {"domain":"booking","role":"available-days cache","businessIndexes":["expiresAt","serviceId + yearMonth"]},
+    "AvailabilitySlotsCache": {"domain":"booking","role":"technical slot cache","businessIndexes":["expiresAt","range + resource composite"]},
+    "CitasF2": {"domain":"booking","role":"durable booking projection","businessIndexes":["bookingId unique","fechaYmdMadrid + status + resourceId","pairToken","resourceId + startDate"],"rules":{"pairTokenUnique":false,"contactSource":"contactDetails","phaseIdPattern":"booking_{bookingId}"}},
+    "BookingTransactions": {"domain":"booking","role":"saga idempotency","businessIndexes":["pairToken unique","status + updatedAt"]},
+    "MM_LOCKS": {"domain":"recovery","role":"slot and ledger mutex","businessIndexes":["slotKey unique","expiresAt"]},
+    "PendingCompensations": {"domain":"recovery","role":"retry queue","businessIndexes":["kind + status + createdAt","transactionId unique","orderId"]},
+    "movimientoCaja": {"domain":"cash","role":"immutable fiscal ledger","businessIndexes":["seqGlobal unique","transactionId unique","diaKey + seqGlobal","mesKey + seqGlobal"]},
+    "cajaActual": {"domain":"cash","role":"derived singleton projection","singletonId":"CAJA_PRINCIPAL","businessIndexes":["diaKey"]},
+    "HISTORICO_CIERRES_Z": {"domain":"cash","role":"daily closing projection","businessIndexes":["diaKey unique"]},
+    "RESUMEN_CONTEO_X": {"domain":"cash","role":"append-only cash counts","businessIndexes":["diaKey + fechaConteo"]},
+    "SecuenciaTickets": {"domain":"cash","role":"global ticket counter","singletonId":"GLOBAL"},
+    "REGISTRO_HORARIO": {"domain":"labor","role":"append-only time records","businessIndexes":["resourceId + fechaHora","resourceId + diaKey + fechaHora","mesKey + resourceId"],"rules":{"adjustmentRequires":"motivoAjuste"}},
+    "InventarioProductos": {"domain":"inventory","role":"technical expected-stock catalog","businessIndexes":["sku unique","wixProductId unique","stockExpected"]},
+    "movimientoInventario": {"domain":"inventory","role":"internal and ecommerce movement ledger","businessIndexes":["movementToken unique","sku + createdAt","referenceId","movementType + createdAt"]},
+    "ConciliacionStockWix": {"domain":"inventory","role":"Stores/POS reconciliation queue","businessIndexes":["status + createdAt","sku + status","movementId unique"]},
+    "MM_AUDIT_LOG": {"domain":"audit","role":"append-only technical audit","businessIndexes":["fechaLog","traceId","level + fechaLog"]},
+    "m365SyncLog": {"domain":"integration","role":"external synchronization evidence","businessIndexes":["fechaSync","estado + fechaSync","tipo + fechaSync"]}
+  },
+  "canonicalAliases": {
+    "PRODUCTOS_VENTA": "InventarioProductos",
+    "INVENTARIO_PRODUCTOS": "InventarioProductos"
+  },
+  "canonicalRules": {
+    "bookingContact": "CitasF2.contactDetails only",
+    "dualPairField": "pairToken shared across dual phases in CitasF2 and not unique",
+    "dualCachePhaseFields": ["phaseOneServiceId","phaseTwoServiceId","slotF1","slotF2","resourceId","dateYMD","expiresAt"],
+    "cashSourceOfTruth": "movimientoCaja",
+    "cashProjection": "cajaActual",
+    "timeRecordFields": ["resourceId","resourceName","tipoFichaje","diaKey","mesKey","hora","fechaHora","ipDispositivo","motivoAjuste","registradoPor"],
+    "inventoryMovementFields": ["movementToken","quantity","quantityDelta","stockBefore","stockAfter","movementType","referenceId","orderId","refundId"],
+    "reconciliationFields": ["movementId","movementToken","status","quantityDelta","appliedAt","appliedByNote"]
+  },
+  "excludedMigrations": {
+    "MapaStaff": "historical-excluded-do-not-create",
+    "ProveedoresInventario": "historical-do-not-create-unless-consumed",
+    "bookingIdf1": "legacy-name-do-not-destructively-rename",
+    "flatBookingPII": "do-not-duplicate-contactDetails",
+    "legacyTimeClockFields": "migrate-before-retirement"
+  }
+}
