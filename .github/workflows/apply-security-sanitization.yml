@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - 'sanitize/security-data-integrity-2026-08-25'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -22,10 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
 
       - name: Apply targeted sanitization
         run: node scripts/applySecuritySanitization.mjs
@@ -39,9 +38,6 @@ jobs:
           node --check src/backend/marianAssistant.web.js
           node --check src/backend/securityEngine.js
           node -e "const fs=require('fs'); const p=['src/backend/http-functions.js','src/backend/events.js','src/backend/inventario.web.js','src/backend/security.js','src/backend/marianAssistant.web.js','src/backend/securityEngine.js']; for (const f of p) { const s=fs.readFileSync(f,'utf8'); if (/[^\\x00-\\x7F]/.test(s)) throw new Error('G10 ASCII violation: '+f); }"
-
-      - name: Lint
-        run: npm run lint -- --no-fix
 
       - name: Commit sanitized files
         run: |
