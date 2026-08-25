@@ -1,26 +1,25 @@
 /**
  * =============================================================================
  * MODULE: backend/securityEngine.js
- * VERSION: v18.9.1-ultimate
+ * VERSION: v19.6.17-security-input-hardening
  * RESPONSIBILITY: Cryptographic engine (HMAC-SHA256, hash chains, timing-safe equal, and JWT).
- * HISTORIAL DE VERSIONES:
- *   - v18.0.0: Version inicial.
- *   - v18.9.1: Refactorizacion, optimizacion y cumplimiento G10 ASCII Strict.
+ * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
  * =============================================================================
  */
 
 import { createHmac, createHash, timingSafeEqual as nativeTimingSafeEqual } from 'crypto';
 import { getSecret } from 'wix-secrets-backend';
-import {
-    makeTraceId,
-} from "public/mmUtils";
-import {
-    JWT,
-} from "backend/internalConfig";
+import { makeTraceId } from "public/mmUtils";
+import { JWT } from "backend/internalConfig";
 import { SECRETS } from 'backend/mmSecrets';
 import { logger } from 'backend/booking/bookingCore';
 
 const log = logger;
+
+const MAX_CRYPTO_INPUT_LENGTH = 65536;
+const MAX_HMAC_SIGNATURE_LENGTH = 128;
+const MAX_JWT_LENGTH = 8192;
+const MAX_JWT_PART_LENGTH = 6144;
 
 function _stringifySafe(value) {
     if (value === null || value === undefined) return '';
@@ -46,21 +45,33 @@ function _stringifySafe(value) {
     }
 }
 
+function _boundedString(value, maxLength) {
+    if (value === null || value === undefined) return null;
+    const str = typeof value === 'string' ? value : _stringifySafe(value);
+    if (typeof str !== 'string' || str.length === 0 || str.length > maxLength) return null;
+    return str;
+}
+
 export function hmacSha256Hex(secretKey, payload) {
     if (!secretKey || typeof secretKey !== 'string') {
         throw new Error('SECURITY_ALERT: Valid secretKey required for HMAC generation');
     }
-    if (payload === null || payload === undefined) {
-        throw new Error('SECURITY_ALERT: Valid payload required for HMAC generation');
+    if (secretKey.length > MAX_CRYPTO_INPUT_LENGTH) {
+        throw new Error('SECURITY_ALERT: HMAC secret exceeds maximum length');
     }
-    const s = typeof payload === 'string' ? payload : _stringifySafe(payload);
-    return createHmac('sha256', secretKey).update(s).digest('hex');
+    const s = _boundedString(payload, MAX_CRYPTO_INPUT_LENGTH);
+    if (s === null) {
+        throw new Error('SECURITY_ALERT: HMAC payload exceeds maximum length');
+    }
+    return createHmac('sha256', secretKey).update(s, 'utf8').digest('hex');
 }
 
 export function timingSafeEqual(a, b) {
     if (a === null || a === undefined || b === null || b === undefined) return false;
     const strA = String(a);
     const strB = String(b);
+    if (strA.length > MAX_HMAC_SIGNATURE_LENGTH || strB.length > MAX_HMAC_SIGNATURE_LENGTH) return false;
+
     const bufA = Buffer.from(strA, 'utf8');
     const bufB = Buffer.from(strB, 'utf8');
 
@@ -84,7 +95,7 @@ export function timingSafeEqual(a, b) {
 
 export function verifyHMAC(secretKey, payload, signature) {
     try {
-        if (typeof signature !== 'string') return false;
+        if (typeof signature !== 'string' || signature.length !== 64) return false;
         const expected = hmacSha256Hex(secretKey, payload);
         return timingSafeEqual(signature, expected);
     } catch (_) {
@@ -93,15 +104,17 @@ export function verifyHMAC(secretKey, payload, signature) {
 }
 
 export function hashSHA256(data) {
-    const rawStr = _stringifySafe(data);
-    return createHash('sha256').update(rawStr).digest('hex');
+    const rawStr = _boundedString(data, MAX_CRYPTO_INPUT_LENGTH);
+    if (rawStr === null) throw new Error('SECURITY_ALERT: Hash input exceeds maximum length');
+    return createHash('sha256').update(rawStr, 'utf8').digest('hex');
 }
 
 export function hashChain(previousHash, currentData) {
-    if (!previousHash || typeof previousHash !== 'string') {
+    if (!previousHash || typeof previousHash !== 'string' || previousHash.length !== 64) {
         throw new Error('SECURITY_ALERT: Valid previousHash required for chain hashing');
     }
-    const safeData = _stringifySafe(currentData);
+    const safeData = _boundedString(currentData, MAX_CRYPTO_INPUT_LENGTH);
+    if (safeData === null) throw new Error('SECURITY_ALERT: Hash-chain data exceeds maximum length');
     return hashSHA256(`${previousHash}|${safeData}`);
 }
 
@@ -114,7 +127,7 @@ function _base64UrlEncode(str) {
 }
 
 function _base64UrlDecode(str) {
-    if (typeof str !== 'string') return '';
+    if (typeof str !== 'string' || str.length > MAX_JWT_PART_LENGTH) return '';
     const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
     const pad = base64.length % 4;
     const padded = pad ? base64 + '='.repeat(4 - pad) : base64;
@@ -145,7 +158,7 @@ async function _getJwtSecretOrThrow(traceId) {
 
 export async function generarToken(payload, traceId) {
     const activeTraceId = traceId || makeTraceId('jwt-gen');
-    if (!payload || typeof payload !== 'object') {
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
         throw new Error('INVALID_PAYLOAD: Payload object required for token generation');
     }
 
@@ -165,8 +178,11 @@ export async function generarToken(payload, traceId) {
 
     const encodedHeader = _base64UrlEncode(_stringifySafe(header));
     const encodedPayload = _base64UrlEncode(_stringifySafe(jwtPayload));
-    const signature = _signJWT(secretKey, `${encodedHeader}.${encodedPayload}`);
+    if (encodedHeader.length > MAX_JWT_PART_LENGTH || encodedPayload.length > MAX_JWT_PART_LENGTH) {
+        throw new Error('INVALID_PAYLOAD: JWT payload exceeds maximum size');
+    }
 
+    const signature = _signJWT(secretKey, `${encodedHeader}.${encodedPayload}`);
     return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
 
@@ -174,7 +190,7 @@ export async function verificarToken(token, traceId) {
     const activeTraceId = traceId || makeTraceId('jwt-verify');
 
     try {
-        if (!token || typeof token !== 'string') return null;
+        if (typeof token !== 'string' || token.length === 0 || token.length > MAX_JWT_LENGTH) return null;
 
         const parts = token.split('.');
         if (parts.length !== 3) return null;
@@ -182,6 +198,8 @@ export async function verificarToken(token, traceId) {
         const encodedHeader = parts[0];
         const encodedPayload = parts[1];
         const signature = parts[2];
+        if (!encodedHeader || !encodedPayload || signature.length !== 43 ||
+            encodedHeader.length > MAX_JWT_PART_LENGTH || encodedPayload.length > MAX_JWT_PART_LENGTH) return null;
 
         let header;
         try {
@@ -191,7 +209,7 @@ export async function verificarToken(token, traceId) {
         }
 
         const targetAlg = (JWT && JWT.ALGORITHM) ? JWT.ALGORITHM : 'HS256';
-        if (!header || String(header.alg || '').toUpperCase() !== String(targetAlg).toUpperCase()) return null;
+        if (!header || String(header.alg || '').toUpperCase() !== String(targetAlg).toUpperCase() || header.typ !== 'JWT') return null;
 
         const secretKey = await _getJwtSecretOrThrow(activeTraceId);
         const expectedSignature = _signJWT(secretKey, `${encodedHeader}.${encodedPayload}`);
@@ -203,14 +221,15 @@ export async function verificarToken(token, traceId) {
         } catch (_) {
             return null;
         }
+        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
 
-        const exp = Number(payload && payload.exp);
-        const iat = Number(payload && payload.iat);
+        const exp = Number(payload.exp);
+        const iat = Number(payload.iat);
         if (!Number.isFinite(exp) || !Number.isFinite(iat)) return null;
 
         const now = Math.floor(Date.now() / 1000);
         if (iat > now + 60) return null;
-        if (exp <= now) return null;
+        if (exp <= now || exp - iat > Math.ceil((JWT?.EXPIRATION_MS || 1800000) / 1000) + 60) return null;
 
         return payload;
     } catch (error) {
