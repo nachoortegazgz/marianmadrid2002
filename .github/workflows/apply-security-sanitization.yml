@@ -1,0 +1,56 @@
+name: apply-security-sanitization
+
+on:
+  push:
+    branches:
+      - 'sanitize/security-data-integrity-2026-08-25'
+
+permissions:
+  contents: write
+
+jobs:
+  sanitize:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Apply targeted sanitization
+        run: node scripts/applySecuritySanitization.mjs
+
+      - name: Validate syntax and ASCII
+        run: |
+          node --check src/backend/http-functions.js
+          node --check src/backend/events.js
+          node --check src/backend/inventario.web.js
+          node --check src/backend/security.js
+          node --check src/backend/marianAssistant.web.js
+          node --check src/backend/securityEngine.js
+          node -e "const fs=require('fs'); const p=['src/backend/http-functions.js','src/backend/events.js','src/backend/inventario.web.js','src/backend/security.js','src/backend/marianAssistant.web.js','src/backend/securityEngine.js']; for (const f of p) { const s=fs.readFileSync(f,'utf8'); if (/[^\\x00-\\x7F]/.test(s)) throw new Error('G10 ASCII violation: '+f); }"
+
+      - name: Lint
+        run: npm run lint -- --no-fix
+
+      - name: Commit sanitized files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/backend/http-functions.js src/backend/events.js src/backend/inventario.web.js scripts/applySecuritySanitization.mjs .github/workflows/apply-security-sanitization.yml
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'security: sanitize external DTOs audit payloads and inventory inputs'
+          git push
