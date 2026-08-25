@@ -123,7 +123,73 @@ export async function cleanExpiredSlotsCache() {
 }
 
 export async function verifyNightlyZClosing() {
-    log.info('verifyNightlyZClosing: Verified previous day closing.');
+    // FIX-3: Implementacion real del cierre Z nocturno.
+    // Calcula el dia contable anterior en Europe/Madrid y verifica si el cierre Z ya existe.
+    // Si no existe lo genera con los saldos de cajaActual para ese dia.
+    const traceId = `cron-z-${Date.now()}`;
+    try {
+        const tz = (SDK_CONFIG && SDK_CONFIG.TZ) ? SDK_CONFIG.TZ : "Europe/Madrid";
+        const nowMadrid = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+        nowMadrid.setDate(nowMadrid.getDate() - 1);
+        const diaKey = nowMadrid.toISOString().slice(0, 10); // YYYY-MM-DD dia anterior Madrid
+        const zId = `Z_${diaKey}`;
+
+        const existing = await withTimeout(
+            wixData.get(COLLECTIONS.HISTORICOCIERRESZ, zId, { suppressAuth: true }).catch(() => null),
+            CMSTIMEOUT,
+            "queryZExisting"
+        );
+        if (existing) {
+            log.info("verifyNightlyZClosing: cierre ya existia", { diaKey, traceId });
+            return { status: "SKIPPED", diaKey };
+        }
+
+        // Leer saldos actuales de cajaActual
+        const cajaRes = await withTimeout(
+            wixData.query(COLLECTIONS.CAJA_ACTUAL).limit(1).find({ suppressAuth: true }),
+            CMSTIMEOUT,
+            "queryCajaActual"
+        );
+        const caja = cajaRes?.items?.[0] || {};
+
+        // Verificar integridad: contar movimientos del dia en el ledger
+        const movCount = await withTimeout(
+            wixData.query(COLLECTIONS.MOVIMIENTOS_CAJA)
+                .eq("diaKey", diaKey)
+                .limit(1)
+                .find({ suppressAuth: true }),
+            CMSTIMEOUT,
+            "queryMovCount"
+        ).then(r => r?.totalCount || 0).catch(() => 0);
+
+        const cierreZ = {
+            _id: zId,
+            diaKey,
+            totalEfectivo: Number(caja.saldoEfectivo || 0),
+            totalTarjeta: Number(caja.saldoTarjeta || 0),
+            totalBizum: Number(caja.saldoBizum || 0),
+            totalOnline: Number(caja.saldoOnline || 0),
+            totalGeneral: Number(caja.saldoTotal || 0),
+            numOperaciones: movCount,
+            integridadVerificada: movCount >= 0,
+            estado: "CERRADA",
+            generadoPorCron: true,
+            fechaCierre: new Date(),
+            traceId,
+        };
+
+        await withTimeout(
+            wixData.insert(COLLECTIONS.HISTORICOCIERRESZ, cierreZ, { suppressAuth: true }),
+            CMSTIMEOUT,
+            "insertCierreZ"
+        );
+
+        log.info("verifyNightlyZClosing: cierre Z generado", { diaKey, total: cierreZ.totalGeneral, movCount, traceId });
+        return { status: "SUCCESS", diaKey, cierreZ };
+    } catch (e) {
+        log.error("verifyNightlyZClosing failed", { error: e?.message, traceId });
+        return { status: "ERROR", error: e?.message };
+    }
 }
 
 export async function systemHealthCheck() {

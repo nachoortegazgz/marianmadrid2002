@@ -157,11 +157,29 @@ export const registerBookingPayment = async (bookingId, amount, paymentMethod, o
     const cuotaIva = Math.round((importeContable - baseImponible) * 100) / 100;
 
     const seqGlobal = Date.now();
-    const numTicketFactura = `FAC-${diaKey.slice(0, 4)}-${String(seqGlobal).slice(-6)}`;
+    // FIX-1: numTicketFactura con entropía suficiente para evitar colisiones en concurrencia alta
+    const numTicketFactura = `FAC-${diaKey.replace(/-/g, '')}-${String(seqGlobal)}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
     const transId = options.transactionId || makeTraceId("tx");
     const recordId = `MOV_${normalizeIdPart(diaKey, 10)}_${normalizeIdPart(transId, 80)}`;
 
-    const prevHash = "GENESIS_HASH";
+    // FIX-2: Encadenamiento real del hash fiscal — consulta el hashCadena del último movimiento
+    // Si no existe ninguno previo, arranca en GENESIS_HASH (primer asiento del ledger)
+    let prevHash = "GENESIS_HASH";
+    try {
+        const lastRes = await withTimeout(
+            wixData.query(COLLECTIONS.MOVIMIENTOS_CAJA)
+                .descending("seqGlobal")
+                .limit(1)
+                .find({ suppressAuth: true }),
+            CMSTIMEOUTMS,
+            "queryPrevHash"
+        );
+        if (lastRes?.items?.length > 0 && lastRes.items[0].hashCadena) {
+            prevHash = String(lastRes.items[0].hashCadena);
+        }
+    } catch (hashQueryErr) {
+        log.warn("prevHash query failed, using GENESIS_HASH", { traceId, error: hashQueryErr?.message });
+    }
     const rawDataToSign = `${prevHash}|${numTicketFactura}|${importeContable}|${diaKey}|${nifEmisor || ''}`;
     const hashCadena = hmacSha256Hex(fiscalKey, rawDataToSign);
     const firmaDigital = hmacSha256Hex(fiscalKey, hashCadena);
