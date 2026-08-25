@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const root = process.cwd();
 const targets = {
@@ -25,16 +26,9 @@ function assertAscii(content, file) {
   const match = /[^\x00-\x7F]/.exec(content);
   if (match) throw new Error(`G10 ASCII violation in ${file} at ${match.index}`);
 }
-function syntaxCheck(file) {
-  const { spawnSync } = awaitImportChildProcess();
-  const r = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
-  if (r.status !== 0) throw new Error(`Syntax error in ${file}: ${(r.stderr || r.stdout || '').trim()}`);
-}
-function awaitImportChildProcess() {
-  return requireCompat();
-}
-function requireCompat() {
-  return eval('require')('node:child_process');
+function assertSyntax(file) {
+  const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
+  if (result.status !== 0) throw new Error(`Syntax validation failed for ${file}: ${(result.stderr || result.stdout || '').trim()}`);
 }
 
 function sanitizeHttp() {
@@ -106,8 +100,8 @@ ${anchor}`;
 
 function sanitizeInventory() {
   let c = read(targets.inventory);
-  const constants = 'const MAX_INVENTORY_LINES = 100;\\nconst MAX_INVENTORY_QTY = 10000;\\nconst MAX_INVENTORY_TEXT = 240;\\n';
-  c = replaceExactly(c, 'const CMS_TIMEOUT_MS = Number(SDK_CONFIG?.TIMEOUTS?.CMS_MS) || 15000;\\n', 'const CMS_TIMEOUT_MS = Number(SDK_CONFIG?.TIMEOUTS?.CMS_MS) || 15000;\\n' + constants, 'inventory constants');
+  const constants = 'const MAX_INVENTORY_LINES = 100;\nconst MAX_INVENTORY_QTY = 10000;\nconst MAX_INVENTORY_TEXT = 240;\n';
+  c = replaceExactly(c, 'const CMS_TIMEOUT_MS = Number(SDK_CONFIG?.TIMEOUTS?.CMS_MS) || 15000;\n', 'const CMS_TIMEOUT_MS = Number(SDK_CONFIG?.TIMEOUTS?.CMS_MS) || 15000;\n' + constants, 'inventory constants');
   c = c.replace(/const lines = Array\.isArray\(payload\.lines\) \? payload\.lines : \[\];/g, 'const lines = Array.isArray(payload.lines) ? payload.lines.slice(0, MAX_INVENTORY_LINES) : [];');
   c = c.replace(/const sku = _safeTrim\(line\.sku\);\n\s*const quantity = Math\.abs\(Number\(line\.quantity\) \|\| 0\);/g, 'const sku = _safeTrim(line.sku).slice(0, 80);\n            const quantityRaw = Number(line.quantity);\n            const quantity = Number.isFinite(quantityRaw) ? Math.abs(quantityRaw) : 0;');
   c = c.replace(/if \(!sku \|\| quantity <= 0\) continue;/g, 'if (!sku || quantity <= 0 || quantity > MAX_INVENTORY_QTY) continue;');
@@ -126,8 +120,7 @@ sanitizeInventory();
 
 for (const [name, file] of Object.entries(targets)) {
   assertAscii(read(file), file);
-  const { spawnSync } = requireCompat();
-  const result = spawnSync(process.execPath, ['--check', file], { encoding: 'utf8' });
-  if (result.status !== 0) throw new Error(`Syntax validation failed for ${name}: ${(result.stderr || result.stdout || '').trim()}`);
+  assertSyntax(file);
+  console.log(`validated ${name}: ${file}`);
 }
 console.log('SECURITY SANITIZATION APPLIED: http-functions.js, events.js, inventario.web.js');
