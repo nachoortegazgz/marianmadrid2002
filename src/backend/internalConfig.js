@@ -1,17 +1,20 @@
-/*
-=============================================================================
-MODULE: backend/internalConfig.js
-VERSION: v19.8.0-excellence-consolidated
-RESPONSIBILITY: Centralized Backend Configuration, Collections Enum,
-            SDK Timeouts, Concurrency Guards, and Domain Enums.
-STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
-=============================================================================
-*/
+/**
+ * =============================================================================
+ * MODULE: backend/internalConfig.js
+ * VERSION: v19.6.16-canonical-ssot
+ * RESPONSIBILITY: Centralized Backend Configuration, Collections Enum,
+ *                 SDK Timeouts, Concurrency Guards, and Domain Enums.
+ * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
+ * =============================================================================
+ */
+
 export const COLLECTIONS = Object.freeze({
     SERVICIOS_CITA: "Import2",
-    ADDONS_CATALOGO: "AddonsCatalogo",
-    SERVICIOSOPCIONESADDON: "AddonsCatalogo",
+    EXTRAS_CATALOGO: "AddonsCatalogo",
     MAPA_STAFF: "MapaStaff",
+    // Temporary compatibility alias: new code must use EXTRAS_CATALOGO.
+    ADDONS_CATALOGO: "AddonsCatalogo",
+    SERVICIOS_OPCIONES_ADDON: "AddonsCatalogo",
     DUAL_CACHE: "DualSlotCache",
     DAYS_CACHE: "AvailabilityDaysCache",
     SLOTS_CACHE: "AvailabilitySlotsCache",
@@ -19,29 +22,40 @@ export const COLLECTIONS = Object.freeze({
     TRANSACTIONS: "BookingTransactions",
     LOCKS: "MM_LOCKS",
     COMPENSATIONS: "PendingCompensations",
+    BOOKINGS_SERVICE_SYNC_QUEUE: "BookingsServiceSyncQueue",
     MOVIMIENTOS_CAJA: "movimientoCaja",
     CAJA_ACTUAL: "cajaActual",
-    HISTORICOCIERRESZ: "HISTORICOCIERRESZ",
-    CONTEOSX: "RESUMENCONTEO_X",
+    HISTORICO_CIERRES_Z: "HISTORICO_CIERRES_Z",
+    CONTEOS_X: "RESUMEN_CONTEO_X",
     CONTADORES_FISCALES: "SecuenciaTickets",
-    REGISTROHORARIO: "REGISTROHORARIO",
+    REGISTRO_HORARIO: "REGISTRO_HORARIO",
     PRODUCTOS_VENTA: "InventarioProductos",
-    INVENTARIO_PRODUCTOS: "InventarioProductos",
+    INVENTARIO_PRODUCTOS: "InventarioProductos", // Alias de compatibilidad para stock esperado.
     MOVIMIENTO_INVENTARIO: "movimientoInventario",
-    CONCILIACIONSTOCKWIX: "ConciliacionStockWix",
-    PROVEEDORES_INVENTARIO: "ProveedoresInventario",
-    AUDITLOG: "MMAUDIT_LOG",
+    CONCILIACION_STOCK_WIX: "ConciliacionStockWix",
+    AUDIT_LOG: "MM_AUDIT_LOG",
     SYNC_LOG: "m365SyncLog",
-    PLANCUENTASCONTABLES: "PLANCUENTASCONTABLES",
-    ASIENTOSCONTABLES: "ASIENTOSCONTABLES",
-    LINEASASIENTOCONTABLE: "LINEASASIENTOCONTABLE",
-    LIBROIVAFACTURASEXPEDIDAS: "LIBROIVAFACTURASEXPEDIDAS",
-    LIBROIVAFACTURASRECIBIDAS: "LIBROIVAFACTURASRECIBIDAS",
-    MAYORCONTABLESALDOS: "MAYORCONTABLESALDOS",
-    LIBROINVENTARIOCIERRE: "LIBROINVENTARIOCIERRE",
-    EVENTOSSISTEMAFACTURACION: "EVENTOSSISTEMAFACTURACION",
-    LIBROIVABIENESINVERSION: "LIBROIVABIENESINVERSION",
-    LIBROIVAINTRACOMUNITARIO: "LIBROIVAINTRACOMUNITARIO",
+    CONFIGURACION_FISCAL: "CONFIGURACION_FISCAL",
+    PLAN_CUENTAS_CONTABLES: "PLAN_CUENTAS_CONTABLES",
+    ASIENTOS_CONTABLES: "ASIENTOS_CONTABLES",
+    LINEAS_ASIENTO_CONTABLE: "LINEAS_ASIENTO_CONTABLE",
+    LIBRO_IVA_FACTURAS_EXPEDIDAS: "LIBRO_IVA_FACTURAS_EXPEDIDAS",
+    LIBRO_IVA_FACTURAS_RECIBIDAS: "LIBRO_IVA_FACTURAS_RECIBIDAS",
+    LIBRO_IVA_BIENES_INVERSION: "LIBRO_IVA_BIENES_INVERSION",
+    LIBRO_IVA_INTRACOMUNITARIO: "LIBRO_IVA_INTRACOMUNITARIO",
+    MAYOR_CONTABLE_SALDOS: "MAYOR_CONTABLE_SALDOS",
+    LIBRO_INVENTARIO_CIERRE: "LIBRO_INVENTARIO_CIERRE",
+    EVENTOS_SISTEMA_FACTURACION: "EVENTOS_SISTEMA_FACTURACION",
+});
+
+export const SERVICE_CATALOG = Object.freeze({
+    STATES: Object.freeze(["ACTIVO", "INACTIVO", "BORRADOR"]),
+    CATEGORIES: Object.freeze(["PELUQUERIA", "ESTETICA", "UNAS", "COMBINADO", "PRODUCTO"]),
+    CURRENCY: "EUR",
+    MAX_TITLE_LENGTH: 160,
+    MAX_SUMMARY_LENGTH: 120,
+    MAX_DESCRIPTION_LENGTH: 6000,
+    MAX_DURATION_MINUTES: 1440,
 });
 
 export const APP_IDS = Object.freeze({
@@ -55,7 +69,7 @@ export const SDK_CONFIG = Object.freeze({
     LOCATION_ID: "7a12abfd-bf30-4847-bcdf-00dc573d4802",
     LOCATION_TYPES: Object.freeze({
         TIME_SLOTS: "BUSINESS",
-        BOOKINGSWRITER: "OWNERBUSINESS",
+        BOOKINGS_WRITER: "OWNER_BUSINESS",
     }),
     TIMEOUTS: Object.freeze({
         API_MS: 15000,
@@ -64,57 +78,57 @@ export const SDK_CONFIG = Object.freeze({
         WEBHOOK_MS: 30000,
     }),
     CACHE: Object.freeze({
-        SERVICESTTLMS: 600000,
-        SLOTSCACHETTL_MS: 120000,
-        DUALCACHETTL_MS: 900000,
-        STAFFTTLMS: 300000,
+        SERVICES_TTL_MS: 600000,
+        SLOTS_CACHE_TTL_MS: 120000,
+        DUAL_CACHE_TTL_MS: 900000,
+        STAFF_TTL_MS: 300000,
         MAX_ENTRIES: 100,
-        DAYSCACHEVERSION: 1,
+        DAYS_CACHE_VERSION: 1,
     }),
     SECURITY: Object.freeze({
-        SECRETCACHETTL_MS: 300000,
-        RATELIMITCACHECLEANUPTTL_MS: 60000,
-        RATELIMITCACHEMAXENTRIES: 5000,
+        SECRET_CACHE_TTL_MS: 300000,
+        RATE_LIMIT_CACHE_CLEANUP_TTL_MS: 60000,
+        RATE_LIMIT_CACHE_MAX_ENTRIES: 5000,
     }),
     RATE_LIMIT: Object.freeze({
         MAX_REQUESTS: 20,
         WINDOW_MS: 5000,
-        BOOKINGMAXREQUESTS: 5,
-        BOOKINGWINDOWMS: 10000,
+        BOOKING_MAX_REQUESTS: 5,
+        BOOKING_WINDOW_MS: 10000,
     }),
     JOBS: Object.freeze({
         TIMEOUT_MS: 30000,
-        AUDITRETENTIONDAYS: 90,
-        DELETEBATCHSIZE: 100,
-        DELETEMAXPAGES: 10,
-        DUALCACHECLEANUP_LIMIT: 100,
-        FISCALRECOVERYBATCH_SIZE: 25,
-        HEALTHCHECKQUERY_LIMIT: 100,
-        FISCALDAILYMAX_PAGES: 10,
+        AUDIT_RETENTION_DAYS: 90,
+        DELETE_BATCH_SIZE: 100,
+        DELETE_MAX_PAGES: 10,
+        DUAL_CACHE_CLEANUP_LIMIT: 100,
+        FISCAL_RECOVERY_BATCH_SIZE: 25,
+        HEALTH_CHECK_QUERY_LIMIT: 100,
+        FISCAL_DAILY_MAX_PAGES: 10,
+        BOOKINGS_SERVICE_SYNC_BATCH_SIZE: 10,
+        BOOKINGS_SERVICE_SYNC_MAX_ATTEMPTS: 3,
+        BOOKINGS_SERVICE_SYNC_BACKOFF_MS: 300000,
     }),
     EVENTS: Object.freeze({
         RETRY_ATTEMPTS: 3,
-        RETRYBASEBACKOFF_MS: 1000,
+        RETRY_BASE_BACKOFF_MS: 1000,
     }),
     EXTERNAL_HTTP: Object.freeze({
-        RATELIMITMAX_REQUESTS: 20,
-        RATELIMITWINDOW_MS: 5000,
-        HMACMAXCLOCKSKEWSECONDS: 60,
-        CORSALLOWEDORIGINS: ["https://www.marianmadrid.es", "https://marianmadrid.es"],
-    }),
-    FISCAL: Object.freeze({
-        NIF_EMISOR: null,
+        RATE_LIMIT_MAX_REQUESTS: 20,
+        RATE_LIMIT_WINDOW_MS: 5000,
+        HMAC_MAX_CLOCK_SKEW_SECONDS: 60,
+        CORS_ALLOWED_ORIGINS: ["https://www.marianmadrid.es", "https://marianmadrid.es"],
     }),
 });
 
 export const CONCURRENCY = Object.freeze({
-    MUTEXTTLMS: 120000,
+    MUTEX_TTL_MS: 120000,
     HEARTBEAT_MS: 15000,
-    TRANSACTIONPOLLBASE_MS: 250,
-    TRANSACTIONMAXWAIT_MS: 3000,
-    LOCKCLEANUPGRACE_MS: 60000,
-    MAXCOMPENSATIONRETRIES: 3,
-    LEDGERMUTEXTTL_MS: 45000,
+    TRANSACTION_POLL_BASE_MS: 250,
+    TRANSACTION_MAX_WAIT_MS: 3000,
+    LOCK_CLEANUP_GRACE_MS: 60000,
+    MAX_COMPENSATION_RETRIES: 3,
+    LEDGER_MUTEX_TTL_MS: 45000,
 });
 
 export const SLOT_SEARCH = Object.freeze({
@@ -123,22 +137,26 @@ export const SLOT_SEARCH = Object.freeze({
 });
 
 export const API = Object.freeze({
-    STAFFRESOURCETYPE_ID: "9b626e2e-f4ec-4ae7-a25e-149b5c3be095",
+    STAFF_RESOURCE_TYPE_ID: "1cd44cf8-756f-41c3-bd90-3e2ffcaf1155",
+});
+
+export const STAFF_ACCESS = Object.freeze({
+    MARIAN_RESOURCE_ID: "e556070a-6d6a-402e-8422-11133033ea76",
 });
 
 export const TIPO_FICHAJE = Object.freeze({
     ENTRADA: "ENTRADA",
     SALIDA: "SALIDA",
-    PAUSAINICIO: "PAUSAINICIO",
-    PAUSAFIN: "PAUSAFIN",
+    PAUSA_INICIO: "PAUSA_INICIO",
+    PAUSA_FIN: "PAUSA_FIN",
     AJUSTE: "AJUSTE",
 });
 
 export const TIPO_MOVIMIENTO = Object.freeze({
-    VENTAEFECTIVO: "VENTAEFECTIVO",
-    VENTATARJETA: "VENTATARJETA",
-    VENTABIZUM: "VENTABIZUM",
-    VENTAONLINE: "VENTAONLINE",
+    VENTA_EFECTIVO: "VENTA_EFECTIVO",
+    VENTA_TARJETA: "VENTA_TARJETA",
+    VENTA_BIZUM: "VENTA_BIZUM",
+    VENTA_ONLINE: "VENTA_ONLINE",
     REEMBOLSO: "REEMBOLSO",
     AJUSTE: "AJUSTE",
 });
@@ -170,25 +188,24 @@ export const CITA_FIELDS = Object.freeze({
 
 export const ESTADO_CITA = Object.freeze({
     CONFIRMED: "CONFIRMED",
-    PENDINGPAYMENT: "PENDINGPAYMENT",
+    PENDING_PAYMENT: "PENDING_PAYMENT",
     CANCELED: "CANCELED",
     REFUNDED: "REFUNDED",
 });
 
 export const ESTADO_PAGO = Object.freeze({
     UNPAID: "UNPAID",
-    PENDINGPAYMENT: "PENDINGPAYMENT",
-    PENDINGLEDGER: "PENDINGLEDGER",
+    PENDING_PAYMENT: "PENDING_PAYMENT",
+    PENDING_LEDGER: "PENDING_LEDGER",
     PAID: "PAID",
     REFUNDED: "REFUNDED",
-    PARTIALLYREFUNDED: "PARTIALLYREFUNDED",
+    PARTIALLY_REFUNDED: "PARTIALLY_REFUNDED",
 });
 
 export const COLLAB_ROLES = Object.freeze({
     ADMIN: "ADMIN",
     GESTION: "GESTION",
     ESTILISTA: "ESTILISTA",
-    MARIANMANAGER: "MARIANMANAGER",
 });
 
 export const JWT = Object.freeze({

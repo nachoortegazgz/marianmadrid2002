@@ -1,23 +1,31 @@
-/*
-=============================================================================
-FILE: backend/security.web.js
-VERSION: v19.8.0-excellence-consolidated
-RESPONSIBILITY: Web-module facade for RBAC checks (thin wrapper).
-STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
-=============================================================================
-*/
-import { webMethod, Permissions } from 'wix-web-module';
+/**
+ * =============================================================================
+ * FILE: backend/security.web.js
+ * VERSION: v18.8.16-strict
+ * RESPONSIBILITY: Web-module facade for RBAC checks (thin wrapper).
+ *
+ * CHANGES (v18.8.16):
+ * - Propagate typed error codes from backend/security.js (err.code) when available.
+ * - Keep stable {status,data,error} contract for widgets/pages.
+ * - Keep Permissions.SiteMember (forced login pattern).
+ * HISTORIAL:
+ * - v18.8.16-strict: Header standardized during V2 compliance review.
+ * =============================================================================
+ */
+import { webMethod, Permissions } from "wix-web-module";
 import {
     isAdmin,
     isCajero,
-    isStaffCollaborator,
     isMarianManager,
+    isStaffCollaborator,
     requireAdmin as requireAdminInternal
 } from 'backend/security';
 
-function toPublicError(err, fallbackCode = 'ACCESSDENIED', fallbackMessage = 'Acceso denegado.') {
+function _toPublicError(err, fallbackCode = 'ACCESS_DENIED', fallbackMessage = 'Acceso denegado.') {
     const code = String(err?.code || fallbackCode);
     const message = String(err?.message || fallbackMessage);
+
+    // Never leak internal meta; keep it minimal.
     return { code, message };
 }
 
@@ -36,22 +44,19 @@ export const checkStaffCollaboratorAccess = webMethod(
                     }
                 };
             }
+
             const [admin, cajero, marianManager] = await Promise.all([
                 isAdmin(traceId),
                 isCajero(traceId),
-                isMarianManager(traceId)
+                isMarianManager(traceId),
             ]);
             return {
                 status: 'SUCCESS',
-                data: {
-                    isAdmin: !!admin,
-                    isCajero: !!cajero,
-                    isMarianManager: !!marianManager
-                },
-                error: null
+                data: { isAdmin: !!admin, isCajero: !!cajero, isMarianManager: !!marianManager },
+                error: null,
             };
         } catch (err) {
-            return { status: 'ERROR', data: null, error: toPublicError(err, 'ACCESSDENIED') };
+            return { status: 'ERROR', data: null, error: _toPublicError(err, 'ACCESS_DENIED') };
         }
     }
 );
@@ -63,7 +68,7 @@ export const requireAdmin = webMethod(
             await requireAdminInternal(traceId);
             return { status: 'SUCCESS', data: true, error: null };
         } catch (err) {
-            return { status: 'ERROR', data: null, error: toPublicError(err, 'ADMINREQUIRED') };
+            return { status: 'ERROR', data: null, error: _toPublicError(err, 'ADMIN_REQUIRED') };
         }
     }
 );

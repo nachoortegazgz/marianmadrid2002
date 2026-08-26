@@ -1,3 +1,25 @@
 {
-  "extends": ["plugin:@wix/cli/recommended"]
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended"],
+  "globals": {
+    "$w": "readonly"
+  },
+  "ignorePatterns": ["node_modules/", ".wix/"],
+  "rules": {
+    "no-console": ["error", { "allow": ["info", "warn", "error"] }],
+    "no-debugger": "error",
+    "no-duplicate-imports": "error",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^(context|_)", "varsIgnorePattern": "^_", "ignoreRestSiblings": true }],
+    "no-var": "error",
+    "prefer-const": "error"
+  }
 }

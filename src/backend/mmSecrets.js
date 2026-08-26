@@ -1,21 +1,21 @@
-/*
-=============================================================================
-FILE: backend/mmSecrets.js
-VERSION: v19.8.0-excellence-consolidated
-RESPONSIBILITY: Private catalog of Wix Secrets Manager key names.
-STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
-=============================================================================
-*/
+/**
+ * =============================================================================
+ * FILE: backend/mmSecrets.js
+ * VERSION: v19.6.16-canonical-ssot
+ * RESPONSIBILITY: Private catalog of Wix Secrets Manager key names.
+ * STANDARDS: Velo V3, SDK V2, G10 ASCII Strict (0 non-ASCII characters).
+ * =============================================================================
+ */
+
 export const SECRETS = Object.freeze({
-    FISCALKEY: "SECRETFISCALKEY",
-    FISCALNIFEMISOR: "FISCALNIFEMISOR",
-    AUTHJWTKEY: "SECRETAUTHJWT_KEY",
-    ADMINEMAILS: "ADMINEMAILS",
-    CAJEROEMAILS: "CAJEROEMAILS",
-    POWERAUTOMATE: "POWERAUTOMATE_TOKEN",
-    SENDGRIDKEY: "SENDGRIDAPI_KEY",
-    MAPASTAFF: "MAPASTAFF",
-    WIXAPPKEY: "APP_KEY",
-    BOOKINGSTOKEN: "BOOKINGSAPI_TOKEN",
-    MARIANASSISTANTOPENAIKEY: "MARIANASSISTANTOPENAIKEY",
+    FISCAL_KEY: "SECRET_FISCALKEY",
+    FISCAL_NIF_EMISOR: "FISCAL_NIF_EMISOR",
+    AUTH_JWT_KEY: "SECRET_AUTH_JWT_KEY",
+    ADMIN_EMAILS: "ADMIN_EMAILS",
+    CAJERO_EMAILS: "CAJERO_EMAILS",
+    POWER_AUTOMATE: "POWER_AUTOMATE_TOKEN",
+    SENDGRID_KEY: "SENDGRID_API_KEY",
+    WIX_APP_KEY: "APP_KEY",
+    BOOKINGS_TOKEN: "BOOKINGS_API_TOKEN",
+    MARIAN_ASSISTANT_OPENAI_KEY: "MARIAN_ASSISTANT_OPENAI_KEY",
 });

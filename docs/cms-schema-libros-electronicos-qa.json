@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "2026-08-25-production-schema-v1",
+  "status": "PARTIALLY_APPLIED_PRODUCTION_SCHEMA",
+  "purpose": "Contrato de colecciones para libro diario, mayor, libros IVA y evidencias técnicas. Creado en producción el 25 de agosto de 2026 por autorización expresa; la aplicación contable y fiscal sigue requiriendo validación de gestoría antes de cualquier uso para presentación o legalización.",
+  "conventions": {
+    "collectionId": "MAYUSCULAS_CON_GUIONES_BAJOS",
+    "fieldId": "camelCase en castellano sin tildes ni enie",
+    "money": "NUMBER con redondeo a dos decimales en backend",
+    "dateTime": "DATETIME UTC; zona horaria almacenada como texto IANA cuando sea necesaria",
+    "systemFields": ["_id", "_createdDate", "_updatedDate", "_owner"],
+    "writePolicy": "append-only; rectificaciones por registros vinculados, nunca por alteración de una línea confirmada"
+  },
+  "collections": [
+    {
+      "id": "CONFIGURACION_FISCAL",
+      "displayName": "CONFIGURACION_FISCAL",
+      "purpose": "Constantes no secretas del emisor, periodos y versiones de integración fiscal.",
+      "singletonId": "EMISOR_PRINCIPAL",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "fields": [["nombreRazonSocial", "TEXT", true], ["nifEmisor", "TEXT", true], ["direccionFiscal", "TEXT", false], ["codigoPostalFiscal", "TEXT", false], ["municipioFiscal", "TEXT", false], ["provinciaFiscal", "TEXT", false], ["paisFiscal", "TEXT", true], ["moneda", "TEXT", true], ["zonaHoraria", "TEXT", true], ["regimenIva", "TEXT", false], ["sujetoSii", "BOOLEAN", true], ["serieFacturaPredeterminada", "TEXT", false], ["versionConfiguracion", "TEXT", true], ["activo", "BOOLEAN", true], ["fechaActualizacion", "DATETIME", true]],
+      "indexes": [["nifEmisor", true]]
+    },
+    {
+      "id": "PLAN_CUENTAS_CONTABLES",
+      "displayName": "PLAN_CUENTAS_CONTABLES",
+      "purpose": "Mapa de cuentas y dimensiones analíticas validado por gestoría; no codifica decisiones contables en el frontend.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "fields": [["codigoCuentaContable", "TEXT", true], ["nombreCuentaContable", "TEXT", true], ["grupoCuentaContable", "TEXT", true], ["subgrupoCuentaContable", "TEXT", false], ["naturalezaCuenta", "TEXT", true], ["categoriaOperacion", "TEXT", false], ["subcategoriaOperacion", "TEXT", false], ["codigoCuentaDebePredeterminada", "TEXT", false], ["nombreCuentaDebePredeterminada", "TEXT", false], ["codigoCuentaHaberPredeterminada", "TEXT", false], ["nombreCuentaHaberPredeterminada", "TEXT", false], ["codigoCuentaIvaRepercutido", "TEXT", false], ["nombreCuentaIvaRepercutido", "TEXT", false], ["codigoCuentaIvaSoportado", "TEXT", false], ["nombreCuentaIvaSoportado", "TEXT", false], ["tipoIvaPredeterminado", "NUMBER", false], ["centroCostePredeterminado", "TEXT", false], ["activa", "BOOLEAN", true], ["validadaPorGestoria", "BOOLEAN", false], ["fechaValidacion", "DATETIME", false], ["fechaActualizacion", "DATETIME", true]],
+      "indexes": [["codigoCuentaContable", true], ["activa", false], ["categoriaOperacion", false]]
+    },
+    {
+      "id": "ASIENTOS_CONTABLES",
+      "displayName": "ASIENTOS_CONTABLES",
+      "purpose": "Cabecera inmutable de un hecho económico equilibrado por líneas Debe/Haber.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idAsiento", "TEXT", true], ["numeroAsiento", "NUMBER", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["fechaOperacion", "DATETIME", true], ["fechaHoraRegistro", "DATETIME", true], ["zonaHorariaOperacion", "TEXT", true], ["tipoAsiento", "TEXT", true], ["categoriaOperacion", "TEXT", true], ["subcategoriaOperacion", "TEXT", false], ["conceptoAsiento", "TEXT", true], ["origenRegistro", "TEXT", true], ["idOrigen", "TEXT", true], ["idTransaccion", "TEXT", true], ["idPedidoWix", "TEXT", false], ["idDevolucionWix", "TEXT", false], ["idReservaWix", "TEXT", false], ["referenciaExterna", "TEXT", false], ["serieFactura", "TEXT", false], ["numeroFactura", "TEXT", false], ["fechaExpedicionFactura", "DATETIME", false], ["fechaOperacionFiscal", "DATETIME", false], ["tipoFactura", "TEXT", false], ["idAsientoRectificado", "TEXT", false], ["motivoRectificacion", "TEXT", false], ["moneda", "TEXT", true], ["totalDebe", "NUMBER", true], ["totalHaber", "NUMBER", true], ["importeTotalDocumento", "NUMBER", false], ["medioPago", "TEXT", false], ["estadoAsiento", "TEXT", true], ["idResponsableOperativo", "TEXT", false], ["idMiembroRegistrador", "TEXT", true], ["nombreRegistrador", "TEXT", false], ["idCentroCoste", "TEXT", false], ["codigoActividadIae", "TEXT", false], ["versionEsquema", "TEXT", true], ["versionAlgoritmoIntegridad", "TEXT", true], ["hashAnterior", "TEXT", true], ["hashAsiento", "TEXT", true], ["firmaAsiento", "TEXT", true], ["idTraza", "TEXT", true]],
+      "indexes": [["idAsiento", true], ["numeroAsiento", true], ["idTransaccion", true], ["fechaOperacion", "numeroAsiento"], ["ejercicioFiscal", "periodoFiscal"], ["idPedidoWix", false], ["idReservaWix", false], ["estadoAsiento", "fechaOperacion"]]
+    },
+    {
+      "id": "LINEAS_ASIENTO_CONTABLE",
+      "displayName": "LINEAS_ASIENTO_CONTABLE",
+      "purpose": "Detalle inmutable de la partida doble y del desglose fiscal y analítico de cada asiento.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idLineaAsiento", "TEXT", true], ["idAsiento", "TEXT", true], ["numeroLinea", "NUMBER", true], ["fechaOperacion", "DATETIME", true], ["codigoCuentaContable", "TEXT", true], ["nombreCuentaContable", "TEXT", true], ["grupoCuentaContable", "TEXT", false], ["importeDebe", "NUMBER", true], ["importeHaber", "NUMBER", true], ["importeNeto", "NUMBER", true], ["categoriaOperacion", "TEXT", true], ["idCentroCoste", "TEXT", false], ["idResponsableOperativo", "TEXT", false], ["codigoProductoServicio", "TEXT", false], ["descripcionLinea", "TEXT", true], ["baseImponible", "NUMBER", false], ["tipoIva", "NUMBER", false], ["cuotaIva", "NUMBER", false], ["claveOperacionIva", "TEXT", false], ["nifContraparte", "TEXT", false], ["nombreContraparte", "TEXT", false], ["referenciaExterna", "TEXT", false], ["idTraza", "TEXT", true], ["hashLinea", "TEXT", true], ["fechaHoraRegistro", "DATETIME", true]],
+      "indexes": [["idLineaAsiento", true], ["idAsiento", "numeroLinea"], ["codigoCuentaContable", "fechaOperacion"], ["fechaOperacion", false], ["categoriaOperacion", "fechaOperacion"]]
+    },
+    {
+      "id": "LIBRO_IVA_FACTURAS_EXPEDIDAS",
+      "displayName": "LIBRO_IVA_FACTURAS_EXPEDIDAS",
+      "purpose": "Proyección fiscal de facturas emitidas y rectificativas, basada en el diario y en el documento nativo de origen.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idRegistroIva", "TEXT", true], ["idAsiento", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["codigoActividad", "TEXT", false], ["tipoActividad", "TEXT", false], ["epigrafeIae", "TEXT", false], ["tipoFactura", "TEXT", true], ["conceptoIngreso", "TEXT", false], ["importeIngresoComputable", "NUMBER", false], ["fechaExpedicion", "DATETIME", true], ["fechaOperacion", "DATETIME", false], ["serieFactura", "TEXT", false], ["numeroFactura", "TEXT", true], ["numeroFacturaFinal", "TEXT", false], ["tipoIdentificacionDestinatario", "TEXT", false], ["codigoPaisDestinatario", "TEXT", false], ["nifDestinatario", "TEXT", false], ["nombreDestinatario", "TEXT", false], ["claveOperacion", "TEXT", false], ["calificacionOperacion", "TEXT", false], ["operacionExenta", "TEXT", false], ["importeTotalFactura", "NUMBER", true], ["baseImponible", "NUMBER", true], ["tipoIva", "NUMBER", true], ["cuotaIvaRepercutida", "NUMBER", true], ["tipoRecargoEquivalencia", "NUMBER", false], ["cuotaRecargoEquivalencia", "NUMBER", false], ["fechaCobro", "DATETIME", false], ["importeCobrado", "NUMBER", false], ["medioCobro", "TEXT", false], ["identificacionMedioCobro", "TEXT", false], ["tipoRetencionIrpf", "NUMBER", false], ["importeRetenidoIrpf", "NUMBER", false], ["referenciaExterna", "TEXT", false], ["idFacturaRectificada", "TEXT", false], ["idTraza", "TEXT", true], ["fechaHoraRegistro", "DATETIME", true]],
+      "indexes": [["idRegistroIva", true], ["idAsiento", true], ["ejercicioFiscal", "periodoFiscal"], ["serieFactura", "numeroFactura"], ["fechaExpedicion", false], ["nifDestinatario", false]]
+    },
+    {
+      "id": "LIBRO_IVA_FACTURAS_RECIBIDAS",
+      "displayName": "LIBRO_IVA_FACTURAS_RECIBIDAS",
+      "purpose": "Registro documental de facturas de proveedores y gastos, con soporte de IVA deducible y pago.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idRegistroIva", "TEXT", true], ["idAsiento", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["codigoActividad", "TEXT", false], ["tipoActividad", "TEXT", false], ["epigrafeIae", "TEXT", false], ["tipoFactura", "TEXT", true], ["conceptoGasto", "TEXT", false], ["importeGastoDeducible", "NUMBER", false], ["fechaExpedicion", "DATETIME", true], ["fechaOperacion", "DATETIME", false], ["fechaRecepcion", "DATETIME", true], ["serieNumeroFacturaProveedor", "TEXT", true], ["numeroFacturaFinal", "TEXT", false], ["numeroRecepcion", "TEXT", false], ["numeroRecepcionFinal", "TEXT", false], ["tipoIdentificacionProveedor", "TEXT", false], ["codigoPaisProveedor", "TEXT", false], ["nifProveedor", "TEXT", true], ["nombreProveedor", "TEXT", true], ["claveOperacion", "TEXT", false], ["bienInversion", "BOOLEAN", false], ["inversionSujetoPasivo", "BOOLEAN", false], ["deduciblePeriodoPosterior", "BOOLEAN", false], ["ejercicioDeduccion", "NUMBER", false], ["periodoDeduccion", "TEXT", false], ["importeTotalFactura", "NUMBER", true], ["baseImponible", "NUMBER", true], ["tipoIva", "NUMBER", true], ["cuotaIvaSoportado", "NUMBER", true], ["cuotaIvaDeducible", "NUMBER", false], ["tipoRecargoEquivalencia", "NUMBER", false], ["cuotaRecargoEquivalencia", "NUMBER", false], ["fechaPago", "DATETIME", false], ["importePagado", "NUMBER", false], ["medioPago", "TEXT", false], ["identificacionMedioPago", "TEXT", false], ["tipoRetencionIrpf", "NUMBER", false], ["importeRetenidoIrpf", "NUMBER", false], ["referenciaExterna", "TEXT", false], ["idTraza", "TEXT", true], ["fechaHoraRegistro", "DATETIME", true]],
+      "indexes": [["idRegistroIva", true], ["idAsiento", true], ["ejercicioFiscal", "periodoFiscal"], ["serieNumeroFacturaProveedor", false], ["fechaRecepcion", false], ["nifProveedor", false]]
+    },
+    {
+      "id": "MAYOR_CONTABLE_SALDOS",
+      "displayName": "MAYOR_CONTABLE_SALDOS",
+      "purpose": "Proyección reconstruible por cuenta y periodo; nunca se usa como fuente de verdad.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "fields": [["idMayor", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["codigoCuentaContable", "TEXT", true], ["nombreCuentaContable", "TEXT", true], ["saldoInicialDebe", "NUMBER", true], ["saldoInicialHaber", "NUMBER", true], ["movimientosDebe", "NUMBER", true], ["movimientosHaber", "NUMBER", true], ["saldoFinalDebe", "NUMBER", true], ["saldoFinalHaber", "NUMBER", true], ["fechaCalculo", "DATETIME", true], ["idTraza", "TEXT", true]],
+      "indexes": [["idMayor", true], ["ejercicioFiscal", "periodoFiscal", "codigoCuentaContable"]]
+    },
+    {
+      "id": "LIBRO_INVENTARIO_CIERRE",
+      "displayName": "LIBRO_INVENTARIO_CIERRE",
+      "purpose": "Snapshot inmutable de inventario y saldos para cierre de ejercicio o periodo autorizado.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idCierreInventario", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["fechaCierre", "DATETIME", true], ["tipoCierre", "TEXT", true], ["idProducto", "TEXT", false], ["sku", "TEXT", false], ["descripcionProducto", "TEXT", false], ["cantidadExistencias", "NUMBER", false], ["costeUnitario", "NUMBER", false], ["valorExistencias", "NUMBER", false], ["codigoCuentaContable", "TEXT", false], ["saldoDebe", "NUMBER", false], ["saldoHaber", "NUMBER", false], ["hashCierre", "TEXT", true], ["firmaCierre", "TEXT", true], ["idTraza", "TEXT", true]],
+      "indexes": [["idCierreInventario", true], ["ejercicioFiscal", "fechaCierre"], ["sku", false]]
+    },
+    {
+      "id": "EVENTOS_SISTEMA_FACTURACION",
+      "displayName": "EVENTOS_SISTEMA_FACTURACION",
+      "purpose": "Evidencia técnica append-only de configuración, integridad, errores y operaciones relevantes del sistema de facturación.",
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "appendOnly": true,
+      "fields": [["idEventoSistema", "TEXT", true], ["fechaHoraEvento", "DATETIME", true], ["tipoEvento", "TEXT", true], ["severidad", "TEXT", true], ["origenEvento", "TEXT", true], ["idUsuarioResponsable", "TEXT", false], ["idMiembroResponsable", "TEXT", false], ["idAsiento", "TEXT", false], ["idTransaccion", "TEXT", false], ["idReferencia", "TEXT", false], ["versionSistema", "TEXT", true], ["versionEsquema", "TEXT", true], ["resultado", "TEXT", true], ["detalleSeguro", "OBJECT", false], ["hashEventoAnterior", "TEXT", true], ["hashEvento", "TEXT", true], ["firmaEvento", "TEXT", true], ["idTraza", "TEXT", true]],
+      "indexes": [["idEventoSistema", true], ["fechaHoraEvento", false], ["idAsiento", false], ["idTransaccion", false], ["tipoEvento", "fechaHoraEvento"]]
+    },
+    {
+      "id": "LIBRO_IVA_BIENES_INVERSION",
+      "displayName": "LIBRO_IVA_BIENES_INVERSION",
+      "purpose": "Libro condicional de bienes de inversión, que se habilita solo tras confirmar aplicabilidad con gestoría.",
+      "conditional": true,
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "fields": [["idRegistroBien", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["tipoBien", "TEXT", true], ["identificadorBien", "TEXT", true], ["descripcionBien", "TEXT", true], ["fechaInicioUtilizacion", "DATETIME", true], ["valorAdquisicion", "NUMBER", true], ["valorAmortizable", "NUMBER", false], ["metodoAmortizacion", "TEXT", false], ["porcentajeAmortizacion", "NUMBER", false], ["amortizacionAcumulada", "NUMBER", false], ["fechaExpedicionFactura", "DATETIME", true], ["serieNumeroFacturaProveedor", "TEXT", true], ["nifProveedor", "TEXT", true], ["nombreProveedor", "TEXT", true], ["baseImponible", "NUMBER", true], ["tipoIva", "NUMBER", true], ["cuotaIvaDeducible", "NUMBER", false], ["referenciaExterna", "TEXT", false], ["idAsiento", "TEXT", true], ["idTraza", "TEXT", true]],
+      "indexes": [["idRegistroBien", true], ["ejercicioFiscal", "identificadorBien"], ["idAsiento", true]]
+    },
+    {
+      "id": "LIBRO_IVA_INTRACOMUNITARIO",
+      "displayName": "LIBRO_IVA_OPERACIONES_INTRACOMUNITARIAS",
+      "purpose": "Libro condicional para operaciones intracomunitarias; no se activa por defecto.",
+      "conditional": true,
+      "permissions": {"read": "ADMIN", "insert": "ADMIN", "update": "ADMIN", "remove": "ADMIN"},
+      "fields": [["idRegistroOperacion", "TEXT", true], ["idAsiento", "TEXT", true], ["ejercicioFiscal", "NUMBER", true], ["periodoFiscal", "TEXT", true], ["tipoOperacion", "TEXT", true], ["fechaOperacion", "DATETIME", true], ["nifIvaContraparte", "TEXT", true], ["nombreContraparte", "TEXT", true], ["codigoPaisContraparte", "TEXT", true], ["descripcionBienServicio", "TEXT", true], ["importeOperacion", "NUMBER", true], ["referenciaExterna", "TEXT", false], ["idTraza", "TEXT", true]],
+      "indexes": [["idRegistroOperacion", true], ["ejercicioFiscal", "periodoFiscal"], ["idAsiento", true], ["nifIvaContraparte", false]]
+    }
+  ]
+}
