@@ -39,3 +39,9 @@ Antes de retirar los alias se confirmó que los contenidos eran idénticos, que 
 ## Referencias
 
 [1] [Wix — Working with the Velo sidebar and page-code file naming](https://support.wix.com/en/article/velo-working-with-the-velo-sidebar)
+
+## Revisión específica posterior de `src/pages`
+
+Se repitió el inventario sobre `src/pages` después de la limpieza anterior. El estado de trabajo estaba limpio y no aparecieron alias con nombres simples equivalentes a páginas con identificador interno. Persisten dos grupos de plantillas idénticas entre páginas con **nombres e identificadores Wix diferentes**; se conservan íntegramente porque sus identificadores son parte del vínculo con el Editor y no permiten demostrar que representen la misma página.
+
+El resultado operativo es que ya no queda ningún duplicado de `src/pages` que pueda retirarse sin riesgo conforme a la convención Wix. La versión con más optimizaciones se mantiene en el nombre canónico del Editor, y no se ha aplicado ninguna eliminación adicional por similitud de código de plantilla.
