@@ -2,9 +2,9 @@
  * =============================================================================
  * FILE: backend/fiscalAggregator.web.js
  * VERSION: v19.6.16-fiscal-aggregator-aeat
- * RESPONSIBILITY: Aggregates tax summaries for AEAT declarations (Modelo 303,
- *                 Modelo 130, Modelo 390) and generates the official Libro Registro
- *                 de Facturas Expedidas from the immutable Veri*Factu ledger.
+ * RESPONSIBILITY: Produces tax-review summaries and an internal supporting
+ *                 ledger extract from the immutable financial ledger.
+ *                 Outputs require professional review and are not official filings.
  * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
  * =============================================================================
  */

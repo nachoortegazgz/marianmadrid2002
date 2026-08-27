@@ -2,9 +2,9 @@
  * =============================================================================
  * MODULE: backend/cajas.web.js
  * VERSION: v19.6.3-prioritized-reliability-refactor
- * RESPONSIBILITY: POS and Veri*Factu compliant financial ledger with SHA-256
- * hash chains, idempotent transaction recording, and full
- * chain integrity verification.
+ * RESPONSIBILITY: Internal financial ledger with SHA-256 hash chains,
+ * idempotent transaction recording, and chain integrity verification.
+ * It provides technical controls and does not claim tax certification.
  * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
  * CHANGELOG:
  * - v19.5.3-fiscal-recovery-finalization: Finalizes CitasF2 PAID state only after a recovered online ledger succeeds and flags exhausted recoveries for review.
@@ -1065,70 +1065,10 @@ export const registerZClosing = webMethod(Permissions.Admin, async (diaKey, opti
     try {
         _rateLimitOrThrow("cajas.registerZClosing", "admin", traceId);
         await requireAdmin(traceId);
-
         if (!diaKey) throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "diaKey required", { traceId });
 
-        const zId = `Z_${String(diaKey)}`;
-
-        const existingZ = await withTimeout(
-            wixData
-            .query(COLLECTIONS.HISTORICO_CIERRES_Z)
-            .eq("_id", zId)
-            .limit(1)
-            .find({ suppressAuth: true })
-            .catch(() => null),
-            CMS_TIMEOUT_MS,
-            "checkExistingZ"
-        );
-
-        if (existingZ?.items?.length) {
-            return { status: "SUCCESS", data: { ...existingZ.items[0], idempotent: true }, error: null };
-        }
-
-        const integrity = await _verifyIntegrityInternal(diaKey, { traceId });
-        if (!integrity.integrityOk) {
-            throw createBookingError(ERROR_CODES.FISCAL_VIOLATION, "Integrity violation in Z closing", { traceId });
-        }
-
-        const items = await _getAllDailyMovements(diaKey);
-
-        let totalEfectivo = 0,
-            totalTarjeta = 0,
-            totalBizum = 0,
-            totalOnline = 0;
-
-        items.forEach((m) => {
-            const val = Number(m.importeContable) || 0;
-            if (m.formaPago === FORMA_PAGO.EFECTIVO) totalEfectivo += val;
-            if (m.formaPago === FORMA_PAGO.TARJETA) totalTarjeta += val;
-            if (m.formaPago === FORMA_PAGO.BIZUM) totalBizum += val;
-            if (m.formaPago === FORMA_PAGO.ONLINE) totalOnline += val;
-        });
-
-        const totalGeneral = totalEfectivo + totalTarjeta + totalBizum + totalOnline;
-
-        const cierreZ = {
-            _id: zId,
-            diaKey: String(diaKey),
-            totalEfectivo,
-            totalTarjeta,
-            totalBizum,
-            totalOnline,
-            totalGeneral,
-            numOperaciones: items.length,
-            estado: CAJA_STATUS.CLOSED,
-            fechaCierre: new Date(),
-            traceId,
-        };
-
-        const result = await withTimeout(
-            wixData.insert(COLLECTIONS.HISTORICO_CIERRES_Z, cierreZ, { suppressAuth: true }),
-            CMS_TIMEOUT_MS,
-            "insertZClosing"
-        );
-        await _upsertCurrentCashProjection(diaKey, { closed: true });
-
-        return { status: "SUCCESS", data: result, error: null };
+        // The public and scheduled paths must create the same signed Z_V2 record.
+        return await _registerZClosingInternal(String(diaKey), { traceId, autoCron: false });
     } catch (err) {
         return { status: "ERROR", data: null, error: _toPublicError(err, "Z_CLOSING_FAIL") };
     }
@@ -1157,31 +1097,11 @@ export const getCashierState = webMethod(Permissions.SiteMember, async (options 
         const diaKey = options.diaKey || hoyStr.substring(0, 10);
 
         const items = await _getAllDailyMovements(diaKey);
-
-        let saldoEfectivo = 0,
-            saldoTarjeta = 0,
-            saldoBizum = 0,
-            saldoOnline = 0;
-
-        items.forEach((m) => {
-            const amount = Number(m.importeContable) || 0;
-            if (m.formaPago === FORMA_PAGO.EFECTIVO) saldoEfectivo += amount;
-            if (m.formaPago === FORMA_PAGO.TARJETA) saldoTarjeta += amount;
-            if (m.formaPago === FORMA_PAGO.BIZUM) saldoBizum += amount;
-            if (m.formaPago === FORMA_PAGO.ONLINE) saldoOnline += amount;
-        });
+        const projection = _buildCashierProjection(items);
 
         return {
             status: "SUCCESS",
-            data: {
-                diaKey,
-                saldoEfectivo,
-                saldoTarjeta,
-                saldoBizum,
-                saldoOnline,
-                saldoTotal: saldoEfectivo + saldoTarjeta + saldoBizum + saldoOnline,
-                totalOperaciones: items.length,
-            },
+            data: { diaKey, ...projection },
             error: null,
         };
     } catch (err) {

@@ -229,9 +229,9 @@ check('Proyeccion contable solo se activa con mapa validado y preserva partida d
   for (const token of ['ASIENTOS_CONTABLES_beforeInsert', 'ASIENTOS_CONTABLES_beforeUpdate', 'LINEAS_ASIENTO_CONTABLE_beforeInsert', 'LINEAS_ASIENTO_CONTABLE_beforeUpdate']) assert.ok(dataHooks.includes(token), token);
 });
 
-check('Cierre Z conserva resumen fiscal sellado y secuencia verificable', () => {
+check('Cierre Z conserva resumen fiscal sellado, secuencia verificable y una sola ruta de creacion', () => {
   const cashbox = read('src/backend/cajas.web.js');
-  for (const token of ['_buildZClosingSummary', 'resumenTiposMovimiento', 'resumenTipoIva', 'seqInicio', 'seqFin', 'hashInicio', 'hashFin', 'hashCierre', 'firmaCierre', 'integridadVerificada', 'totalPropinas']) assert.ok(cashbox.includes(token), token);
+  for (const token of ['_buildZClosingSummary', 'resumenTiposMovimiento', 'resumenTipoIva', 'seqInicio', 'seqFin', 'hashInicio', 'hashFin', 'hashCierre', 'firmaCierre', 'integridadVerificada', 'totalPropinas', '_registerZClosingInternal(String(diaKey), { traceId, autoCron: false })']) assert.ok(cashbox.includes(token), token);
 });
 
 check('Registro laboral deriva el actor de la sesion y conserva su identificador', () => {
