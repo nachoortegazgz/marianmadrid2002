@@ -50,13 +50,15 @@ check('Web Methods usan el contrato reconocido por el runtime Velo', () => {
   assert.equal(assistant.includes('registerZClosing'), false);
 });
 
-check('ADMINISTRACION reutiliza el controlador exclusivo de Marian', () => {
+check('ADMINISTRACION es exclusiva de Marian y ONLY STAFF conserva sus flujos protegidos', () => {
   const controller = read('src/public/marianAdministrationController.js');
-  const legacy = read('src/pages/ONLY STAFF.mvf3f.js');
+  const staffPage = read('src/pages/ONLY STAFF.mvf3f.js');
   const administration = read('src/pages/ADMINISTRACION.mvf3f.js');
   for (const token of ['checkStaffCollaboratorAccess', 'askMarianAssistant', 'registerManualTransaction', 'registerXCount', 'registerZClosing', 'getInventoryDashboard', 'getQuarterlyTaxSummary', 'previewManagerPackage', 'createManagerPackageVersion', 'downloadManagerPackageVersion', 'getManagerPackageHistory', 'emailManagerPackageVersion', 'DOCUMENT_PREVIEW', 'DOCUMENT_CREATE', 'DOCUMENT_HISTORY', 'DOCUMENT_DOWNLOAD', 'DOCUMENT_EMAIL']) assert.ok(controller.includes(token), token);
-  assert.ok(legacy.includes('initMarianAdministration'));
-  assert.ok(legacy.includes('#htmlOnlyStaff'));
+  for (const token of ['#htmlOnlyStaff', 'registrarFichaje', 'getEstadoJornada', 'getHistorialFichajes', 'calcularHorasTrabajadas', 'registrarAjusteHorario', 'registerManualTransaction', 'registerXCount', 'registerZClosing', 'registerInternalInventoryUse', 'registerInventoryReceipt', 'markInventoryReconciliationApplied', 'CLOCK', 'HOURS_CALC', 'INVENTORY_USE', 'INVENTORY_RECEIPT', '_requiresCashier', '_requiresAdmin']) assert.ok(staffPage.includes(token), token);
+  assert.equal(staffPage.includes('initMarianAdministration'), false);
+  assert.equal(staffPage.includes('previewManagerPackage'), false);
+  assert.equal(staffPage.includes('DOCUMENT_EMAIL'), false);
   assert.ok(administration.includes('initMarianAdministration'));
   assert.ok(administration.includes('#htmlAdministracion'));
 });

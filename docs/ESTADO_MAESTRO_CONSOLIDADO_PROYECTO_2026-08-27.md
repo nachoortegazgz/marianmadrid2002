@@ -53,6 +53,7 @@ El sistema usa una arquitectura de proyecciones y fuentes de verdad separadas. `
 | Inventario | `inventario.web.js`, `events.js` | Consumo interno, recepción, movimientos online y trazabilidad de devoluciones con reabastecimiento confirmado. |
 | Laboral | `horario.web.js`, `REGISTRO_HORARIO` | Registro de jornada vinculado al actor de la sesión. |
 | Administración | `ADMINISTRACION.mvf3f.js`, `marianAdministrationController.js` | Superficie exclusiva de Marian para caja, fiscalidad de apoyo, inventario, documentos y gestoría. |
+| Personal | `ONLY STAFF.mvf3f.js` | Superficie canónica Wix del equipo: jornada, historial y horas, caja según rol e inventario; no expone documentos ni gestoría. |
 | Seguridad | `security.js`, `securityEngine.js`, `mmSecrets.js` | RBAC, allowlists en secretos, rate limiting, HMAC y límites de datos sensibles. |
 | Operación | `crons.js`, `jobs.config`, `.github/` | Limpieza, recuperación, salud, preparación de PDF el día 5, monitor postdespliegue, CI y actualización conservadora de dependencias. |
 
@@ -99,7 +100,7 @@ Dependabot propone semanalmente solo actualizaciones de parches y menores. La CI
 
 ## Estado de la arquitectura y limpieza
 
-La arquitectura se ha revisado y la mejora estructural más reciente quedó integrada en los commits `4aeb43a` y `b14731a`. La auditoría de duplicados y nombres canónicos Wix queda en `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md`; la limpieza elimina solo tres alias exactos y conserva los identificadores del Editor.
+La arquitectura se ha revisado y la mejora estructural más reciente quedó integrada en los commits `4aeb43a` y `b14731a`. La auditoría de duplicados y nombres canónicos Wix queda en `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md`; la limpieza elimina solo tres alias exactos y conserva los identificadores del Editor. La matriz `docs/MATRIZ_ALINEACION_CODIGO_GITHUB_WIX_2026-08-27.md` confirma que la instantánea desarrollada no supera al código actual salvo por los flujos de ONLY STAFF, que se han restaurado de forma compatible con los controles actuales.
 
 | Nivel | Acción | Estado |
 | --- | --- | --- |
@@ -152,6 +153,7 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/EVIDENCIA_PUBLICACION_PREPARACION_PDF_2026-08-27.md` | Evidencia de publicación Wix y comprobación de rutas públicas asociada a esta mejora. |
 | `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md` | Comparativa de duplicados, alias retirados y nombres canónicos conservados. |
 | `docs/EVIDENCIA_AUDITORIA_PUBLICACION_2026-08-27.md` | Estado local/remoto, nombres canónicos y comprobación de publicación y rutas públicas. |
+| `docs/MATRIZ_ALINEACION_CODIGO_GITHUB_WIX_2026-08-27.md` | Comparativa de la instantánea desarrollada, GitHub y Wix; criterio de consolidación de la versión avanzada. |
 
 ## Declaración final de continuidad
 
