@@ -1,24 +1,24 @@
 # Informe ejecutivo del ecosistema Marian Madrid
 
 **Fecha:** 27 de agosto de 2026
-**Estado general:** operativo con controles reforzados; quedan validaciones de producción y ajustes de experiencia prioritarios.
+**Estado general:** base técnica de Fase 1 validada y versionada; queda pendiente la sincronización visual del componente ADMINISTRACIÓN y la QA real aislada antes de declarar el cierre operativo completo.
 
 ## Resumen
 
-El ecosistema de reservas se ha estabilizado sobre una arquitectura con separación clara de responsabilidades: Wix Bookings mantiene agenda, recursos y reservas nativas; `SERVICIOS_CITA` (`Import2`) gobierna el catálogo comercial; `CitasF2` y `BookingTransactions` aportan persistencia e idempotencia; y `movimientoCaja` conserva el registro económico interno como fuente de verdad. El código validado ya está publicado en el sitio desde la rama principal del repositorio.
+El ecosistema de reservas se ha estabilizado sobre una arquitectura con separación clara de responsabilidades: Wix Bookings mantiene agenda, recursos y reservas nativas; `SERVICIOS_CITA` (`Import2`) gobierna el catálogo comercial; `CitasF2` y `BookingTransactions` aportan persistencia e idempotencia; y `movimientoCaja` conserva el registro económico interno como fuente de verdad. El endurecimiento anterior está publicado en el sitio. El commit actual `56eb6f8` está versionado y validado en GitHub, pero todavía requiere el flujo de vista previa/publicación de Wix; un commit de GitHub no equivale a una publicación del sitio.
 
 La funcionalidad principal está cubierta por pruebas automatizadas de reserva simple, reserva dual, disponibilidad del hueco de exposición en un servicio dual, idempotencia, compensación ante error, pagos, devoluciones y encadenamiento del ledger. Aun así, la prueba controlada con una reserva real de QA sigue pendiente: no se han creado cargos reales, reservas de clientes ni proyecciones externas durante esta revisión.
 
 | Área | Estado | Evidencia actual | Próximo control |
 | --- | --- | --- | --- |
-| Código y publicación | **Correcto** | `main` contiene `77f1ecf`; el sitio se publicó desde `origin/main`. | Mantener publicación solo desde cambios revisados. |
+| Código y publicación | **Versionado y validado; publicación pendiente** | `main` contiene `56eb6f8`; CI `Validate Fase 1` terminó correctamente. | Crear vista previa en Wix, revisar Editor y publicar solo tras preservar el diseño reciente. |
 | Seguridad y calidad | **Correcto** | Sanitización, pruebas de contrato, simulaciones, lint y comprobación de diffs superados. | Repetir el conjunto antes de cada publicación. |
 | Reservas simples, duales y hueco de exposición | **Validado en simulación** | Seis pruebas críticas y seis de integración superadas. | Ejecutar QA real aislada, sin clientes ni cobros reales. |
 | Catálogo público | **Correcto** | `/reserva-online` presenta servicios, precios y enlaces de reserva. | Validar la sincronización de un servicio QA desde CMS. |
 | Personal | **Estructura correcta** | `MAPA_STAFF` mantiene tres registros privados, coherentes en volumen con el personal activo. | Verificar individualmente el mapeo de cada recurso sin exponer datos personales. |
 | Colas de sincronización | **Correcto** | Las colas CMS están vacías, privadas y con índices activos. | Monitorizar solo la cola interna de Bookings. |
-| Microsoft 365 | **En pausa solicitada** | No se han configurado secretos, tenant ni escritura SharePoint durante la revisión. | Desactivar de forma explícita el trabajo programado y el encolado M365 en el siguiente cambio publicado. |
-| Experiencia de inicio | **Pendiente** | El inicio muestra «Nada que reservar ahora», aunque la página de catálogo sí funciona. | Corregir o retirar ese bloque contradictorio sin cambiar la agenda. |
+| Microsoft 365 | **Pausa técnica activa** | Bandera SSOT desactivada, encolado bloqueado, job retirado y health marcado como pausado; no hay secretos, tenant ni escrituras externas. | Mantener bloqueado hasta cierre formal de Fase 1 y autorización expresa. |
+| Experiencia de inicio | **Pendiente** | El inicio muestra «Nada que reservar ahora», aunque la página de catálogo sí funciona. | Corregir o retirar ese bloque contradictorio sin cambiar la agenda, usando el Editor estable. |
 
 ## Componentes ya consolidados
 
@@ -38,7 +38,7 @@ Se crearon y endurecieron dos colas CMS vacías. `BookingsServiceSyncQueue` disp
 
 ## Validaciones superadas
 
-La validación final previa a la publicación produjo **7 comprobaciones de sanitización**, **18 comprobaciones de contrato**, **6 simulaciones críticas**, **6 simulaciones de integración realista** y **2 comprobaciones administrativas**, todas satisfactorias. También se ejecutaron correctamente el análisis estático y la comprobación de espacios en los cambios. La sincronización de tipos con Wix terminó correctamente tras resolver una incidencia temporal de autenticación/red.
+La validación final produjo **7 comprobaciones de sanitización**, **19 comprobaciones de contrato**, **1 comprobación del widget**, **6 simulaciones críticas**, **6 simulaciones de integración realista**, **2 comprobaciones administrativas**, **5 simulaciones documentales** y **3 comprobaciones de automatización**, todas satisfactorias. También se ejecutaron correctamente `npm run lint`, `git diff --check` y `npm run sync:types`. La validación continua de GitHub terminó correctamente para `56eb6f8`.
 
 El recorrido público de `/reserva-online` responde y expone categorías, servicios y enlaces de reserva. En cambio, el bloque nativo de reservas incluido en la página de inicio no recupera opciones y comunica una indisponibilidad que contradice el catálogo. Es un problema de presentación y conversión, no una prueba de que Bookings esté vacío; debe corregirse antes de considerar la experiencia final óptima.
 
@@ -46,13 +46,13 @@ El recorrido público de `/reserva-online` responde y expone categorías, servic
 
 Se ha recibido la instrucción de pausar la integración con Microsoft 365. Durante esta tarea **no se han creado credenciales, secretos, aplicaciones de Microsoft Entra, listas SharePoint ni registros externos**. El adaptador y la cola permanecen como capacidad inactiva preparada para una eventual reanudación.
 
-Para que la pausa sea explícita también en la operación futura, el siguiente cambio retirará la ejecución programada de Microsoft 365 y bloqueará el encolado desde el ledger mientras persista la pausa. Esta acción está pendiente únicamente porque la instrucción llegó después de la última publicación; no se debe interpretar la existencia del código preparado como una integración activa.
+La pausa es explícita en la operación actual: se retiró la ejecución programada, el encolado desde el ledger está condicionado por la bandera desactivada y el adaptador no procesa mientras persista la pausa. La existencia del adaptador y la cola no implica integración activa.
 
 ## Riesgos y prioridades inmediatas
 
 | Prioridad | Acción | Motivo |
 | --- | --- | --- |
-| Alta | Aplicar y publicar la pausa técnica completa de Microsoft 365. | Evita ejecuciones programadas o encolado futuros mientras la integración está suspendida. |
+| Alta | Publicar el código que contiene la pausa técnica completa de Microsoft 365. | Hace efectiva en Wix la bandera, el bloqueo de encolado y la retirada del job. |
 | Alta | Resolver el bloque de inicio que indica ausencia de reservas. | Elimina una contradicción visible que reduce conversión y confianza. |
 | Alta | Ejecutar QA real aislada de reserva simple, dual y hueco de exposición. | Convierte la cobertura simulada en evidencia operativa sin afectar a clientes. |
 | Media | Validar un servicio QA completo de `Import2` hacia Bookings. | Confirma la sincronización asíncrona con revisión nativa. |
@@ -62,4 +62,4 @@ Para que la pausa sea explícita también en la operación futura, el siguiente 
 
 ## Conclusión
 
-La base técnica y operativa está en un estado sólido: el sitio publicado sirve el catálogo de reservas, el código dispone de defensas transaccionales y trazabilidad, las colas internas son privadas e idempotentes, y las regresiones pasan de forma consistente. El objetivo de un ecosistema plenamente óptimo aún requiere cerrar tres asuntos: la pausa técnica completa de Microsoft 365, la corrección visual del inicio y la ejecución de pruebas reales controladas de reserva. Ninguno de estos puntos exige alterar datos de clientes ni realizar cobros reales.
+La base técnica y operativa está en un estado sólido: el sitio publicado sirve el catálogo de reservas, el código dispone de defensas transaccionales y trazabilidad, las colas internas son privadas e idempotentes, el ledger V2 conserva naturaleza, IVA, rectificación y líneas, y las regresiones pasan de forma consistente. El cierre formal de Fase 1 aún requiere publicar el commit validado, sincronizar el widget vivo de `#htmlAdministracion`, corregir el bloque contradictorio del inicio y ejecutar QA real aislada de reservas sin clientes ni cobros reales. No se han configurado Resend ni M365, ni se ha enviado información externa.
