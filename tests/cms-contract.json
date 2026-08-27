@@ -11,6 +11,7 @@
     "LOCKS": "MM_LOCKS",
     "COMPENSATIONS": "PendingCompensations",
     "BOOKINGS_SERVICE_SYNC_QUEUE": "BookingsServiceSyncQueue",
+    "M365_GRAPH_SYNC_QUEUE": "M365GraphSyncQueue",
     "MOVIMIENTOS_CAJA": "movimientoCaja",
     "CAJA_ACTUAL": "cajaActual",
     "HISTORICO_CIERRES_Z": "HISTORICO_CIERRES_Z",
@@ -139,6 +140,16 @@
       "nextAttemptAt",
       "traceId",
       "errorCode"
+    ],
+    "M365GraphSyncQueue": [
+      "payload",
+      "payloadHash",
+      "status",
+      "attempts",
+      "nextAttemptAt",
+      "traceId",
+      "errorCode",
+      "externalRecordId"
     ],
     "PendingCompensations": [
       "bookingId",

@@ -23,6 +23,7 @@ export const COLLECTIONS = Object.freeze({
     LOCKS: "MM_LOCKS",
     COMPENSATIONS: "PendingCompensations",
     BOOKINGS_SERVICE_SYNC_QUEUE: "BookingsServiceSyncQueue",
+    M365_GRAPH_SYNC_QUEUE: "M365GraphSyncQueue",
     MOVIMIENTOS_CAJA: "movimientoCaja",
     CAJA_ACTUAL: "cajaActual",
     HISTORICO_CIERRES_Z: "HISTORICO_CIERRES_Z",
@@ -108,6 +109,9 @@ export const SDK_CONFIG = Object.freeze({
         BOOKINGS_SERVICE_SYNC_BATCH_SIZE: 10,
         BOOKINGS_SERVICE_SYNC_MAX_ATTEMPTS: 3,
         BOOKINGS_SERVICE_SYNC_BACKOFF_MS: 300000,
+        M365_GRAPH_SYNC_BATCH_SIZE: 20,
+        M365_GRAPH_SYNC_MAX_ATTEMPTS: 3,
+        M365_GRAPH_SYNC_BACKOFF_MS: 300000,
     }),
     EVENTS: Object.freeze({
         RETRY_ATTEMPTS: 3,

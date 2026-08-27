@@ -93,5 +93,25 @@ check("EXTRAS_CATALOGO es el alias canonico del catalogo de complementos", () =>
     assert.equal(contract.collections.EXTRAS_CATALOGO, "AddonsCatalogo");
 });
 
-console.log(`TOTAL=${failures.length + 6} PASS=${6 - failures.length} FAIL=${failures.length}`);
+check("La proyeccion M365 usa cola, datos minimos y errores saneados", () => {
+    const graphSync = source("src/backend/m365GraphSync.js");
+    for (const token of [
+        "M365_GRAPH_SYNC_QUEUE",
+        "M365_GRAPH_CLIENT_SECRET",
+        "enqueueM365LedgerRecord",
+        "processM365GraphSyncQueue",
+        "M365_GRAPH_NOT_CONFIGURED",
+        "M365_GRAPH_PERMISSION_DENIED",
+        "IntegrityHash",
+        "/lists/",
+    ]) {
+        assert.ok(graphSync.includes(token), token);
+    }
+    assert.equal(graphSync.includes("response.text("), false);
+    assert.equal(graphSync.includes("customerEmail"), false);
+    assert.equal(graphSync.includes("customerPhone"), false);
+});
+
+const totalChecks = 7;
+console.log(`TOTAL=${failures.length + totalChecks} PASS=${totalChecks - failures.length} FAIL=${failures.length}`);
 process.exitCode = failures.length ? 1 : 0;

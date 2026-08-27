@@ -810,6 +810,30 @@
       ]
     },
     {
+      "id": "M365GraphSyncQueue",
+      "purpose": "Cola privada, idempotente y recuperable de proyecciones minimas del ledger hacia una lista SharePoint.",
+      "fields": [
+        ["payload", "OBJECT", true],
+        ["payloadHash", "TEXT", true],
+        ["status", "TEXT", true],
+        ["attempts", "NUMBER", true],
+        ["nextAttemptAt", "DATETIME", true],
+        ["traceId", "TEXT", true],
+        ["errorCode", "TEXT", false],
+        ["externalRecordId", "TEXT", false],
+        ["createdAt", "DATETIME", true],
+        ["updatedAt", "DATETIME", true],
+        ["completedAt", "DATETIME", false],
+        ["blockedAt", "DATETIME", false],
+        ["failedAt", "DATETIME", false]
+      ],
+      "indexes": [
+        ["status", "nextAttemptAt"],
+        ["payloadHash", true],
+        ["traceId", false]
+      ]
+    },
+    {
       "id": "movimientoCaja",
       "purpose": "Ledger fiscal inmutable y fuente de verdad de caja.",
       "fields": [

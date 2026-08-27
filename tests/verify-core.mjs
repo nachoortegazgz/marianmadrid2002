@@ -136,6 +136,25 @@ check('Sincronizacion de servicios usa cola, revision nativa y errores saneados'
   assert.ok(crons.includes('processBookingsServiceSyncJob'));
 });
 
+check('Registro externo M365 usa cola privada y no bloquea el ledger confirmado', () => {
+  const config = read('src/backend/internalConfig.js');
+  const graphSync = read('src/backend/m365GraphSync.js');
+  const cashbox = read('src/backend/cajas.web.js');
+  const crons = read('src/backend/crons.js');
+  const jobs = read('src/backend/jobs.config');
+  const schemaById = new Map(canonicalSchema.collections.map((collection) => [collection.id, collection]));
+  const queue = schemaById.get('M365GraphSyncQueue');
+  assert.ok(config.includes('M365_GRAPH_SYNC_QUEUE'));
+  assert.ok(queue);
+  for (const fieldId of ['payload', 'payloadHash', 'status', 'attempts', 'nextAttemptAt', 'traceId', 'errorCode', 'externalRecordId']) {
+    assert.ok(queue.fields.some(([candidate]) => candidate === fieldId), fieldId);
+  }
+  for (const token of ['getSecret(SECRETS.M365_GRAPH_CLIENT_SECRET)', 'enqueueM365LedgerRecord', 'processM365GraphSyncQueue', 'M365_GRAPH_PERMISSION_DENIED', 'IntegrityHash']) assert.ok(graphSync.includes(token), token);
+  assert.ok(cashbox.includes('enqueueM365LedgerRecord(result, traceId)'));
+  assert.ok(crons.includes('processM365GraphSyncJob'));
+  assert.ok(jobs.includes('processM365GraphSyncJob'));
+});
+
 check('Servicios invalidan todas las cachés y los complementos respetan el contrato CMS', () => {
   const dataHooks = read('src/backend/data.js');
   const reservations = read('src/backend/reservas.web.js');
@@ -220,7 +239,10 @@ check('Cache, Jobs y rate limiter usan limites ejecutables por Wix', () => {
   const security = read('src/backend/security.js');
   const crons = read('src/backend/crons.js');
   const jobsSource = read('src/backend/jobs.config');
+  const rootJobsSource = read('jobs.config');
   const jobs = JSON.parse(jobsSource.replace(/^\/\/.*$/gm, ''));
+  const rootJobs = JSON.parse(rootJobsSource.replace(/^\/\/.*$/gm, ''));
+  assert.deepEqual(rootJobs, jobs, 'jobs.config raiz y src/backend/jobs.config deben permanecer alineados');
   for (const token of ['MAX_RATE_LIMIT_CACHE_SIZE', '_ensureRateLimitCapacity', '_pruneExpiredRateLimitEntries']) assert.ok(security.includes(token), token);
   assert.ok(crons.includes('cleanExpiredSlotsCache'));
   assert.ok(jobs.jobs.length <= 20);

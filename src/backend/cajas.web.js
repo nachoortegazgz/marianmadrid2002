@@ -59,6 +59,7 @@ import {
 
 import { hmacSha256Hex, hashChain } from "backend/securityEngine";
 import { projectLedgerMovementToAccounting } from "backend/contabilidad";
+import { enqueueM365LedgerRecord } from "backend/m365GraphSync";
 import { requireAdmin, requireCajero, rateLimiter } from "backend/security";
 
 const log = logger;
@@ -575,6 +576,16 @@ export async function registerBookingPayment(bookingId, amount, paymentMethod, o
 
             if (!nifEmisor) {
                 log.warn("Ledger entry recorded without configured fiscal issuer NIF", { recordId, traceId });
+            }
+
+            try {
+                await enqueueM365LedgerRecord(result, traceId);
+            } catch (_) {
+                log.warn("M365 ledger projection enqueue failed", {
+                    recordId,
+                    traceId,
+                    errorCode: "M365_GRAPH_QUEUE_ENQUEUE_FAILED",
+                });
             }
 
             log.info("Ledger entry recorded", {

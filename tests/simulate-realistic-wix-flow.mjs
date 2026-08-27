@@ -216,6 +216,23 @@ test('dual booking writes two agenda phases and allows a simple booking in its e
   assert.equal(sim.citas.size, 3);
 });
 
+test('simple, dual and exposure-gap bookings generate correlated records and one online transaction', () => {
+  const sim = new RealisticWixFlowSimulator();
+  const dual = sim.reserveDual({ token: 'dual-record-qa-001', startMinute: 60 });
+  const simple = sim.reserveSimple({ token: 'simple-gap-record-qa-001', startMinute: 90 });
+  const bookingIds = [...dual.bookingIds, ...simple.bookingIds];
+  const checkout = sim.createCheckout({ checkoutToken: 'checkout-record-qa-001', bookingIds, amount: 85 });
+  const payment = sim.paymentWebhook({ token: 'payment-record-qa-001', checkoutId: checkout.checkoutId, orderId: 'order-record-qa-001' });
+
+  assert.deepEqual(payment.bookingIds, bookingIds);
+  assert.equal(sim.ledger.length, 1);
+  assert.deepEqual(sim.ledger[0].bookingIds, bookingIds);
+  assert.equal(sim.citas.get(dual.bookingIds[0]).traceId, 'trace_dual-record-qa-001');
+  assert.equal(sim.citas.get(dual.bookingIds[1]).traceId, 'trace_dual-record-qa-001');
+  assert.equal(sim.citas.get(simple.bookingIds[0]).traceId, 'trace_simple-gap-record-qa-001');
+  assert.ok(bookingIds.every((bookingId) => sim.citas.get(bookingId).statusPago === 'PAID'));
+});
+
 test('reservation rejects past slots and preserves token idempotency semantics', () => {
   const sim = new RealisticWixFlowSimulator({ now: START_OF_DAY + 60 * MINUTE });
   assert.throws(() => sim.reserveSimple({ token: 'past-qa-001', startMinute: 60 }), /SLOT_IN_PAST/);
