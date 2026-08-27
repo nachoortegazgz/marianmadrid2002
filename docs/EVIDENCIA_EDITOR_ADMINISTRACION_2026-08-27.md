@@ -1,6 +1,6 @@
 # Evidencia de Editor: ADMINISTRACIÓN
 
-**Fecha de observación:** 27 de agosto de 2026.  
+**Fecha de observación:** 27 de agosto de 2026.
 **Método:** sesión autenticada de solo lectura en el Editor Wix; no se guardaron ni publicaron cambios de diseño.
 
 El sitio **Marian Madrid Peluquería y Estética** abrió correctamente en el Editor, con la página **Inicio** como superficie inicial. Se confirmó que la navegación contiene una entrada `ADMINISTRACION` y que el sitio sigue publicado, con Velo activado, zona horaria `Europe/Madrid` y moneda EUR.

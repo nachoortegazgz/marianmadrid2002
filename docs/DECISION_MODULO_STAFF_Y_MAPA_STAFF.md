@@ -1,6 +1,6 @@
 # Decisión técnica: `staff.js` y `MAPA_STAFF`
 
-**Fecha:** 26 de agosto de 2026  
+**Fecha:** 26 de agosto de 2026
 **Decisión:** se **mantiene** `src/backend/staff.js`, pero se transforma en un adaptador privado de la colección CMS `MAPA_STAFF` (`MapaStaff`). Se elimina su responsabilidad anterior de leer el secreto `MAPA_STAFF`.
 
 > `staff.js` sigue siendo necesario como frontera de dominio. No debe contener datos estáticos, secretos ni lógica de interfaz; concentra las consultas privadas, la normalización, la caché limitada y la conversión entre una selección editorial y los recursos nativos de Wix Bookings.

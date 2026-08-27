@@ -1,7 +1,7 @@
 # Hoja de ruta de Fase 2: registro externo institucional
 
-**Estado:** planificado y bloqueado hasta la finalización formal de la Fase 1 y la autorización expresa del propietario.  
-**Ámbito previsto:** cuenta institucional indicada por el propietario para Microsoft 365.  
+**Estado:** planificado y bloqueado hasta la finalización formal de la Fase 1 y la autorización expresa del propietario.
+**Ámbito previsto:** cuenta institucional indicada por el propietario para Microsoft 365.
 **Principio rector:** Wix conserva la fuente de verdad de reservas, cobros y libro mayor. Microsoft 365 recibe una proyección mínima para consulta y conciliación, nunca autoriza pagos, modifica reservas ni reemplaza registros internos.
 
 > No se iniciará sesión, no se creará ninguna aplicación, no se almacenarán secretos y no se escribirá ningún dato externo hasta recibir el cierre de Fase 1 y el mandato expreso de iniciar Fase 2.

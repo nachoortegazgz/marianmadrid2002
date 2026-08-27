@@ -1,8 +1,8 @@
 # Matriz de configuracion del sitio y aplicaciones Wix
 
-**Sitio de referencia:** `188bed94-177c-4bc9-a9f0-35080d874f3e`  
-**Dominio operativo:** `www.marianmadrid.es`  
-**Rama de codigo:** `qa/wix-engine-hardening-20260825`  
+**Sitio de referencia:** `188bed94-177c-4bc9-a9f0-35080d874f3e`
+**Dominio operativo:** `www.marianmadrid.es`
+**Rama de codigo:** `qa/wix-engine-hardening-20260825`
 **Objetivo:** configurar el sitio y sus aplicaciones Wix sin contradecir los contratos de codigo, los IDs CMS ni las fuentes de verdad del ecosistema.
 
 > Esta matriz separa el **estado objetivo** del **estado confirmado**. La sesion actual no dispone de lectura autenticada del dashboard Wix: el conector devolvio `403 permission_denied` y el panel solicito inicio de sesion. Por tanto, los elementos marcados como pendientes deben comprobarse en el dashboard antes de modificarse.

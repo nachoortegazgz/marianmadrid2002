@@ -1,7 +1,7 @@
 # Matriz de requisitos de Fase 1: operación, registros y cumplimiento
 
-**Fecha de referencia:** 27 de agosto de 2026.  
-**Finalidad:** delimitar qué debe controlar el ecosistema Wix nativo para reservas, ventas, caja física, eventos derivados, gestión interna y documentación.  
+**Fecha de referencia:** 27 de agosto de 2026.
+**Finalidad:** delimitar qué debe controlar el ecosistema Wix nativo para reservas, ventas, caja física, eventos derivados, gestión interna y documentación.
 **Límite profesional:** este documento es un análisis técnico-operativo y no sustituye la determinación del régimen tributario, la asesoría contable-fiscal, laboral o de protección de datos aplicable al titular del negocio.
 
 ## Principio de diseño

@@ -1,7 +1,7 @@
 # Evidencia de esquema: `movimientoCaja`
 
-**Fecha:** 27 de agosto de 2026.  
-**Alcance:** ampliación del esquema de la colección privada de ledger.  
+**Fecha:** 27 de agosto de 2026.
+**Alcance:** ampliación del esquema de la colección privada de ledger.
 **Método:** lectura previa completa, creación idempotente de campos y lectura posterior; no se modificó, eliminó ni recreó ningún movimiento histórico.
 
 La colección productiva `movimientoCaja` se comprobó antes del cambio. Su revisión era `12`, tenía permisos de lectura, inserción, actualización y eliminación restringidos a administradores, y no incluía campos de naturaleza de operación, tratamiento IVA, referencia rectificativa, detalle de líneas ni versión de la carga de integridad.
@@ -20,5 +20,5 @@ Se añadieron cinco campos nuevos mediante la operación de creación de campo d
 
 ## Fuente técnica
 
-[1] [Wix — Create Data Collection Field](https://dev.wix.com/docs/api-reference/business-solutions/cms/collection-management/data-collections/create-data-collection-field)  
+[1] [Wix — Create Data Collection Field](https://dev.wix.com/docs/api-reference/business-solutions/cms/collection-management/data-collections/create-data-collection-field)
 [2] [Wix — Data types in Wix Data](https://dev.wix.com/docs/rest/business-solutions/cms/data-types-in-wix-data)

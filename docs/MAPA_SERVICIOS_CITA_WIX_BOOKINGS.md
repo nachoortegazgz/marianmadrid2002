@@ -1,7 +1,7 @@
 # Mapa canónico de `SERVICIOS_CITA` a Wix Bookings
 
-**Versión propuesta:** `2026-08-26-bookings-service-sync-v1`  
-**Dirección de sincronización:** `SERVICIOS_CITA` (`Import2`) → Wix Bookings Services V2.  
+**Versión propuesta:** `2026-08-26-bookings-service-sync-v1`
+**Dirección de sincronización:** `SERVICIOS_CITA` (`Import2`) → Wix Bookings Services V2.
 **Objetivo:** convertir el catálogo editorial y comercial de Marian en la fuente de verdad de los campos configurables de servicios, sin modificar reservas, sesiones, información de clientes ni detalles históricos.
 
 > **Regla de seguridad:** el catálogo no autoriza una escritura sobre Wix Bookings hasta que el registro tenga `bookingsSyncEnabled = true`, `serviceId` sea válido y todas las dependencias referenciadas estén verificadas. Una actualización incompleta no se degrada a un objeto parcial: queda en cola con un motivo técnico saneado.
@@ -151,9 +151,9 @@ sequenceDiagram
 
 ## Referencias
 
-[1] [Wix Bookings Services Collection Fields](https://dev.wix.com/docs/velo/apis/wix-bookings-v2/services-collection-fields)  
-[2] [Wix Services V2: Service Object](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/service-object)  
-[3] [Wix Services V2: Update Service](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/update-service)  
-[4] [Wix Services V2: Create Service](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/create-service)  
-[5] [Wix: About Service Payments](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/about-service-payments)  
+[1] [Wix Bookings Services Collection Fields](https://dev.wix.com/docs/velo/apis/wix-bookings-v2/services-collection-fields)
+[2] [Wix Services V2: Service Object](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/service-object)
+[3] [Wix Services V2: Update Service](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/update-service)
+[4] [Wix Services V2: Create Service](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/create-service)
+[5] [Wix: About Service Payments](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/about-service-payments)
 [6] [Wix: Set Service Locations](https://dev.wix.com/docs/api-reference/business-solutions/bookings/services/services-v2/set-service-locations)

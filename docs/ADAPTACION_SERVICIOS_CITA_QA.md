@@ -1,7 +1,7 @@
 # Adaptacion de SERVICIOS_CITA para QA
 
-**Estado:** Preparado para aplicacion supervisada en QA.  
-**Contrato de codigo:** `2026-08-26-service-catalog-qa-v1`.  
+**Estado:** Preparado para aplicacion supervisada en QA.
+**Contrato de codigo:** `2026-08-26-service-catalog-qa-v1`.
 **Coleccion de servicios:** `Import2` (nombre visible `SERVICIOS_CITA`).
 
 ## Objetivo

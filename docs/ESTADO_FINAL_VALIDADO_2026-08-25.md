@@ -1,6 +1,6 @@
 # Estado final validado del ecosistema Wix
 
-**Fecha de consolidación:** 25 de agosto de 2026  
+**Fecha de consolidación:** 25 de agosto de 2026
 **Rama:** `qa/wix-engine-hardening-20260825`
 
 ## Declaración de estado

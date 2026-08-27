@@ -1,6 +1,6 @@
 # Estudio de integracion: asesoria de imagen con videocamara
 
-**Fecha de consulta:** 26 de agosto de 2026.  
+**Fecha de consulta:** 26 de agosto de 2026.
 **Alcance:** herramienta de asesoría estética para corte y color, con captura voluntaria de cámara y privacidad por defecto. No es un dispositivo ni un servicio de diagnóstico médico.
 
 > Una cámara web convencional puede servir para guía de encuadre, visualización de color y recomendaciones de estilo. No aporta la resolución, iluminación ni validación clínica necesarias para diagnosticar el cuero cabelludo o indicar tratamientos.
@@ -97,13 +97,13 @@ La simulación generativa debe empezar únicamente tras superar el piloto local 
 
 ## Referencias
 
-[1] [Wix: Introducción al componente HTML](https://dev.wix.com/docs/velo/velo-only-apis/$w/html-component/introduction)  
-[2] [Wix: Mensajería entre página y elemento HTML](https://dev.wix.com/docs/velo/velo-only-apis/$w/html-component/messaging-between-a-site-page-and-an-html-element)  
-[3] [Google AI Edge: MediaPipe Solutions guide](https://developers.google.com/edge/mediapipe/solutions/guide)  
-[4] [MediaPipe: Hair Segmentation](https://github.com/google/mediapipe/blob/master/docs/solutions/hair_segmentation.md)  
-[5] [Kazuhito00: Skin-Clothes-Hair-Segmentation-using-SMP](https://github.com/Kazuhito00/Skin-Clothes-Hair-Segmentation-using-SMP)  
-[6] [yakhyo: face-parsing](https://github.com/yakhyo/face-parsing)  
-[7] [AIRI Institute: HairFastGAN](https://github.com/AIRI-Institute/HairFastGAN)  
-[8] [Xiaojiu-z: Stable-Hair](https://github.com/Xiaojiu-z/Stable-Hair)  
-[9] [Du et al., 2025: Non-invasive detection in scalp and hair diseases](https://pmc.ncbi.nlm.nih.gov/articles/PMC12050651/)  
+[1] [Wix: Introducción al componente HTML](https://dev.wix.com/docs/velo/velo-only-apis/$w/html-component/introduction)
+[2] [Wix: Mensajería entre página y elemento HTML](https://dev.wix.com/docs/velo/velo-only-apis/$w/html-component/messaging-between-a-site-page-and-an-html-element)
+[3] [Google AI Edge: MediaPipe Solutions guide](https://developers.google.com/edge/mediapipe/solutions/guide)
+[4] [MediaPipe: Hair Segmentation](https://github.com/google/mediapipe/blob/master/docs/solutions/hair_segmentation.md)
+[5] [Kazuhito00: Skin-Clothes-Hair-Segmentation-using-SMP](https://github.com/Kazuhito00/Skin-Clothes-Hair-Segmentation-using-SMP)
+[6] [yakhyo: face-parsing](https://github.com/yakhyo/face-parsing)
+[7] [AIRI Institute: HairFastGAN](https://github.com/AIRI-Institute/HairFastGAN)
+[8] [Xiaojiu-z: Stable-Hair](https://github.com/Xiaojiu-z/Stable-Hair)
+[9] [Du et al., 2025: Non-invasive detection in scalp and hair diseases](https://pmc.ncbi.nlm.nih.gov/articles/PMC12050651/)
 [10] [Flament et al., 2025: AI-based grading of scalp exfoliation from video imaging](https://pmc.ncbi.nlm.nih.gov/articles/PMC11975186/)

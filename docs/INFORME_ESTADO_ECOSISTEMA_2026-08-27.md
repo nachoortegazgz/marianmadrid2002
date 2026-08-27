@@ -1,6 +1,6 @@
 # Informe ejecutivo del ecosistema Marian Madrid
 
-**Fecha:** 27 de agosto de 2026  
+**Fecha:** 27 de agosto de 2026
 **Estado general:** operativo con controles reforzados; quedan validaciones de producción y ajustes de experiencia prioritarios.
 
 ## Resumen

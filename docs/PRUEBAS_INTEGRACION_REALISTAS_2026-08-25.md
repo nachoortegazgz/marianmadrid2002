@@ -1,6 +1,6 @@
 # Pruebas de integración realistas: reservas, agenda y checkout
 
-**Fecha:** 25 de agosto de 2026  
+**Fecha:** 25 de agosto de 2026
 **Objetivo:** ejercitar los flujos críticos con la mayor fidelidad posible sin crear citas que bloqueen la agenda pública ni ejecutar pagos reales.
 
 > Las pruebas ejecutadas son deterministas y aisladas. No crean datos en Wix, no marcan citas reales en agenda, no generan checkout de producción y no cobran importes. Los resultados prueban los contratos y reglas de los flujos; no equivalen a una certificación del despliegue publicado.

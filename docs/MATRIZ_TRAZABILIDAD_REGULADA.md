@@ -1,7 +1,7 @@
 # Matriz de Trazabilidad Contable, Fiscal, Laboral e Inventario
 
-**Estado:** Auditoría técnica del runtime versionado.  
-**Alcance:** Flujos backend, contratos CMS, hooks, agregadores e informes disponibles.  
+**Estado:** Auditoría técnica del runtime versionado.
+**Alcance:** Flujos backend, contratos CMS, hooks, agregadores e informes disponibles.
 **Límite:** Este documento no certifica cumplimiento fiscal, laboral, contable ni de protección de datos. Es una matriz técnica para que gestoría, asesoría laboral y responsable de protección de datos validen la configuración, los datos empresariales y el uso real antes de presentar o conservar documentación oficial.
 
 ## Criterio de revisión

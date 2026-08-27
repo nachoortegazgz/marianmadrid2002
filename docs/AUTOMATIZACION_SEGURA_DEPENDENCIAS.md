@@ -1,7 +1,7 @@
 # Automatización segura de dependencias
 
-**Ámbito:** repositorio `nachoortegazgz/marianmadrid2002`.  
-**Estado:** activación preparada en el repositorio; requiere que el cambio se integre en `main` para que GitHub empiece a aplicar la política.  
+**Ámbito:** repositorio `nachoortegazgz/marianmadrid2002`.
+**Estado:** activación preparada en el repositorio; requiere que el cambio se integre en `main` para que GitHub empiece a aplicar la política.
 **Principio:** las actualizaciones se proponen y validan automáticamente, pero nunca se fusionan, publican en Wix ni modifican el catálogo o datos productivos de forma automática.
 
 ## Política implantada

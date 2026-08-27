@@ -1,7 +1,7 @@
 # Auditoría técnica de Fase 1: reservas, caja y ADMINISTRACIÓN
 
-**Fecha:** 27 de agosto de 2026.  
-**Ámbito:** revisión estática del código publicado, de los contratos CMS y del componente administrativo de referencia.  
+**Fecha:** 27 de agosto de 2026.
+**Ámbito:** revisión estática del código publicado, de los contratos CMS y del componente administrativo de referencia.
 **Resultado:** existe una base robusta de reservas y ledger, pero hacen falta correcciones de clasificación, detalle documental, propinas y flujo administrativo antes de declarar el ciclo integral cerrado.
 
 ## Controles ya presentes

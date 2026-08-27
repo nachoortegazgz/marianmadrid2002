@@ -1,7 +1,7 @@
 # Verificación de Cobertura Transaccional
 
-**Fecha:** 25 de agosto de 2026  
-**Sitio auditado:** `188bed94-177c-4bc9-a9f0-35080d874f3e` — `https://www.marianmadrid.es/`  
+**Fecha:** 25 de agosto de 2026
+**Sitio auditado:** `188bed94-177c-4bc9-a9f0-35080d874f3e` — `https://www.marianmadrid.es/`
 **Alcance:** revisión de código publicado, esquema CMS real, lecturas de colecciones y simulaciones deterministas. No se crearon cobros, pedidos, devoluciones ni asientos comerciales para esta auditoría.
 
 > **Alcance fiscal.** Este es un dictamen técnico de trazabilidad, no una certificación fiscal, contable, SIF o VERI*FACTU. La activación de la contabilidad derivada, la configuración de cuentas, las series, el régimen tributario y cualquier presentación deben ser revisados por gestoría antes de utilizarse con ese fin.

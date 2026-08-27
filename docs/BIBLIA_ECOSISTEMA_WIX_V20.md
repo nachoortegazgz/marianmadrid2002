@@ -1,7 +1,7 @@
 # Biblia Operativa del Ecosistema Wix v20
 
-**Estado:** Línea base técnica consolidada para QA y evolución controlada.  
-**Sitio de referencia:** Marian Madrid Peluquería y Estética (`188bed94-177c-4bc9-a9f0-35080d874f3e`).  
+**Estado:** Línea base técnica consolidada para QA y evolución controlada.
+**Sitio de referencia:** Marian Madrid Peluquería y Estética (`188bed94-177c-4bc9-a9f0-35080d874f3e`).
 **Rama de referencia:** `qa/wix-engine-hardening-20260825`.
 
 ## 1. Principio rector

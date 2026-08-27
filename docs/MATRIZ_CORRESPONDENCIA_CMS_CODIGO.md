@@ -1,7 +1,7 @@
 # Matriz de Correspondencia CMS–Código y Nomenclatura Objetivo
 
-**Versión:** 1.0 — 25 de agosto de 2026  
-**Ámbito:** colecciones personalizadas del sitio Marian Madrid y sus dependencias Velo.  
+**Versión:** 1.0 — 25 de agosto de 2026
+**Ámbito:** colecciones personalizadas del sitio Marian Madrid y sus dependencias Velo.
 **Propósito:** definir la nomenclatura legible de CMS y la ruta de corrección del código sin alterar datos, índices, flujos de reservas, movimientos de inventario ni el ledger de caja.
 
 > **Alcance normativo.** La AEAT exige que un Sistema Informático de Facturación preserve integridad, conservación, accesibilidad, legibilidad, trazabilidad e inalterabilidad de los registros de facturación. La denominación interna de una colección o campo CMS no sustituye el formato de los registros de facturación exigido por la normativa ni acredita por sí sola cumplimiento SIF o VERI*FACTU. Esta matriz adopta terminología española clara y trazable para facilitar control interno y revisión profesional. [1] [2]

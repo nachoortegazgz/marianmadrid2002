@@ -1,7 +1,7 @@
 # Consolidacion Tecnica del Ecosistema
 
-**Fecha de consolidacion:** 25 de agosto de 2026  
-**Rama:** `qa/wix-engine-hardening-20260825`  
+**Fecha de consolidacion:** 25 de agosto de 2026
+**Rama:** `qa/wix-engine-hardening-20260825`
 **Alcance:** reservas, eCommerce, caja, inventario, libros de apoyo, control horario, panel administrativo, contratos CMS, seguridad, pruebas y documentacion.
 
 > Esta consolidacion es tecnica. El software aporta trazabilidad y controles de integridad, pero no certifica por si solo cumplimiento fiscal, laboral, mercantil o de proteccion de datos. Cualquier uso regulado debe validarse con la asesoria correspondiente antes de presentar, firmar o legalizar informacion.

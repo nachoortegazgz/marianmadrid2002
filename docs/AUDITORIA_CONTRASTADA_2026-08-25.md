@@ -1,7 +1,7 @@
 # Auditoría contrastada del ecosistema Wix
 
-**Fecha:** 25 de agosto de 2026  
-**Alcance:** contraste técnico de `pasted_content_11.txt` y `pasted_content_12.txt` frente a la rama `qa/wix-engine-hardening-20260825`, el contrato CMS canónico y las pruebas del repositorio.  
+**Fecha:** 25 de agosto de 2026
+**Alcance:** contraste técnico de `pasted_content_11.txt` y `pasted_content_12.txt` frente a la rama `qa/wix-engine-hardening-20260825`, el contrato CMS canónico y las pruebas del repositorio.
 **Criterio de intervención:** solo se corrige código cuya discrepancia está demostrada por el runtime, los contratos o el flujo de datos actual. No se aceptan snippets del adjunto que sustituyan identificadores confirmados, abran CORS, inventen datos fiscales o eliminen estructuras CMS.
 
 > Esta revisión es técnica. No certifica cumplimiento fiscal, contable, laboral ni de protección de datos; cualquier uso regulado requiere validación de la asesoría o profesional competente.

@@ -1,7 +1,7 @@
 # Diseño de documentos y gestoría en ADMINISTRACIÓN
 
-**Estado:** aprobado para Fase 1.  
-**Superficie:** componente `#htmlAdministracion` de la página existente **ADMINISTRACIÓN**.  
+**Estado:** aprobado para Fase 1.
+**Superficie:** componente `#htmlAdministracion` de la página existente **ADMINISTRACIÓN**.
 **Acceso:** exclusivamente Marian, comprobado tanto en el controlador como en cada método backend con `requireMarianManager()`.
 
 ## Decisión de entrega

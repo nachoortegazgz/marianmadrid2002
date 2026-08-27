@@ -1,7 +1,7 @@
 # Prueba de Integración: Cierre Diario desde ADMINISTRACION
 
-**Fecha:** 25 de agosto de 2026  
-**Modalidad:** simulación determinista aislada  
+**Fecha:** 25 de agosto de 2026
+**Modalidad:** simulación determinista aislada
 **Impacto sobre producción:** ninguno
 
 > La prueba no invoca Wix Payments, Wix Bookings, CMS ni el botón real de cierre. No genera cobros, movimientos de caja, conteos X ni cierres Z en el sitio publicado. Verifica que el contrato funcional de la página `ADMINISTRACION` y el cierre Z del backend conservan los controles y la evidencia esperada.

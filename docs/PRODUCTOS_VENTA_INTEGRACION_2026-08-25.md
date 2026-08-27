@@ -1,7 +1,7 @@
 # Integración de PRODUCTOS_VENTA con InventarioProductos
 
-**Fecha de verificación:** 25 de agosto de 2026.  
-**Colección técnica:** `InventarioProductos`.  
+**Fecha de verificación:** 25 de agosto de 2026.
+**Colección técnica:** `InventarioProductos`.
 **Nombre visible comercial:** `PRODUCTOS_VENTA`.
 
 > `PRODUCTOS_VENTA` y `InventarioProductos` no son dos fuentes de verdad distintas. El primero es el nombre visible del catálogo comercial; el segundo es el ID técnico que Wix y el código ya utilizan. Crear una segunda colección duplicaría stock, SKU y enlaces con Wix Stores.
