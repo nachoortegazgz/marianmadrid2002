@@ -1,8 +1,11 @@
 # Evidencia de prueba QA real controlada
 
-**Fecha de ejecución:** 27 de agosto de 2026 (UTC).  
-**Entorno:** sitio Wix publicado `marianmadrid.es`.  
-**Identificador de trazabilidad:** `QA-REAL-20260827T230205Z`.  
+**Fecha de ejecución:** 27 de agosto de 2026 (UTC).
+
+**Entorno:** sitio Wix publicado `marianmadrid.es`.
+
+**Identificador de trazabilidad:** `QA-REAL-20260827T230205Z`.
+
 **Autor:** Manus AI.
 
 ## Propósito y límites
