@@ -20,3 +20,10 @@ La automatización visual del Editor sufrió tiempos de espera al intentar abrir
 ## Reintento posterior de inspección
 
 Se intentó reabrir el Editor conectado para revisar el componente HTML existente de `ADMINISTRACION`. La pestaña no estaba activa y la navegación posterior devolvió un tiempo de espera `HTTP 504` del conector del navegador. No se guardó ni publicó ningún cambio visual. Por tanto, `docs/WIDGET_PANEL_GESTION_MARIAN.html` permanece como fuente canónica versionada de referencia y la sincronización con el HTML Component vivo sigue pendiente de una sesión del Editor disponible.
+
+
+## Vista previa de publicación
+
+La vista previa remota generada desde el código local validado quedó disponible en `https://wix.to/KRoADxI`. La primera carga devolvió correctamente los metadatos públicos del sitio. La inspección visual posterior sufrió un tiempo de espera `HTTP 504` del conector del navegador. No se realizaron ediciones de diseño ni se sincronizó el contenido del componente `#htmlAdministracion` por inferencia.
+
+La publicación solicitada se limita al despliegue de código local validado. El widget documental permanece versionado y probado, pero su actualización visual en el HTML Component vivo requiere una sesión estable del Editor y queda evidenciada como paso posterior controlado.
