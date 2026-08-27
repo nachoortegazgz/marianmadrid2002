@@ -13,7 +13,9 @@ Repositorio Wix Velo para reservas simples y duales, venta eCommerce, ledger de 
 | Ledger y caja | `cajas.web.js`, `events.js`, `data.js` | `movimientoCaja` es el registro fuente inmutable. `cajaActual` es una proyección derivada; nunca debe sustituir ni reescribir el ledger. |
 | Fiscalidad | `fiscalAggregator.web.js` | Los resúmenes y libros se derivan del ledger y son documentación de trabajo para revisión profesional. |
 | Inventario | `inventario.web.js`, `events.js` | Los movimientos y conciliaciones se registran mediante los flujos nativos y las recuperaciones pendientes. |
-| Panel Marian | `src/pages/ONLY STAFF.mvf3f.js`, `docs/WIDGET_PANEL_GESTION_MARIAN.html` | Acceso verificado en backend. El widget usa handshake y origen controlado; las operaciones sensibles requieren confirmación visible. |
+| Panel Marian | `src/pages/ADMINISTRACION.mvf3f.js`, `src/public/marianAdministrationController.js`, `docs/WIDGET_PANEL_GESTION_MARIAN.html` | Acceso verificado en backend. El widget usa handshake, lista cerrada de mensajes y confirmación visible en operaciones sensibles. |
+| Paquetes para gestoria | `fiscalDocuments.web.js`, `MM_AUDIT_LOG` | Previsualizacion, versionado, descarga y entrega manual confirmada; no crea declaraciones ni facturas oficiales. |
+| M365 (Fase 2) | `m365GraphSync.js` y `M365GraphSyncQueue` | Infraestructura conservada pero desactivada por `SDK_CONFIG.M365.ENABLED = false`; no hay cron ni trafico externo en Fase 1. |
 | Asistente IA | `marianAssistant.web.js` | Chat privado, historial acotado, `store: false` y solo acciones no destructivas sugeridas. |
 
 ## Flujo de trabajo confiable
@@ -31,7 +33,9 @@ npm run dev
 
 ## Panel administrativo de Marian
 
-El código de la página está versionado en `src/pages/ONLY STAFF.mvf3f.js`. El contenido del componente HTML debe mantenerse desde el archivo completo `docs/WIDGET_PANEL_GESTION_MARIAN.html` en el componente Wix con ID `#htmlOnlyStaff`.
+El codigo de la pagina esta versionado en `src/pages/ADMINISTRACION.mvf3f.js`. El contenido completo del componente HTML se mantiene en `docs/WIDGET_PANEL_GESTION_MARIAN.html` y debe sincronizarse con el componente Wix existente con ID `#htmlAdministracion`; no debe crearse una pagina paralela.
+
+El flujo documental muestra por defecto `gestion@marianmadrid.es`, permite a Marian editarlo para cada envio y exige una confirmacion visible. La entrega permanece bloqueada hasta que se configuren unicamente en Wix Secrets Manager `RESEND_API_KEY` y `RESEND_FROM_EMAIL`, con el dominio remitente verificado. Nunca se guardan esos valores en codigo, CMS, archivos ni Git.
 
 El asistente requiere configurar este secreto en Wix Secrets Manager, sin incluirlo en código ni CMS:
 
@@ -47,4 +51,4 @@ Los comandos de desarrollo, las pruebas estáticas y el Local Editor no realizan
 
 ## Evidencia mínima antes de producción
 
-Antes de una publicación deben pasar la validación local, la sincronización de tipos, Local Editor sin errores y las pruebas controladas en entorno adecuado para reservas, pagos, eCommerce, compensaciones y colecciones CMS.
+Antes de una publicacion deben pasar la validacion local, la sincronizacion de tipos, Local Editor sin errores y las pruebas controladas en entorno adecuado para reservas, pagos, eCommerce, compensaciones y colecciones CMS. El Editor debe revisarse antes de sincronizar el componente HTML si Wix advierte que contiene cambios de diseno mas recientes.

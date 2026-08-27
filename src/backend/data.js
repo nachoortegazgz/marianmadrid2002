@@ -16,6 +16,7 @@ import {
     COLLECTIONS,
     SINGLETONS,
     TIPO_FICHAJE,
+    TIPO_MOVIMIENTO,
     CITA_FIELDS,
     ESTADO_CITA,
     SERVICE_CATALOG,
@@ -291,6 +292,51 @@ export function cajaActual_beforeRemove(itemId, context) {
     throw new Error("SINGLETON_PROTECTED: Direct deletion of cajaActual is forbidden.");
 }
 
+function _expectedMovementNature(tipoMovimiento) {
+    if (tipoMovimiento === TIPO_MOVIMIENTO.PROPINA) return "PROPINA";
+    if (tipoMovimiento === TIPO_MOVIMIENTO.REEMBOLSO) return "DEVOLUCION";
+    if (tipoMovimiento === TIPO_MOVIMIENTO.AJUSTE) return "AJUSTE";
+    return "VENTA";
+}
+
+function _assertLedgerDocumentDetail(item) {
+    const tipoMovimiento = String(item.tipoMovimiento || "").trim().toUpperCase();
+    if (!Object.values(TIPO_MOVIMIENTO).includes(tipoMovimiento)) {
+        throw new Error("FISCAL_VIOLATION: Unsupported tipoMovimiento.");
+    }
+    const expectedNature = _expectedMovementNature(tipoMovimiento);
+    if (String(item.naturalezaOperacion || "").trim().toUpperCase() !== expectedNature) {
+        throw new Error("FISCAL_VIOLATION: naturalezaOperacion does not match tipoMovimiento.");
+    }
+
+    const isTip = tipoMovimiento === TIPO_MOVIMIENTO.PROPINA;
+    const expectedTaxTreatment = isTip ? "PROPINA_PENDIENTE_GESTORIA" : "IVA_GENERAL";
+    if (String(item.tratamientoIva || "").trim().toUpperCase() !== expectedTaxTreatment) {
+        throw new Error("FISCAL_VIOLATION: tratamientoIva does not match tipoMovimiento.");
+    }
+    if (isTip && (Number(item.baseImponible) !== 0 || Number(item.cuotaIva) !== 0 || Number(item.tasaIva) !== 0)) {
+        throw new Error("FISCAL_VIOLATION: Tips must not include VAT before professional review.");
+    }
+    if (tipoMovimiento === TIPO_MOVIMIENTO.REEMBOLSO && !String(item.referenciaRectificativa || "").trim()) {
+        throw new Error("FISCAL_VIOLATION: Refunds require referenciaRectificativa.");
+    }
+
+    const lines = Array.isArray(item.detalleLineas) ? item.detalleLineas : [];
+    if (item.integrityPayloadVersion !== "LEDGER_V2" || !lines.length || lines.length > 50) {
+        throw new Error("FISCAL_VIOLATION: Missing or invalid signed document detail.");
+    }
+    const totals = lines.reduce((acc, line) => ({
+        base: acc.base + (Number(line?.baseImponible) || 0),
+        tax: acc.tax + (Number(line?.cuotaIva) || 0),
+        total: acc.total + (Number(line?.importeTotal) || 0),
+    }), { base: 0, tax: 0, total: 0 });
+    if (Math.abs(totals.base - (Number(item.baseImponible) || 0)) > 0.01 ||
+        Math.abs(totals.tax - (Number(item.cuotaIva) || 0)) > 0.01 ||
+        Math.abs(totals.total - Math.abs(Number(item.importeTotal) || 0)) > 0.01) {
+        throw new Error("FISCAL_VIOLATION: Signed document detail totals do not match ledger totals.");
+    }
+}
+
 export function movimientoCaja_beforeInsert(item, context) {
     if (!item || typeof item !== "object") return item;
 
@@ -308,6 +354,7 @@ export function movimientoCaja_beforeInsert(item, context) {
     if (!String(item.numTicketFactura || "").trim()) {
         throw new Error("FISCAL_VIOLATION: Missing numTicketFactura.");
     }
+    _assertLedgerDocumentDetail(item);
 
     _normalizeDateField(item, "fechaCreacion", new Date());
     return item;

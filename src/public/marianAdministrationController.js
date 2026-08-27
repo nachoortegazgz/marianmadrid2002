@@ -26,6 +26,13 @@ import {
 } from "backend/fiscalAggregator.web";
 import { askMarianAssistant } from "backend/marianAssistant.web";
 import {
+    previewManagerPackage,
+    createManagerPackageVersion,
+    downloadManagerPackageVersion,
+    getManagerPackageHistory,
+    emailManagerPackageVersion,
+} from "backend/fiscalDocuments.web";
+import {
     URLS,
     SDK_CONFIG,
     MONEY,
@@ -55,6 +62,16 @@ function _readQuarter(value) {
 function _readPositiveAmount(value) {
     const amount = Number(value);
     return Number.isFinite(amount) && amount > 0 ? amount : null;
+}
+
+function _readEmail(value) {
+    const email = _safeTrim(value).toLowerCase();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? email : null;
+}
+
+function _readDocumentId(value) {
+    const id = _safeTrim(value);
+    return /^DOC_GESTORIA_(20\d{2}|21\d{2})_T[1-4]_PAQUETE_GESTORIA_V\d{4}$/.test(id) ? id : null;
 }
 
 export async function initMarianAdministration(widget, slug = "administracion") {
@@ -155,14 +172,16 @@ export async function initMarianAdministration(widget, slug = "administracion") 
             if (type === "TPV_TX") {
                 const amount = _readPositiveAmount(payload.amount);
                 const paymentMethod = _safeTrim(payload.paymentMethod).toUpperCase();
+                const transactionKind = _safeTrim(payload.transactionKind).toUpperCase() || "VENTA";
                 const concept = _safeTrim(payload.concept);
-                if (!amount || !["EFECTIVO", "TARJETA", "BIZUM"].includes(paymentMethod) || !concept) {
-                    _postError(post, "TPV_TX_RES", messageId, "Importe, forma de pago y concepto validos son obligatorios");
+                if (!amount || !["EFECTIVO", "TARJETA", "BIZUM"].includes(paymentMethod) || !["VENTA", "PROPINA"].includes(transactionKind) || !concept) {
+                    _postError(post, "TPV_TX_RES", messageId, "Importe, forma de pago, naturaleza y concepto validos son obligatorios");
                     return;
                 }
                 post("TPV_TX_RES", await registerManualTransaction({
                     amount,
                     paymentMethod,
+                    tipoMovimiento: transactionKind === "PROPINA" ? "PROPINA" : "",
                     concept,
                     resourceId: staffContext?.resourceId || null,
                     traceId,
@@ -191,6 +210,55 @@ export async function initMarianAdministration(widget, slug = "administracion") 
                     return;
                 }
                 post("Z_CLOSING_RES", await registerZClosing(diaKey, { traceId }), messageId);
+                return;
+            }
+
+            if (type === "DOCUMENT_PREVIEW" || type === "DOCUMENT_CREATE" || type === "DOCUMENT_HISTORY") {
+                const year = _readYear(payload.year);
+                const quarter = _readQuarter(payload.quarter);
+                if (!year || !quarter) {
+                    _postError(post, "DOCUMENT_RES", messageId, "Ejercicio y trimestre validos son obligatorios");
+                    return;
+                }
+                const input = { year, quarter };
+                if (type === "DOCUMENT_PREVIEW") {
+                    post("DOCUMENT_PREVIEW_RES", await previewManagerPackage(input), messageId);
+                    return;
+                }
+                if (type === "DOCUMENT_CREATE") {
+                    post("DOCUMENT_CREATE_RES", await createManagerPackageVersion(input), messageId);
+                    return;
+                }
+                post("DOCUMENT_HISTORY_RES", await getManagerPackageHistory(input), messageId);
+                return;
+            }
+
+            if (type === "DOCUMENT_DOWNLOAD") {
+                const documentId = _readDocumentId(payload.documentId);
+                if (!documentId) {
+                    _postError(post, "DOCUMENT_DOWNLOAD_RES", messageId, "La version documental no es valida");
+                    return;
+                }
+                post("DOCUMENT_DOWNLOAD_RES", await downloadManagerPackageVersion({ documentId }), messageId);
+                return;
+            }
+
+            if (type === "DOCUMENT_EMAIL") {
+                const documentId = _readDocumentId(payload.documentId);
+                const recipient = _readEmail(payload.recipient);
+                if (!documentId || !recipient) {
+                    _postError(post, "DOCUMENT_EMAIL_RES", messageId, "La version y el email de gestoria deben ser validos");
+                    return;
+                }
+                if (payload.confirmed !== true) {
+                    _postError(post, "DOCUMENT_EMAIL_RES", messageId, "Confirma expresamente el envio antes de continuar");
+                    return;
+                }
+                post("DOCUMENT_EMAIL_RES", await emailManagerPackageVersion({
+                    documentId,
+                    recipient,
+                    confirmed: true,
+                }), messageId);
                 return;
             }
 

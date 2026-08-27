@@ -123,6 +123,31 @@ function _canonicalPayload(prevHash, transactionId, tipoMovimiento, importeConta
     return `${String(prevHash)}|${String(transactionId)}|${String(tipoMovimiento)}|${Number(importeContable)}|${String(formaPago)}`;
 }
 
+function _stableSerialize(value) {
+    if (Array.isArray(value)) return `[${value.map(_stableSerialize).join(",")}]`;
+    if (value && typeof value === "object") {
+        return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${_stableSerialize(value[key])}`).join(",")}}`;
+    }
+    return JSON.stringify(value);
+}
+
+function _canonicalPayloadV2(movement) {
+    return _stableSerialize({
+        prevHash: String(movement?.prevHash || ""),
+        transactionId: String(movement?.transactionId || ""),
+        tipoMovimiento: String(movement?.tipoMovimiento || ""),
+        importeContable: Number(movement?.importeContable || 0),
+        formaPago: String(movement?.formaPago || ""),
+        baseImponible: Number(movement?.baseImponible || 0),
+        cuotaIva: Number(movement?.cuotaIva || 0),
+        tasaIva: Number(movement?.tasaIva || 0),
+        naturalezaOperacion: String(movement?.naturalezaOperacion || ""),
+        tratamientoIva: String(movement?.tratamientoIva || ""),
+        referenciaRectificativa: String(movement?.referenciaRectificativa || ""),
+        detalleLineas: Array.isArray(movement?.detalleLineas) ? movement.detalleLineas : [],
+    });
+}
+
 async function _getNextSequenceNumbers(year, traceId) {
     const SEQ_COLLECTION = COLLECTIONS.CONTADORES_FISCALES;
     const SEQ_ID = "GLOBAL";
@@ -304,7 +329,52 @@ function _mapFormaPagoToTipoMovimiento(formaPagoUpper, isRefund) {
         [FORMA_PAGO.ONLINE]: TIPO_MOVIMIENTO.VENTA_ONLINE,
     };
 
-    return map[formaPagoUpper] || TIPO_MOVIMIENTO.AJUSTE;
+    return map[formaPagoUpper] || "";
+}
+
+function _resolveMovementType(formaPago, amount, requestedType, traceId) {
+    const method = String(formaPago || "").toUpperCase();
+    if (!Object.values(FORMA_PAGO).includes(method)) {
+        throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Unsupported payment method", { traceId });
+    }
+    const requested = String(requestedType || "").trim().toUpperCase();
+    if (requested && !Object.values(TIPO_MOVIMIENTO).includes(requested)) {
+        throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Unsupported movement type", { traceId });
+    }
+
+    const isRefund = Number(amount) < 0 || requested === TIPO_MOVIMIENTO.REEMBOLSO;
+    if (isRefund) {
+        if (requested && requested !== TIPO_MOVIMIENTO.REEMBOLSO) {
+            throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Refund type does not match amount", { traceId });
+        }
+        return TIPO_MOVIMIENTO.REEMBOLSO;
+    }
+
+    const expected = _mapFormaPagoToTipoMovimiento(method, false);
+    if (!expected) throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Unsupported payment method", { traceId });
+    if (!requested || requested === expected) return expected;
+    if (requested === TIPO_MOVIMIENTO.PROPINA && method !== FORMA_PAGO.ONLINE) return requested;
+
+    throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Movement type does not match payment method", { traceId, method, requested, expected });
+}
+
+function _movementNature(tipoMovimiento) {
+    if (tipoMovimiento === TIPO_MOVIMIENTO.PROPINA) return "PROPINA";
+    if (tipoMovimiento === TIPO_MOVIMIENTO.REEMBOLSO) return "DEVOLUCION";
+    if (tipoMovimiento === TIPO_MOVIMIENTO.AJUSTE) return "AJUSTE";
+    return "VENTA";
+}
+
+function _buildDocumentLines(concept, absAmount, baseImponible, cuotaIva, tasaIva) {
+    return [{
+        linea: 1,
+        descripcion: String(concept || "Movimiento de caja").trim().slice(0, 180),
+        cantidad: 1,
+        baseImponible: _roundMoney(baseImponible),
+        cuotaIva: _roundMoney(cuotaIva),
+        tasaIva: Number(tasaIva) || 0,
+        importeTotal: _roundMoney(absAmount),
+    }];
 }
 
 async function _findCitaByBookingId(bookingId) {
@@ -364,7 +434,9 @@ export async function _verifyIntegrityInternal(diaKey, options = {}) {
         expectedPrevHash = m.hashCadena || "";
 
         // 2) hash + signature
-        const payloadCanonico = _canonicalPayload(m.prevHash, m.transactionId, m.tipoMovimiento, m.importeContable, m.formaPago);
+        const payloadCanonico = m.integrityPayloadVersion === "LEDGER_V2"
+            ? _canonicalPayloadV2(m)
+            : _canonicalPayload(m.prevHash, m.transactionId, m.tipoMovimiento, m.importeContable, m.formaPago);
         const computedHashCadena = hashChain(m.prevHash, payloadCanonico);
         const computedFirma = hmacSha256Hex(fiscalKey, payloadCanonico);
         const firmaExpectedFull = `${computedFirma}|${computedHashCadena}`;
@@ -458,23 +530,27 @@ export async function registerBookingPayment(bookingId, amount, paymentMethod, o
             const year = parseInt(madridDateStr.slice(0, 4), 10) || new Date().getFullYear();
             const pad = (n) => String(n).padStart(5, "0");
 
-            const seqResult = await _getNextSequenceNumbers(year, traceId);
-            const numTicketFactura = `FAC-${year}-${pad(seqResult.nextYearSeq)}`;
-            const seqGlobal = seqResult.nextGlobalSeq;
-
-            const isRefund = options.tipoMovimiento === TIPO_MOVIMIENTO.REEMBOLSO || cleanAmount < 0;
+            const tipoMov = _resolveMovementType(normalizedMethod, cleanAmount, options.tipoMovimiento, traceId);
+            const isRefund = tipoMov === TIPO_MOVIMIENTO.REEMBOLSO;
+            const isTip = tipoMov === TIPO_MOVIMIENTO.PROPINA;
             const signo = isRefund ? -1 : 1;
 
             const absAmount = Math.abs(cleanAmount);
             const importeContable = absAmount * signo;
-
-            const baseImponible = Number((absAmount / (1 + IVA_RATES.GENERAL)).toFixed(2)) * signo;
-            const cuotaIva = Number((absAmount - Math.abs(baseImponible)).toFixed(2)) * signo;
+            const taxRate = isTip ? 0 : IVA_RATES.GENERAL;
+            const baseImponible = isTip ? 0 : Number((absAmount / (1 + taxRate)).toFixed(2)) * signo;
+            const cuotaIva = isTip ? 0 : Number((absAmount - Math.abs(baseImponible)).toFixed(2)) * signo;
+            const naturalezaOperacion = _movementNature(tipoMov);
+            const tratamientoIva = isTip ? "PROPINA_PENDIENTE_GESTORIA" : "IVA_GENERAL";
 
             const transIdRaw = options.transactionId || `TX_${traceId}_${Date.now()}`;
             const transId = _normalizeIdPart(transIdRaw, 120);
+            const referenciaRectificativa = isRefund ? _normalizeIdPart(options.refundId || options.orderId || transId, 120) : null;
+            const detalleLineas = _buildDocumentLines(options.concept || `${tipoMov} ${transId}`, absAmount, baseImponible, cuotaIva, taxRate);
 
-            const tipoMov = options.tipoMovimiento || _mapFormaPagoToTipoMovimiento(normalizedMethod, isRefund);
+            const seqResult = await _getNextSequenceNumbers(year, traceId);
+            const numTicketFactura = `FAC-${year}-${pad(seqResult.nextYearSeq)}`;
+            const seqGlobal = seqResult.nextGlobalSeq;
 
             const diaKey = options.diaKey || madridDateStr.substring(0, 10);
             const mesKey = options.mesKey || diaKey.substring(0, 7);
@@ -482,7 +558,20 @@ export async function registerBookingPayment(bookingId, amount, paymentMethod, o
             const fiscalKey = await _getCachedCashierSecret();
             const nifEmisor = await _getCachedFiscalIssuerNif();
 
-            const payloadCanonico = _canonicalPayload(ultimoHash, transId, tipoMov, importeContable, normalizedMethod);
+            const payloadCanonico = _canonicalPayloadV2({
+                prevHash: ultimoHash,
+                transactionId: transId,
+                tipoMovimiento: tipoMov,
+                importeContable,
+                formaPago: normalizedMethod,
+                baseImponible,
+                cuotaIva,
+                tasaIva: taxRate,
+                naturalezaOperacion,
+                tratamientoIva,
+                referenciaRectificativa,
+                detalleLineas,
+            });
             const hashCadena = hashChain(ultimoHash, payloadCanonico);
             const firma = hmacSha256Hex(fiscalKey, payloadCanonico);
             const firmaDigital = `${firma}|${hashCadena}`;
@@ -525,7 +614,12 @@ export async function registerBookingPayment(bookingId, amount, paymentMethod, o
                 importeContable,
                 baseImponible,
                 cuotaIva,
-                tasaIva: IVA_RATES.GENERAL,
+                tasaIva: taxRate,
+                naturalezaOperacion,
+                tratamientoIva,
+                referenciaRectificativa,
+                detalleLineas,
+                integrityPayloadVersion: "LEDGER_V2",
                 nifEmisor,
                 numTicketFactura,
                 prevHash: ultimoHash,
@@ -578,14 +672,16 @@ export async function registerBookingPayment(bookingId, amount, paymentMethod, o
                 log.warn("Ledger entry recorded without configured fiscal issuer NIF", { recordId, traceId });
             }
 
-            try {
-                await enqueueM365LedgerRecord(result, traceId);
-            } catch (_) {
-                log.warn("M365 ledger projection enqueue failed", {
-                    recordId,
-                    traceId,
-                    errorCode: "M365_GRAPH_QUEUE_ENQUEUE_FAILED",
-                });
+            if (SDK_CONFIG?.M365?.ENABLED === true) {
+                try {
+                    await enqueueM365LedgerRecord(result, traceId);
+                } catch (_) {
+                    log.warn("M365 ledger projection enqueue failed", {
+                        recordId,
+                        traceId,
+                        errorCode: "M365_GRAPH_QUEUE_ENQUEUE_FAILED",
+                    });
+                }
             }
 
             log.info("Ledger entry recorded", {
@@ -620,6 +716,7 @@ function _buildZClosingSummary(diaKey, movements, integrity, source) {
     const totalsByVatRate = {};
     let totalVentas = 0;
     let totalReembolsos = 0;
+    let totalPropinas = 0;
     let totalAjustes = 0;
     let baseImponibleNeta = 0;
     let cuotaIvaNeta = 0;
@@ -642,6 +739,7 @@ function _buildZClosingSummary(diaKey, movements, integrity, source) {
         baseImponibleNeta += base;
         cuotaIvaNeta += vat;
         if (type === TIPO_MOVIMIENTO.REEMBOLSO || amount < 0) totalReembolsos += amount;
+        else if (type === TIPO_MOVIMIENTO.PROPINA) totalPropinas += amount;
         else if (type === TIPO_MOVIMIENTO.AJUSTE) totalAjustes += amount;
         else totalVentas += amount;
     }
@@ -665,6 +763,7 @@ function _buildZClosingSummary(diaKey, movements, integrity, source) {
         totalOnline: _roundMoney(totalsByPayment.online),
         totalVentas: _roundMoney(totalVentas),
         totalReembolsos: _roundMoney(totalReembolsos),
+        totalPropinas: _roundMoney(totalPropinas),
         totalAjustes: _roundMoney(totalAjustes),
         baseImponibleNeta: _roundMoney(baseImponibleNeta),
         cuotaIvaNeta: _roundMoney(cuotaIvaNeta),
@@ -904,14 +1003,21 @@ export const registerManualTransaction = webMethod(Permissions.SiteMember, async
         await requireCajero(traceId);
 
         const { amount, paymentMethod, tipoMovimiento, concept, resourceId = "TPV" } = payload;
+        const normalizedMethod = String(paymentMethod || "").toUpperCase();
+        const requestedType = String(tipoMovimiento || "").toUpperCase();
+        const inferredType = _mapFormaPagoToTipoMovimiento(normalizedMethod, false);
+        if (!inferredType || (requestedType && requestedType !== TIPO_MOVIMIENTO.PROPINA && requestedType !== inferredType)) {
+            throw createBookingError(ERROR_CODES.INVALID_PAYLOAD, "Manual movement type does not match payment method", { traceId });
+        }
 
-        return await registerBookingPayment(null, amount, paymentMethod, {
-            concept: concept || "Manual TPV",
+        const isTip = requestedType === TIPO_MOVIMIENTO.PROPINA;
+        return await registerBookingPayment(null, amount, normalizedMethod, {
+            concept: concept || (isTip ? "Propina TPV" : "Manual TPV"),
             resourceId,
             traceId,
-            tipoMovimiento: tipoMovimiento || TIPO_MOVIMIENTO.VENTA_EFECTIVO,
+            tipoMovimiento: isTip ? TIPO_MOVIMIENTO.PROPINA : inferredType,
             transactionId: `MANUAL_${traceId}_${Date.now()}`,
-            origen: "ONLY_STAFF_MANUAL",
+            origen: isTip ? "ONLY_STAFF_MANUAL_TIP" : "ONLY_STAFF_MANUAL",
         });
     } catch (err) {
         return { status: "ERROR", data: null, error: _toPublicError(err, "MANUAL_TX_FAIL") };

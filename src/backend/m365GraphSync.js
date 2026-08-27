@@ -30,6 +30,10 @@ const PENDING_STATES = ["PENDING", "RETRY", "BLOCKED"];
 const ALLOWED_EVENT_TYPES = new Set(["LEDGER_MOVEMENT", "Z_CLOSING"]);
 const GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
+function _isM365Enabled() {
+    return SDK_CONFIG?.M365?.ENABLED === true;
+}
+
 function _cleanText(value, maxLength) {
     return String(value ?? "").trim().replace(/[\r\n\t]+/g, " ").slice(0, maxLength);
 }
@@ -225,6 +229,9 @@ async function _postListItem(config, token, payload) {
 }
 
 export async function enqueueM365LedgerRecord(movement, traceId) {
+    if (!_isM365Enabled()) {
+        return { status: "PAUSED", traceId: _cleanTraceId(traceId), queueId: "" };
+    }
     const payload = _asLedgerPayload(movement, traceId);
     const now = new Date();
     const queueId = _queueId(payload);
@@ -297,6 +304,13 @@ async function _processQueueItem(queue, runTraceId) {
 
 export async function processM365GraphSyncQueue(options = {}) {
     const traceId = _cleanTraceId(options?.traceId || makeTraceId("cron-m365-graph"));
+    if (!_isM365Enabled()) {
+        return {
+            status: "PAUSED",
+            data: { scanned: 0, completed: 0, retried: 0, failed: 0, blocked: 0, skipped: 0 },
+            error: null,
+        };
+    }
     const limit = Math.max(1, Math.min(Number(options?.limit) || BATCH_SIZE, BATCH_SIZE));
     const pending = await wixData.query(QUEUE_COL)
         .in("status", PENDING_STATES)

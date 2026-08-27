@@ -13,7 +13,8 @@ import { webMethod, Permissions } from "wix-web-module";
 import wixData from "wix-data";
 import {
     COLLECTIONS,
-    SDK_CONFIG
+    SDK_CONFIG,
+    TIPO_MOVIMIENTO
 } from "backend/internalConfig";
 import {
     makeTraceId,
@@ -109,8 +110,13 @@ export const getQuarterlyTaxSummary = webMethod(Permissions.SiteMember, async (y
         let totalFacturado = 0;
         let totalVentas = 0;
         let totalReembolsos = 0;
+        let totalPropinas = 0;
+        let totalAjustes = 0;
         let countVentas = 0;
         let countReembolsos = 0;
+        let countPropinas = 0;
+        let countAjustes = 0;
+        let countFiscal = 0;
 
         const breakdownByPaymentMethod = {
             efectivo: 0,
@@ -133,21 +139,34 @@ export const getQuarterlyTaxSummary = webMethod(Permissions.SiteMember, async (y
             const formaPago = _safeTrim(m.formaPago).toLowerCase();
             const tasaIva = Number(m.tasaIva) || 0;
             const tasaIvaKey = String(tasaIva);
+            const tipoMovimiento = _safeTrim(m.tipoMovimiento).toUpperCase();
+            const naturaleza = _safeTrim(m.naturalezaOperacion).toUpperCase() || (tipoMovimiento === TIPO_MOVIMIENTO.PROPINA ? "PROPINA" : tipoMovimiento === TIPO_MOVIMIENTO.REEMBOLSO || importeContable < 0 ? "DEVOLUCION" : tipoMovimiento === TIPO_MOVIMIENTO.AJUSTE ? "AJUSTE" : "VENTA");
 
+            if (breakdownByPaymentMethod[formaPago] !== undefined) {
+                breakdownByPaymentMethod[formaPago] += importeContable;
+            }
+            if (naturaleza === "PROPINA") {
+                totalPropinas += importeContable;
+                countPropinas++;
+                continue;
+            }
+            if (naturaleza === "AJUSTE") {
+                totalAjustes += importeContable;
+                countAjustes++;
+                continue;
+            }
+
+            countFiscal++;
             totalBaseImponible += base;
             totalCuotaIva += cuota;
             totalFacturado += importeContable;
 
-            if (importeContable >= 0) {
+            if (naturaleza === "VENTA") {
                 totalVentas += importeContable;
                 countVentas++;
             } else {
                 totalReembolsos += importeContable;
                 countReembolsos++;
-            }
-
-            if (breakdownByPaymentMethod[formaPago] !== undefined) {
-                breakdownByPaymentMethod[formaPago] += importeContable;
             }
 
             if (breakdownByMonth[mes]) {
@@ -174,24 +193,33 @@ export const getQuarterlyTaxSummary = webMethod(Permissions.SiteMember, async (y
                 ejercicio: y,
                 trimestre: q,
                 periodoMeses: months,
-                totalOperaciones: items.length,
-                conteo: {
-                    ventas: countVentas,
-                    reembolsos: countReembolsos
-                },
-                modelo303: {
-                    casilla01_baseImponible: round2(totalBaseImponible),
-                    casilla02_tipoGravamen: "21%",
-                    casilla03_cuotaDevengada: round2(totalCuotaIva)
-                },
-                modelo130: {
-                    ingresosComputables: round2(totalBaseImponible)
-                },
-                totales: {
-                    totalVentasBrutas: round2(totalVentas),
-                    totalReembolsos: round2(totalReembolsos),
-                    totalFacturadoNeto: round2(totalFacturado)
-                },
+                                    totalOperaciones: items.length,
+                    totalOperacionesFiscales: countFiscal,
+                    conteo: {
+                        ventas: countVentas,
+                        reembolsos: countReembolsos,
+                        propinas: countPropinas,
+                        ajustes: countAjustes
+                    },
+                    borradorIva: {
+                        estado: "REVISION_PROFESIONAL_REQUERIDA",
+                        baseImponibleRegistrada: round2(totalBaseImponible),
+                        cuotaIvaRegistrada: round2(totalCuotaIva),
+                        nota: "No es un Modelo 303 ni una declaracion preparada para presentar. Los tipos y el regimen deben ser validados por la gestoria."
+                    },
+                    borradorIngresos: {
+                        estado: "REVISION_PROFESIONAL_REQUERIDA",
+                        ingresosRegistrados: round2(totalBaseImponible),
+                        nota: "No es un Modelo 130 ni una declaracion preparada para presentar."
+                    },
+                    totales: {
+                        totalVentasBrutas: round2(totalVentas),
+                        totalReembolsos: round2(totalReembolsos),
+                        totalFacturadoNeto: round2(totalFacturado),
+                        totalPropinasSeparadas: round2(totalPropinas),
+                        totalAjustesSeparados: round2(totalAjustes)
+                    },
+
                 desgloseFormaPago: {
                     efectivo: round2(breakdownByPaymentMethod.efectivo),
                     tarjeta: round2(breakdownByPaymentMethod.tarjeta),
@@ -240,8 +268,12 @@ export const getLibroRegistroFacturasExpedidas = webMethod(Permissions.Admin, as
             orden: idx + 1,
             numTicketFactura: _safeTrim(m.numTicketFactura),
             fechaExpedicion: _safeTrim(m.diaKey),
-            tipoFactura: m.tipoMovimiento === "REEMBOLSO" || Number(m.importeContable) < 0 ? "R1" : "F2",
+            tipoFactura: m.tipoMovimiento === "REEMBOLSO" || Number(m.importeContable) < 0 ? "R1" : "BORRADOR_INTERNO",
             tipoMovimiento: _safeTrim(m.tipoMovimiento),
+            naturalezaOperacion: _safeTrim(m.naturalezaOperacion) || "VENTA",
+            tratamientoIva: _safeTrim(m.tratamientoIva) || "PENDIENTE_VALIDACION",
+            incluidoEnBorradorIva: _safeTrim(m.naturalezaOperacion).toUpperCase() !== "PROPINA" && _safeTrim(m.naturalezaOperacion).toUpperCase() !== "AJUSTE",
+            referenciaRectificativa: _safeTrim(m.referenciaRectificativa) || null,
             formaPago: _safeTrim(m.formaPago),
             baseImponible: Number(m.baseImponible) || 0,
             tipoIva: `${Math.round((Number(m.tasaIva) || 0) * 100)}%`,

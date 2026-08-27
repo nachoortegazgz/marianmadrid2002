@@ -37,7 +37,7 @@ check('Web Methods usan el contrato reconocido por el runtime Velo', () => {
   assert.equal(Object.hasOwn(pkg.dependencies, '@wix/web-methods'), false);
   assert.match(pkg.dependencies['@wix/bookings'], /^\^1\.0\.\d+$/);
   const webModules = allFiles(backend).filter((file) => file.endsWith('.web.js'));
-  assert.equal(webModules.length, 8);
+  assert.equal(webModules.length, 9);
   for (const file of webModules) {
     const source = fs.readFileSync(file, 'utf8');
     assert.match(source, /from "wix-web-module"/, path.relative(root, file));
@@ -54,7 +54,7 @@ check('ADMINISTRACION reutiliza el controlador exclusivo de Marian', () => {
   const controller = read('src/public/marianAdministrationController.js');
   const legacy = read('src/pages/ONLY STAFF.mvf3f.js');
   const administration = read('src/pages/ADMINISTRACION.mvf3f.js');
-  for (const token of ['checkStaffCollaboratorAccess', 'askMarianAssistant', 'registerManualTransaction', 'registerXCount', 'registerZClosing', 'getInventoryDashboard', 'getQuarterlyTaxSummary']) assert.ok(controller.includes(token), token);
+  for (const token of ['checkStaffCollaboratorAccess', 'askMarianAssistant', 'registerManualTransaction', 'registerXCount', 'registerZClosing', 'getInventoryDashboard', 'getQuarterlyTaxSummary', 'previewManagerPackage', 'createManagerPackageVersion', 'downloadManagerPackageVersion', 'getManagerPackageHistory', 'emailManagerPackageVersion', 'DOCUMENT_PREVIEW', 'DOCUMENT_CREATE', 'DOCUMENT_HISTORY', 'DOCUMENT_DOWNLOAD', 'DOCUMENT_EMAIL']) assert.ok(controller.includes(token), token);
   assert.ok(legacy.includes('initMarianAdministration'));
   assert.ok(legacy.includes('#htmlOnlyStaff'));
   assert.ok(administration.includes('initMarianAdministration'));
@@ -75,6 +75,7 @@ check('Contrato CMS: colecciones SSOT y campos canónicos', () => {
   const dataHooks = read('src/backend/data.js');
   assert.ok(dataHooks.includes('motivoAjuste is required for manual adjustments'));
   assert.ok(dataHooks.includes('item.hora = madrid.slice(11, 19)'));
+  for (const token of ['_assertLedgerDocumentDetail', 'naturalezaOperacion does not match tipoMovimiento', 'PROPINA_PENDIENTE_GESTORIA', 'integrityPayloadVersion !== "LEDGER_V2"']) assert.ok(dataHooks.includes(token), token);
 });
 
 check('Esquema CMS canónico cubre las colecciones y los índices activos del runtime', () => {
@@ -136,7 +137,7 @@ check('Sincronizacion de servicios usa cola, revision nativa y errores saneados'
   assert.ok(crons.includes('processBookingsServiceSyncJob'));
 });
 
-check('Registro externo M365 usa cola privada y no bloquea el ledger confirmado', () => {
+check('Registro externo M365 conserva la infraestructura pero queda pausado durante Fase 1', () => {
   const config = read('src/backend/internalConfig.js');
   const graphSync = read('src/backend/m365GraphSync.js');
   const cashbox = read('src/backend/cajas.web.js');
@@ -145,14 +146,23 @@ check('Registro externo M365 usa cola privada y no bloquea el ledger confirmado'
   const schemaById = new Map(canonicalSchema.collections.map((collection) => [collection.id, collection]));
   const queue = schemaById.get('M365GraphSyncQueue');
   assert.ok(config.includes('M365_GRAPH_SYNC_QUEUE'));
+  assert.ok(config.includes('M365: Object.freeze({\n        ENABLED: false'));
   assert.ok(queue);
   for (const fieldId of ['payload', 'payloadHash', 'status', 'attempts', 'nextAttemptAt', 'traceId', 'errorCode', 'externalRecordId']) {
     assert.ok(queue.fields.some(([candidate]) => candidate === fieldId), fieldId);
   }
-  for (const token of ['getSecret(SECRETS.M365_GRAPH_CLIENT_SECRET)', 'enqueueM365LedgerRecord', 'processM365GraphSyncQueue', 'M365_GRAPH_PERMISSION_DENIED', 'IntegrityHash']) assert.ok(graphSync.includes(token), token);
-  assert.ok(cashbox.includes('enqueueM365LedgerRecord(result, traceId)'));
-  assert.ok(crons.includes('processM365GraphSyncJob'));
-  assert.ok(jobs.includes('processM365GraphSyncJob'));
+  for (const token of ['getSecret(SECRETS.M365_GRAPH_CLIENT_SECRET)', 'enqueueM365LedgerRecord', 'processM365GraphSyncQueue', 'M365_GRAPH_PERMISSION_DENIED', 'IntegrityHash', 'if (!_isM365Enabled())']) assert.ok(graphSync.includes(token), token);
+  assert.ok(cashbox.includes('SDK_CONFIG?.M365?.ENABLED === true'));
+  assert.equal(crons.includes('processM365GraphSyncJob'), false);
+  assert.ok(crons.includes('PAUSED_PHASE_1'));
+  assert.equal(jobs.includes('processM365GraphSyncJob'), false);
+});
+
+check('Paquete documental y entrega a gestoría exigen a Marian, versionado e idempotencia', () => {
+  const documents = read('src/backend/fiscalDocuments.web.js');
+  for (const token of ['webMethod(Permissions.Admin', 'requireMarianManager', 'previewManagerPackage', 'createManagerPackageVersion', 'downloadManagerPackageVersion', 'getManagerPackageHistory', 'emailManagerPackageVersion', 'RESEND_API_KEY', 'RESEND_FROM_EMAIL', 'Idempotency-Key', 'DOCUMENT_SEND_CONFIRMATION_REQUIRED', 'DOCUMENT_EMAIL_NOT_CONFIGURED', 'DOCUMENT_SOURCE_CHANGED', 'GESTORIA_DOCUMENT_CREATED', 'GESTORIA_DOCUMENT_SENT', 'GESTORIA_DOCUMENT_FAILED']) assert.ok(documents.includes(token), token);
+  assert.ok(documents.includes('DEFAULT_MANAGER_EMAIL'));
+  assert.equal(documents.includes('https://graph.microsoft.com'), false);
 });
 
 check('Servicios invalidan todas las cachés y los complementos respetan el contrato CMS', () => {
@@ -206,7 +216,7 @@ check('Ledger eCommerce cubre pedidos sin reservas y evita devoluciones huerfana
   assert.ok(cashbox.includes('item.bookingIds || null'));
   assert.ok(cashbox.includes('WAIT_FOR_ORIGINAL_ORDER_LEDGER'));
   assert.ok(cashbox.includes('Daily fiscal movement query reached configured page cap'));
-  for (const token of ['_upsertCurrentCashProjection', '_buildCashierProjection', 'totalEfectivoTeorico', 'estadoCuadre', 'concepto:', 'origen:', 'orderId: options.orderId', 'refundId: options.refundId', 'nifEmisor', 'projectLedgerMovementToAccounting', 'Accounting projection intentionally skipped']) assert.ok(cashbox.includes(token), token);
+  for (const token of ['_upsertCurrentCashProjection', '_buildCashierProjection', 'totalEfectivoTeorico', 'estadoCuadre', 'concepto:', 'origen:', 'orderId: options.orderId', 'refundId: options.refundId', 'nifEmisor', 'projectLedgerMovementToAccounting', 'Accounting projection intentionally skipped', '_resolveMovementType', '_canonicalPayloadV2', 'naturalezaOperacion', 'tratamientoIva', 'detalleLineas', 'integrityPayloadVersion: "LEDGER_V2"', 'TIPO_MOVIMIENTO.PROPINA']) assert.ok(cashbox.includes(token), token);
   assert.ok(events.includes("origen: 'WIX_ECOM_PAYMENT_WEBHOOK'"));
   assert.ok(events.includes("origen: 'WIX_ECOM_REFUND_WEBHOOK'"));
   assert.ok(events.includes('orderId,\n            refundId,\n            origen: \'WIX_ECOM_REFUND_WEBHOOK\','));
@@ -214,14 +224,14 @@ check('Ledger eCommerce cubre pedidos sin reservas y evita devoluciones huerfana
 
 check('Proyeccion contable solo se activa con mapa validado y preserva partida doble', () => {
   const accounting = read('src/backend/contabilidad.js');
-  for (const token of ['PLAN_CUENTAS_CONTABLES', 'ASIENTOS_CONTABLES', 'LINEAS_ASIENTO_CONTABLE', 'NO_APPROVED_ACCOUNT_MAP', 'ACCOUNTING_PROJECTION_UNBALANCED', 'totalDebe', 'totalHaber', 'hashAsiento', 'firmaAsiento']) assert.ok(accounting.includes(token), token);
+  for (const token of ['PLAN_CUENTAS_CONTABLES', 'ASIENTOS_CONTABLES', 'LINEAS_ASIENTO_CONTABLE', 'NO_APPROVED_ACCOUNT_MAP', 'ACCOUNTING_PROJECTION_UNBALANCED', 'totalDebe', 'totalHaber', 'hashAsiento', 'firmaAsiento', 'TIP_TREATMENT_PENDING_PROFESSIONAL_REVIEW']) assert.ok(accounting.includes(token), token);
   const dataHooks = read('src/backend/data.js');
   for (const token of ['ASIENTOS_CONTABLES_beforeInsert', 'ASIENTOS_CONTABLES_beforeUpdate', 'LINEAS_ASIENTO_CONTABLE_beforeInsert', 'LINEAS_ASIENTO_CONTABLE_beforeUpdate']) assert.ok(dataHooks.includes(token), token);
 });
 
 check('Cierre Z conserva resumen fiscal sellado y secuencia verificable', () => {
   const cashbox = read('src/backend/cajas.web.js');
-  for (const token of ['_buildZClosingSummary', 'resumenTiposMovimiento', 'resumenTipoIva', 'seqInicio', 'seqFin', 'hashInicio', 'hashFin', 'hashCierre', 'firmaCierre', 'integridadVerificada']) assert.ok(cashbox.includes(token), token);
+  for (const token of ['_buildZClosingSummary', 'resumenTiposMovimiento', 'resumenTipoIva', 'seqInicio', 'seqFin', 'hashInicio', 'hashFin', 'hashCierre', 'firmaCierre', 'integridadVerificada', 'totalPropinas']) assert.ok(cashbox.includes(token), token);
 });
 
 check('Registro laboral deriva el actor de la sesion y conserva su identificador', () => {
@@ -232,7 +242,8 @@ check('Registro laboral deriva el actor de la sesion y conserva su identificador
 
 check('Informes fiscales conservan desglose, origen y referencias del ledger', () => {
   const fiscal = read('src/backend/fiscalAggregator.web.js');
-  for (const token of ['desgloseTipoIva', 'Number(m.tasaIva)', 'concepto:', 'origen:', 'orderId:', 'refundId:', 'fechaHoraRegistro:', 'FISCAL_RESULT_TRUNCATED']) assert.ok(fiscal.includes(token), token);
+  for (const token of ['desgloseTipoIva', 'Number(m.tasaIva)', 'concepto:', 'origen:', 'orderId:', 'refundId:', 'fechaHoraRegistro:', 'FISCAL_RESULT_TRUNCATED', 'borradorIva', 'totalPropinasSeparadas', 'referenciaRectificativa', 'incluidoEnBorradorIva']) assert.ok(fiscal.includes(token), token);
+  assert.equal(fiscal.includes('modelo303:'), false);
 });
 
 check('Cache, Jobs y rate limiter usan limites ejecutables por Wix', () => {

@@ -177,3 +177,17 @@ Las búsquedas iniciales de las colas `BookingsServiceSyncQueue` y `M365GraphSyn
 También se creó `M365GraphSyncQueue`, vacía, con los trece campos de contrato para una proyección mínima del ledger y con permisos solo administrativos para las cuatro operaciones. Sus índices `statusNextAttemptAt`, `payloadHashUnique` y `traceId` se verificaron como activos y sin fallos. Los tres índices de `BookingsServiceSyncQueue` también están activos. Ninguna cola está conectada a páginas, contiene ítems, ni habilita acceso público.
 | CITAS, MOVIMIENTOS_CAJA, bloqueos y compensaciones | 0 en la vista | Avanzados | Estructura disponible, sin datos visibles de producción en esta vista. |
 | MAPA_STAFF | 3 | Avanzados | Existe con tres correspondencias privadas, alineadas en volumen con los tres recursos activos de Bookings. |
+
+## Publicación y comprobación pública posterior
+
+El commit `77f1ecf` se publicó en la rama principal y se desplegó desde la fuente remota en Wix. La sincronización de tipos del proyecto se completó tras una incidencia de red transitoria; el análisis estático, la revisión de sanitización y todas las simulaciones de reservas, pagos, devoluciones y administración terminaron correctamente antes de la publicación.
+
+La ruta pública `/reserva-online` responde correctamente y muestra categorías, fichas de servicio, precios y enlaces de reserva para servicios operativos. Esto confirma que el catálogo de reservas es accesible al cliente. La página de inicio conserva un bloque nativo que muestra el mensaje «Nada que reservar ahora» pese a que la ruta de catálogo sí está operativa; queda identificado como una incidencia de presentación y conversión que se corregirá sin modificar la lógica transaccional ni los servicios activos.
+
+| Verificación posterior | Resultado | Estado |
+| --- | --- | --- |
+| Publicación desde `origin/main` | Despliegue completado por Wix | Correcto |
+| Catálogo de reserva público | Servicios y enlaces de reserva visibles en `/reserva-online` | Correcto |
+| Bloque de reservas de la página de inicio | Muestra una indisponibilidad contradictoria | Pendiente de corrección de UX |
+| Colas CMS privadas | Vacías, sin acceso público e indexadas | Correcto |
+| Prueba real de reserva y proyección M365 | Requiere crear un servicio y franja aislados, y configurar los secretos externos | Pendiente de QA controlada |

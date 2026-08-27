@@ -898,6 +898,31 @@
           true
         ],
         [
+          "naturalezaOperacion",
+          "TEXT",
+          true
+        ],
+        [
+          "tratamientoIva",
+          "TEXT",
+          true
+        ],
+        [
+          "referenciaRectificativa",
+          "TEXT",
+          false
+        ],
+        [
+          "detalleLineas",
+          "ARRAY",
+          true
+        ],
+        [
+          "integrityPayloadVersion",
+          "TEXT",
+          true
+        ],
+        [
           "nifEmisor",
           "TEXT",
           false
@@ -983,6 +1008,10 @@
         [
           "formaPago",
           "diaKey"
+        ],
+        [
+          "naturalezaOperacion",
+          "mesKey"
         ],
         [
           "reservaIdVinculada",

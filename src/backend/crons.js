@@ -48,7 +48,6 @@ import { _cleanExpiredDualSlotsInternal } from 'backend/reservas.web';
 import { _verifyIntegrityInternal, _registerZClosingInternal, processPendingFiscalRecoveries } from 'backend/cajas.web';
 import { SECRETS } from 'backend/mmSecrets';
 import { processBookingsServiceSyncQueue } from 'backend/bookingsServiceSync';
-import { processM365GraphSyncQueue } from 'backend/m365GraphSync';
 
 const log = logger;
 const JOB_TIMEOUT_MS = SDK_CONFIG.JOBS.TIMEOUT_MS;
@@ -350,16 +349,6 @@ export async function processBookingsServiceSyncJob() {
     }
 }
 
-export async function processM365GraphSyncJob() {
-    const traceId = makeTraceId('cron-m365-graph-sync');
-    try {
-        return await processM365GraphSyncQueue({ traceId });
-    } catch (_) {
-        log.error('[CRON] M365 Graph sync job failed', { traceId, errorCode: 'M365_GRAPH_SYNC_JOB_FAILED' });
-        return { status: 'ERROR', data: null, error: { code: 'M365_GRAPH_SYNC_JOB_FAILED', message: 'External registry synchronization failed.' } };
-    }
-}
-
 export async function verifyNightlyZClosing() {
     const traceId = makeTraceId('cron-zclosing');
     try {
@@ -488,18 +477,25 @@ export async function systemHealthCheck() {
             details.compensationsWarning = `High number of pending compensations: ${details.pendingCompensationsCount}`;
         }
 
-        // 5. Supervision acotada de registros externos pendientes o bloqueados.
-        const m365SyncRes = await withTimeout(
-            wixData.query(COLLECTIONS.M365_GRAPH_SYNC_QUEUE).in('status', ['PENDING', 'RETRY', 'BLOCKED']).limit(HEALTH_CHECK_QUERY_LIMIT).find({ suppressAuth: true }),
-            JOB_TIMEOUT_MS,
-            'cron-healthCheck-m365GraphSync'
-        ).catch(() => null);
-        details.pendingM365GraphSyncCount = m365SyncRes?.items?.length || 0;
-        details.pendingM365GraphSyncHasMore = !!m365SyncRes?.hasNext?.();
-        details.blockedM365GraphSyncCount = (m365SyncRes?.items || []).filter((item) => item?.status === 'BLOCKED').length;
-        if (details.pendingM365GraphSyncCount >= HEALTH_CHECK_QUERY_LIMIT || details.pendingM365GraphSyncHasMore || details.blockedM365GraphSyncCount > 0) {
-            overallStatus = 'WARNING';
-            details.m365GraphSyncWarning = 'External registry queue requires configuration or review.';
+        // 5. M365 permanece pausado expresamente hasta una autorizacion de Fase 2.
+        details.m365GraphSyncEnabled = SDK_CONFIG?.M365?.ENABLED === true;
+        if (!details.m365GraphSyncEnabled) {
+            details.m365GraphSyncState = 'PAUSED_PHASE_1';
+            details.pendingM365GraphSyncCount = 0;
+            details.blockedM365GraphSyncCount = 0;
+        } else {
+            const m365SyncRes = await withTimeout(
+                wixData.query(COLLECTIONS.M365_GRAPH_SYNC_QUEUE).in('status', ['PENDING', 'RETRY', 'BLOCKED']).limit(HEALTH_CHECK_QUERY_LIMIT).find({ suppressAuth: true }),
+                JOB_TIMEOUT_MS,
+                'cron-healthCheck-m365GraphSync'
+            ).catch(() => null);
+            details.pendingM365GraphSyncCount = m365SyncRes?.items?.length || 0;
+            details.pendingM365GraphSyncHasMore = !!m365SyncRes?.hasNext?.();
+            details.blockedM365GraphSyncCount = (m365SyncRes?.items || []).filter((item) => item?.status === 'BLOCKED').length;
+            if (details.pendingM365GraphSyncCount >= HEALTH_CHECK_QUERY_LIMIT || details.pendingM365GraphSyncHasMore || details.blockedM365GraphSyncCount > 0) {
+                overallStatus = 'WARNING';
+                details.m365GraphSyncWarning = 'External registry queue requires configuration or review.';
+            }
         }
 
         // 6. INCIDENCIA 3: Integridad del libro diario del dia actual

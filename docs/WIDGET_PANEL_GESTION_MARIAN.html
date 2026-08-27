@@ -135,7 +135,8 @@
     <nav class="tabs" aria-label="Secciones de gestion">
       <button class="tab" type="button" data-tab="overview" aria-selected="true">Resumen</button>
       <button class="tab" type="button" data-tab="cash">Caja</button>
-      <button class="tab" type="button" data-tab="fiscal">Fiscal y gestoria</button>
+      <button class="tab" type="button" data-tab="fiscal">Fiscal</button>
+      <button class="tab" type="button" data-tab="documents">Documentos y gestoria</button>
       <button class="tab" type="button" data-tab="help">Gestion global</button>
     </nav>
 
@@ -155,7 +156,7 @@
     <section id="cash" class="section">
       <div class="grid-2">
         <article class="panel"><h2 class="panel-title">Estado y conteo de caja <small>Registro controlado</small></h2><ul id="cashBreakdown" class="value-list"><li><span class="muted">Sin datos</span><strong>--</strong></li></ul><div class="btn-row" style="margin-top:14px;"><button id="refreshCash" class="btn outline" type="button">Actualizar caja</button></div><hr style="margin:18px 0; border:0; border-top:1px solid var(--line);" /><div class="form-group"><label for="countDate">Fecha de conteo</label><input id="countDate" type="date" /></div><div class="form-group"><label for="cashCount">Efectivo contado (EUR)</label><input id="cashCount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" /></div><button id="registerXCount" class="btn warning" type="button">Registrar conteo X</button></article>
-        <article class="panel"><h2 class="panel-title">Venta presencial <small>Asiento de caja</small></h2><p class="notice">Solo registra una venta real ya cobrada. Para pagos y devoluciones online utiliza el flujo nativo de Wix.</p><div class="form-row" style="margin-top:14px;"><div class="form-group"><label for="manualAmount">Importe (EUR)</label><input id="manualAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" /></div><div class="form-group"><label for="paymentMethod">Forma de pago</label><select id="paymentMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="BIZUM">Bizum</option></select></div></div><div class="form-group"><label for="manualConcept">Concepto interno</label><input id="manualConcept" type="text" maxlength="120" placeholder="Ej: Venta TPV servicio" /></div><button id="registerManualTx" class="btn success" type="button">Registrar venta presencial</button><hr style="margin:18px 0; border:0; border-top:1px solid var(--line);" /><p class="notice">El cierre Z verifica la integridad de los movimientos del dia y crea un cierre inmutable. Usalo una vez finalizada la jornada.</p><div class="form-group" style="margin-top:14px;"><label for="closingDate">Fecha de cierre</label><input id="closingDate" type="date" /></div><button id="registerZClosing" class="btn danger" type="button">Generar cierre Z</button></article>
+        <article class="panel"><h2 class="panel-title">Venta presencial <small>Asiento de caja</small></h2><p class="notice">Solo registra una venta real ya cobrada. Para pagos y devoluciones online utiliza el flujo nativo de Wix.</p><div class="form-row" style="margin-top:14px;"><div class="form-group"><label for="manualAmount">Importe (EUR)</label><input id="manualAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" /></div><div class="form-group"><label for="paymentMethod">Forma de pago</label><select id="paymentMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="BIZUM">Bizum</option></select></div><div class="form-group"><label for="transactionKind">Naturaleza</label><select id="transactionKind"><option value="VENTA">Venta presencial</option><option value="PROPINA">Propina pendiente de revision fiscal</option></select></div></div><div class="form-group"><label for="manualConcept">Concepto interno</label><input id="manualConcept" type="text" maxlength="120" placeholder="Ej: Venta TPV servicio" /></div><button id="registerManualTx" class="btn success" type="button">Registrar venta presencial</button><hr style="margin:18px 0; border:0; border-top:1px solid var(--line);" /><p class="notice">El cierre Z verifica la integridad de los movimientos del dia y crea un cierre inmutable. Usalo una vez finalizada la jornada.</p><div class="form-group" style="margin-top:14px;"><label for="closingDate">Fecha de cierre</label><input id="closingDate" type="date" /></div><button id="registerZClosing" class="btn danger" type="button">Generar cierre Z</button></article>
       </div>
     </section>
 
@@ -165,11 +166,17 @@
       <article class="panel" style="margin-top:16px;"><h2 class="panel-title">Libro registro de facturas expedidas</h2><div id="ledgerBook" class="empty">Carga el libro registro para ver los movimientos del periodo.</div></article>
     </section>
 
+    <section id="documents" class="section">
+      <article class="panel"><h2 class="panel-title">Paquete de revision para gestoria <small>Versionado desde el ledger inmutable</small></h2><p class="notice">Este paquete es una ayuda de revision. No es una factura, una declaracion ni un modelo oficial. Valida siempre los datos con la gestoria antes de cualquier presentacion.</p><div class="form-row" style="margin-top:14px;"><div class="form-group"><label for="documentYear">Ejercicio</label><input id="documentYear" type="number" min="2020" max="2100" step="1" /></div><div class="form-group"><label for="documentQuarter">Trimestre</label><select id="documentQuarter"><option value="1">1 (enero-marzo)</option><option value="2">2 (abril-junio)</option><option value="3">3 (julio-septiembre)</option><option value="4">4 (octubre-diciembre)</option></select></div></div><div class="form-group"><label for="documentType">Tipo de documento</label><select id="documentType" disabled><option value="PAQUETE_GESTORIA">Paquete de revision para gestoria</option></select></div><div class="form-group"><label for="managerEmail">Email de gestoria</label><input id="managerEmail" type="email" maxlength="240" autocomplete="email" value="gestion@marianmadrid.es" /></div><div class="btn-row"><button id="previewManagerPackage" class="btn outline" type="button">Preparar vista previa</button><button id="createManagerPackage" class="btn" type="button">Crear version</button><button id="downloadManagerPackage" class="btn outline" type="button" disabled>Descargar version</button><button id="emailManagerPackage" class="btn success" type="button" disabled>Enviar a gestoria</button></div></article>
+      <div class="grid-2" style="margin-top:16px;"><article class="panel"><h2 class="panel-title">Vista previa del paquete</h2><div id="documentPreview" class="empty">Selecciona un periodo y prepara una vista previa antes de crear una version.</div></article><article class="panel"><h2 class="panel-title">Version actual</h2><div id="documentVersion" class="empty">Todavia no hay una version creada en esta sesion.</div></article></div>
+      <article class="panel" style="margin-top:16px;"><h2 class="panel-title">Historial del periodo <small>Creaciones y entregas registradas</small></h2><div id="documentHistory" class="empty">Consulta o crea una vista previa para cargar el historial.</div></article>
+    </section>
+
     <section id="help" class="section">
       <div class="grid-3"><article class="panel"><h2 class="panel-title">Agenda y equipo</h2><ul class="checklist"><li class="check"><span class="check-mark">A</span><div><h3>Revisar reservas duales</h3><p>Comprueba que cada fase y sus gaps se reflejen en agenda antes de modificar disponibilidad.</p></div></li><li class="check"><span class="check-mark">B</span><div><h3>Validar pagos pendientes</h3><p>Las reservas online deben llegar a estado pagado a traves del evento nativo y del ledger.</p></div></li></ul></article><article class="panel"><h2 class="panel-title">Caja e inventario</h2><ul class="checklist"><li class="check"><span class="check-mark">C</span><div><h3>Conteo X antes del cierre</h3><p>Registra el efectivo contado y revisa cualquier descuadre antes de generar el cierre Z.</p></div></li><li class="check"><span class="check-mark">D</span><div><h3>Conciliar consumo interno</h3><p>Revisa los ajustes pendientes de inventario y confirma solo los aplicados realmente en Wix.</p></div></li></ul></article><article class="panel"><h2 class="panel-title">Gestoria y archivo</h2><ul class="checklist"><li class="check"><span class="check-mark">E</span><div><h3>Preparar trimestre</h3><p>Genera el resumen y el libro, descarga el CSV y entregalo para revision profesional.</p></div></li><li class="check"><span class="check-mark">F</span><div><h3>Conservar trazabilidad</h3><p>Usa los tickets, hashes y trazas como evidencia tecnica; no sustituyen la revision de una asesoria.</p></div></li></ul></article></div>
     </section>
 
-    <footer class="footer">Gestion Marian | Panel interno responsive | Sin envios ni presentaciones automaticas</footer>
+    <footer class="footer">Gestion Marian | Panel interno responsive | Envios documentales manuales y confirmados</footer>
 
     <button id="assistantFab" class="assistant-fab" type="button" aria-expanded="false">Hablar con mi asistente</button>
     <aside id="assistantDialog" class="assistant-dialog" aria-label="Asistente personal de Marian">
@@ -193,6 +200,11 @@
       Z_CLOSING: 'Z_CLOSING', Z_CLOSING_RES: 'Z_CLOSING_RES',
       FISCAL_SUMMARY: 'FISCAL_SUMMARY', FISCAL_SUMMARY_RES: 'FISCAL_SUMMARY_RES',
       FISCAL_BOOK: 'FISCAL_BOOK', FISCAL_BOOK_RES: 'FISCAL_BOOK_RES',
+      DOCUMENT_PREVIEW: 'DOCUMENT_PREVIEW', DOCUMENT_PREVIEW_RES: 'DOCUMENT_PREVIEW_RES',
+      DOCUMENT_CREATE: 'DOCUMENT_CREATE', DOCUMENT_CREATE_RES: 'DOCUMENT_CREATE_RES',
+      DOCUMENT_HISTORY: 'DOCUMENT_HISTORY', DOCUMENT_HISTORY_RES: 'DOCUMENT_HISTORY_RES',
+      DOCUMENT_DOWNLOAD: 'DOCUMENT_DOWNLOAD', DOCUMENT_DOWNLOAD_RES: 'DOCUMENT_DOWNLOAD_RES',
+      DOCUMENT_EMAIL: 'DOCUMENT_EMAIL', DOCUMENT_EMAIL_RES: 'DOCUMENT_EMAIL_RES',
       AI_CHAT: 'AI_CHAT', AI_CHAT_RES: 'AI_CHAT_RES',
       ADMIN_ERROR: 'ADMIN_ERROR'
     });
@@ -202,6 +214,9 @@
     let context = null;
     let fiscalSummary = null;
     let ledgerBook = null;
+    let documentPreview = null;
+    let currentDocument = null;
+    let documentHistory = [];
     const chatHistory = [];
     const ALLOWED_ASSISTANT_ACTIONS = new Set([
       'REFRESH_CASHIER', 'REFRESH_INVENTORY', 'OPEN_CASH', 'OPEN_FISCAL',
@@ -278,9 +293,9 @@
       fiscalSummary = data || null;
       if (!data) { $('fiscalSummary').textContent = 'No se pudo preparar el resumen.'; return; }
       const totals = data.totales || {};
-      const model = data.modelo303 || {};
+      const iva = data.borradorIva || {};
       const pay = data.desgloseFormaPago || {};
-      $('fiscalSummary').innerHTML = `<ul class="value-list"><li><span class="muted">Operaciones</span><strong>${Number(data.totalOperaciones || 0)}</strong></li><li><span class="muted">Ventas brutas</span><strong>${money(totals.totalVentasBrutas)}</strong></li><li><span class="muted">Reembolsos</span><strong>${money(totals.totalReembolsos)}</strong></li><li><span class="muted">Facturacion neta</span><strong>${money(totals.totalFacturadoNeto)}</strong></li><li><span class="muted">Base imponible</span><strong>${money(model.casilla01_baseImponible)}</strong></li><li><span class="muted">IVA devengado</span><strong>${money(model.casilla03_cuotaDevengada)}</strong></li><li><span class="muted">Cobros online</span><strong>${money(pay.online)}</strong></li></ul>`;
+      $('fiscalSummary').innerHTML = `<ul class="value-list"><li><span class="muted">Operaciones del periodo</span><strong>${Number(data.totalOperaciones || 0)}</strong></li><li><span class="muted">Operaciones en borrador IVA</span><strong>${Number(data.totalOperacionesFiscales || 0)}</strong></li><li><span class="muted">Ventas brutas</span><strong>${money(totals.totalVentasBrutas)}</strong></li><li><span class="muted">Reembolsos</span><strong>${money(totals.totalReembolsos)}</strong></li><li><span class="muted">Facturacion neta</span><strong>${money(totals.totalFacturadoNeto)}</strong></li><li><span class="muted">Base registrada</span><strong>${money(iva.baseImponibleRegistrada)}</strong></li><li><span class="muted">IVA registrado</span><strong>${money(iva.cuotaIvaRegistrada)}</strong></li><li><span class="muted">Propinas separadas</span><strong>${money(totals.totalPropinasSeparadas)}</strong></li><li><span class="muted">Cobros online</span><strong>${money(pay.online)}</strong></li></ul><p class="notice" style="margin-top:12px;">${escapeHtml(iva.nota || 'Borrador de apoyo sujeto a revision profesional.')}</p>`;
       $('downloadManagerCsv').disabled = !ledgerBook;
     }
     function renderLedgerBook(data) {
@@ -291,6 +306,37 @@
       const html = rows.map((row) => `<tr><td>${escapeHtml(row.numTicketFactura)}</td><td>${escapeHtml(formatDate(row.fechaExpedicion))}</td><td>${escapeHtml(row.tipoMovimiento)}</td><td>${escapeHtml(row.formaPago)}</td><td>${money(row.baseImponible)}</td><td>${money(row.cuotaIva)}</td><td>${money(row.importeTotal)}</td></tr>`).join('');
       table.innerHTML = `<table><thead><tr><th>Ticket</th><th>Fecha</th><th>Tipo</th><th>Pago</th><th>Base</th><th>IVA</th><th>Total</th></tr></thead><tbody>${html}</tbody></table>`;
       $('ledgerBook').innerHTML = ''; $('ledgerBook').appendChild(table); $('downloadManagerCsv').disabled = !fiscalSummary;
+    }
+    function readDocumentPeriod() {
+      const year = Number($('documentYear').value); const quarter = Number($('documentQuarter').value);
+      if (!Number.isInteger(year) || year < 2020 || year > 2100 || ![1, 2, 3, 4].includes(quarter)) { show('warn', 'Selecciona un ejercicio y trimestre validos para el paquete documental.'); return null; }
+      return { year, quarter };
+    }
+    function renderDocumentPreview(data) {
+      documentPreview = data || null;
+      if (!data) { $('documentPreview').textContent = 'No se pudo preparar la vista previa.'; return; }
+      if (data.defaultRecipient && !$('managerEmail').value) $('managerEmail').value = data.defaultRecipient;
+      const summary = data.summary || {};
+      $('documentPreview').innerHTML = `<ul class="value-list"><li><span class="muted">Periodo</span><strong>${escapeHtml(String(data.period?.year || ''))} T${escapeHtml(String(data.period?.quarter || ''))}</strong></li><li><span class="muted">Registros</span><strong>${Number(summary.registros || 0)}</strong></li><li><span class="muted">Ventas netas</span><strong>${money(summary.ventasNetas)}</strong></li><li><span class="muted">Base imponible</span><strong>${money(summary.baseImponible)}</strong></li><li><span class="muted">IVA separado</span><strong>${money(summary.cuotaIva)}</strong></li><li><span class="muted">Propinas separadas</span><strong>${money(summary.propinas)}</strong></li></ul>`;
+      renderDocumentHistory(data.history || []);
+    }
+    function renderDocumentVersion(data) {
+      currentDocument = data || null;
+      if (!data?.documentId) { $('documentVersion').textContent = 'Todavia no hay una version creada en esta sesion.'; $('downloadManagerPackage').disabled = true; $('emailManagerPackage').disabled = true; return; }
+      $('documentVersion').innerHTML = `<ul class="value-list"><li><span class="muted">Identificador</span><strong>${escapeHtml(data.documentId)}</strong></li><li><span class="muted">Version</span><strong>${Number(data.version || 0)}</strong></li><li><span class="muted">Huella SHA-256</span><strong>${escapeHtml(String(data.contentHash || '').slice(0, 16))}</strong></li><li><span class="muted">Estado</span><strong>Creado, pendiente de revision</strong></li></ul>`;
+      $('downloadManagerPackage').disabled = false; $('emailManagerPackage').disabled = false;
+    }
+    function renderDocumentHistory(items) {
+      documentHistory = Array.isArray(items) ? items : [];
+      if (!documentHistory.length) { $('documentHistory').textContent = 'No hay versiones ni envios registrados para este periodo.'; return; }
+      const rows = documentHistory.map((item) => `<tr><td>${escapeHtml(formatDate(item.at))}</td><td>${escapeHtml(item.event)}</td><td>${escapeHtml(item.documentId)}</td><td>${Number(item.version || 0)}</td><td>${escapeHtml(item.status)}</td><td>${escapeHtml(item.recipient || '--')}</td></tr>`).join('');
+      $('documentHistory').innerHTML = `<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Evento</th><th>Version</th><th>N.</th><th>Estado</th><th>Destinatario</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    function downloadBase64File(base64, filename, mimeType) {
+      try {
+        const binary = atob(String(base64 || '')); const bytes = new Uint8Array(binary.length); for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        const blob = new Blob([bytes], { type: mimeType || 'application/octet-stream' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = String(filename || 'paquete-gestoria.csv'); document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
+      } catch (_) { show('error', 'No se pudo preparar la descarga documental.'); }
     }
     function escapeHtml(value) { const div = document.createElement('div'); div.textContent = String(value ?? ''); return div.innerHTML; }
     function formatDate(value) {
@@ -368,6 +414,11 @@
       if (type === TYPES.Z_CLOSING_RES) { setLoading($('registerZClosing'), false); if (status === 'SUCCESS') { show('info', 'Cierre Z generado correctamente.'); loadOverview(); } else show('error', error?.message || 'No se pudo generar el cierre Z.'); return; }
       if (type === TYPES.FISCAL_SUMMARY_RES) { setLoading($('loadFiscalSummary'), false); if (status === 'SUCCESS') { renderFiscalSummary(data); show('info', 'Resumen fiscal preparado.'); } else show('error', error?.message || 'No se pudo preparar el resumen fiscal.'); return; }
       if (type === TYPES.FISCAL_BOOK_RES) { setLoading($('loadLedgerBook'), false); if (status === 'SUCCESS') { renderLedgerBook(data); show('info', 'Libro registro cargado.'); } else show('error', error?.message || 'No se pudo cargar el libro registro.'); return; }
+      if (type === TYPES.DOCUMENT_PREVIEW_RES) { setLoading($('previewManagerPackage'), false); if (status === 'PREVIEW') { renderDocumentPreview(payload); show('info', 'Vista previa documental preparada.'); } else show('error', error?.message || 'No se pudo preparar la vista previa documental.'); return; }
+      if (type === TYPES.DOCUMENT_CREATE_RES) { setLoading($('createManagerPackage'), false); if (status === 'CREATED') { renderDocumentVersion(payload); show('info', 'Version documental creada. Revisa o descarga antes de enviar.'); const period = readDocumentPeriod(); if (period) request(TYPES.DOCUMENT_HISTORY, period); } else show('error', error?.message || 'No se pudo crear la version documental.'); return; }
+      if (type === TYPES.DOCUMENT_HISTORY_RES) { if (status === 'OK') renderDocumentHistory(payload.history || []); else show('error', error?.message || 'No se pudo cargar el historial documental.'); return; }
+      if (type === TYPES.DOCUMENT_DOWNLOAD_RES) { setLoading($('downloadManagerPackage'), false); if (status === 'READY') { downloadBase64File(payload.contentBase64, payload.filename, payload.mimeType); show('info', 'Version documental descargada.'); } else show('error', error?.message || 'No se pudo descargar la version.'); return; }
+      if (type === TYPES.DOCUMENT_EMAIL_RES) { setLoading($('emailManagerPackage'), false); if (status === 'SENT' || status === 'ALREADY_SENT') { show('info', payload.message || 'La solicitud de envio ha sido registrada.'); const period = readDocumentPeriod(); if (period) request(TYPES.DOCUMENT_HISTORY, period); } else show('error', error?.message || 'No se pudo enviar el paquete documental.'); return; }
       if (type === TYPES.ADMIN_ERROR) show('error', error?.message || 'Solicitud no autorizada.');
     }
     function applyContext(data) {
@@ -377,18 +428,22 @@
       $('subtitle').textContent = `Sesion autorizada: ${context.memberName || 'Marian'} | Caja, fiscalidad e informes internos.`;
       const today = context.today || todayYmd();
       $('countDate').value = today; $('closingDate').value = today;
-      $('fiscalYear').value = String(new Date().getFullYear()); $('fiscalQuarter').value = String(currentQuarter());
+      $('fiscalYear').value = String(new Date().getFullYear()); $('fiscalQuarter').value = String(currentQuarter()); $('documentYear').value = String(new Date().getFullYear()); $('documentQuarter').value = String(currentQuarter());
       renderCashier(context.cashierState || null); renderInventory(context.inventory || null, context.inventoryQueue || []); loadOverview();
     }
     document.querySelectorAll('.tab').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab)));
     document.querySelectorAll('[data-tab-target]').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tabTarget)));
     $('refreshOverview').addEventListener('click', loadOverview); $('refreshCash').addEventListener('click', () => request(TYPES.CASHIER_STATE, {}));
-    $('registerManualTx').addEventListener('click', () => { const amount = Number($('manualAmount').value); const paymentMethod = $('paymentMethod').value; const concept = $('manualConcept').value.trim(); if (!Number.isFinite(amount) || amount <= 0 || !concept || concept.length < 3 || !['EFECTIVO', 'TARJETA', 'BIZUM'].includes(paymentMethod)) { show('warn', 'Indica un importe positivo, una forma de pago valida y un concepto de al menos 3 caracteres.'); return; } if (!confirmAction(`Registrar venta presencial de ${money(amount)} por ${paymentMethod}.`)) return; setLoading($('registerManualTx'), true); request(TYPES.TPV_TX, { amount, paymentMethod, concept }); });
+    $('registerManualTx').addEventListener('click', () => { const amount = Number($('manualAmount').value); const paymentMethod = $('paymentMethod').value; const transactionKind = $('transactionKind').value; const concept = $('manualConcept').value.trim(); if (!Number.isFinite(amount) || amount <= 0 || !concept || concept.length < 3 || !['EFECTIVO', 'TARJETA', 'BIZUM'].includes(paymentMethod) || !['VENTA', 'PROPINA'].includes(transactionKind)) { show('warn', 'Indica un importe positivo, una forma de pago, una naturaleza valida y un concepto de al menos 3 caracteres.'); return; } const label = transactionKind === 'PROPINA' ? 'propina' : 'venta presencial'; if (!confirmAction(`Registrar ${label} de ${money(amount)} por ${paymentMethod}.`)) return; setLoading($('registerManualTx'), true); request(TYPES.TPV_TX, { amount, paymentMethod, transactionKind, concept }); });
     $('registerXCount').addEventListener('click', () => { const amount = Number($('cashCount').value); const diaKey = $('countDate').value; if (!diaKey || !Number.isFinite(amount) || amount < 0) { show('warn', 'Indica una fecha y un efectivo contado valido.'); return; } if (!confirmAction(`Registrar conteo X de ${money(amount)} para ${diaKey}.`)) return; setLoading($('registerXCount'), true); request(TYPES.X_COUNT, { diaKey, metalicoCaja: amount }); });
     $('registerZClosing').addEventListener('click', () => { const diaKey = $('closingDate').value; if (!diaKey) { show('warn', 'Selecciona la fecha de cierre.'); return; } if (!confirmAction(`Generar cierre Z para ${diaKey}.`)) return; setLoading($('registerZClosing'), true); request(TYPES.Z_CLOSING, { diaKey }); });
     $('loadFiscalSummary').addEventListener('click', () => { const year = Number($('fiscalYear').value); const quarter = Number($('fiscalQuarter').value); if (!Number.isInteger(year) || year < 2020 || year > 2100 || ![1,2,3,4].includes(quarter)) { show('warn', 'Selecciona un ejercicio entre 2020 y 2100 y un trimestre valido.'); return; } setLoading($('loadFiscalSummary'), true, 'Calculando...'); request(TYPES.FISCAL_SUMMARY, { year, quarter }); });
     $('loadLedgerBook').addEventListener('click', () => { const year = Number($('fiscalYear').value); const quarter = Number($('fiscalQuarter').value); if (!Number.isInteger(year) || year < 2020 || year > 2100 || ![1,2,3,4].includes(quarter)) { show('warn', 'Selecciona un ejercicio entre 2020 y 2100 y un trimestre valido.'); return; } setLoading($('loadLedgerBook'), true, 'Cargando...'); request(TYPES.FISCAL_BOOK, { year, quarter }); });
     $('downloadManagerCsv').addEventListener('click', downloadManagerPackage);
+    $('previewManagerPackage').addEventListener('click', () => { const period = readDocumentPeriod(); if (!period) return; setLoading($('previewManagerPackage'), true, 'Preparando...'); request(TYPES.DOCUMENT_PREVIEW, period); });
+    $('createManagerPackage').addEventListener('click', () => { const period = readDocumentPeriod(); if (!period) return; if (!window.confirm('Crear una version inmutable del paquete para revision de gestoria?')) return; setLoading($('createManagerPackage'), true, 'Creando...'); request(TYPES.DOCUMENT_CREATE, period); });
+    $('downloadManagerPackage').addEventListener('click', () => { if (!currentDocument?.documentId) { show('warn', 'Crea primero una version documental.'); return; } setLoading($('downloadManagerPackage'), true, 'Preparando...'); request(TYPES.DOCUMENT_DOWNLOAD, { documentId: currentDocument.documentId }); });
+    $('emailManagerPackage').addEventListener('click', () => { const recipient = $('managerEmail').value.trim(); if (!currentDocument?.documentId) { show('warn', 'Crea primero una version documental.'); return; } if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(recipient)) { show('warn', 'Indica un email de gestoria valido.'); return; } if (!window.confirm(`Enviar la version ${currentDocument.documentId} a ${recipient}? Esta accion comunica un documento fuera del sitio.`)) return; setLoading($('emailManagerPackage'), true, 'Enviando...'); request(TYPES.DOCUMENT_EMAIL, { documentId: currentDocument.documentId, recipient, confirmed: true }); });
     $('assistantFab').addEventListener('click', () => { const open = $('assistantDialog').classList.toggle('open'); $('assistantFab').setAttribute('aria-expanded', String(open)); if (open) $('assistantInput').focus(); });
     $('assistantClose').addEventListener('click', () => { $('assistantDialog').classList.remove('open'); $('assistantFab').setAttribute('aria-expanded', 'false'); });
     $('assistantForm').addEventListener('submit', (event) => { event.preventDefault(); const message = $('assistantInput').value.trim(); if (!message) return; const history = chatHistory.slice(-8); addChatMessage('user', message); chatHistory.push({ role: 'user', content: message }); $('assistantInput').value = ''; renderAssistantActions([]); setLoading($('assistantSend'), true, 'Pensando...'); request(TYPES.AI_CHAT, { message, history }); });

@@ -11,7 +11,7 @@
 import wixData from "wix-data";
 import { getSecret } from "wix-secrets-backend";
 
-import { COLLECTIONS, SDK_CONFIG } from "backend/internalConfig";
+import { COLLECTIONS, SDK_CONFIG, TIPO_MOVIMIENTO } from "backend/internalConfig";
 import { SECRETS } from "backend/mmSecrets";
 import { hmacSha256Hex, hashChain } from "backend/securityEngine";
 
@@ -204,6 +204,9 @@ export async function projectLedgerMovementToAccounting(movimiento) {
     const sourceId = _cleanText(movimiento?._id, 120);
     if (!sourceId || !movimiento?.hashCadena || !movimiento?.transactionId) {
         return { status: "SKIPPED", reason: "INVALID_SOURCE_LEDGER" };
+    }
+    if (movimiento?.tipoMovimiento === TIPO_MOVIMIENTO.PROPINA || movimiento?.tratamientoIva === "PROPINA_PENDIENTE_GESTORIA") {
+        return { status: "SKIPPED", reason: "TIP_TREATMENT_PENDING_PROFESSIONAL_REVIEW" };
     }
 
     const base = _buildBase(movimiento);

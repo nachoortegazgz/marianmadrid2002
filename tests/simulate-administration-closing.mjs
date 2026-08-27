@@ -40,31 +40,42 @@ class AdministrationClosingSimulator {
     };
   }
 
-  registerTpvTransaction({ amount, paymentMethod, concept, traceId }) {
+  registerTpvTransaction({ amount, paymentMethod, kind = 'VENTA', concept, traceId }) {
     this._requireMarian();
     if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) throw new Error('INVALID_AMOUNT');
     if (!['EFECTIVO', 'TARJETA', 'BIZUM'].includes(paymentMethod)) throw new Error('INVALID_PAYMENT_METHOD');
+    if (!['VENTA', 'PROPINA'].includes(kind)) throw new Error('INVALID_MOVEMENT_KIND');
     if (!String(concept || '').trim()) throw new Error('INVALID_CONCEPT');
 
     const seqGlobal = ++this.sequence;
     const importeTotal = roundMoney(amount);
-    const tasaIva = 0.21;
-    const baseImponible = roundMoney(importeTotal / (1 + tasaIva));
-    const cuotaIva = roundMoney(importeTotal - baseImponible);
+    const isTip = kind === 'PROPINA';
+    const tipoMovimiento = isTip ? 'PROPINA' : `VENTA_${paymentMethod}`;
+    const tasaIva = isTip ? 0 : 0.21;
+    const baseImponible = isTip ? 0 : roundMoney(importeTotal / (1 + tasaIva));
+    const cuotaIva = isTip ? 0 : roundMoney(importeTotal - baseImponible);
+    const naturalezaOperacion = isTip ? 'PROPINA' : 'VENTA';
+    const tratamientoIva = isTip ? 'PROPINA_PENDIENTE_GESTORIA' : 'IVA_GENERAL';
+    const detalleLineas = [{ linea: 1, descripcion: concept, baseImponible, cuotaIva, tasaIva, importeTotal }];
     const prevHash = this.movements.at(-1)?.hashCadena || SEED_SIGNATURE;
     const transactionId = `ADMIN_TPV_${DAY}_${String(seqGlobal).padStart(4, '0')}`;
-    const payload = [seqGlobal, 'VENTA_' + paymentMethod, importeTotal, baseImponible, cuotaIva, transactionId, prevHash].join('|');
+    const payload = [seqGlobal, tipoMovimiento, importeTotal, baseImponible, cuotaIva, tratamientoIva, JSON.stringify(detalleLineas), transactionId, prevHash].join('|');
     const hashCadena = sha256(`${prevHash}|${payload}`);
     const movement = {
       seqGlobal,
-      tipoMovimiento: `VENTA_${paymentMethod}`,
+      tipoMovimiento,
       concepto: concept,
-      origen: 'ADMINISTRACION_TPV',
+      origen: isTip ? 'ADMINISTRACION_TPV_PROPINA' : 'ADMINISTRACION_TPV',
       importeTotal,
       importeContable: importeTotal,
       baseImponible,
       cuotaIva,
       tasaIva,
+      naturalezaOperacion,
+      tratamientoIva,
+      referenciaRectificativa: null,
+      detalleLineas,
+      integrityPayloadVersion: 'LEDGER_V2',
       formaPago: paymentMethod,
       numTicketFactura: `SIM-${DAY.replaceAll('-', '')}-${String(seqGlobal).padStart(4, '0')}`,
       transactionId,
@@ -100,7 +111,7 @@ class AdministrationClosingSimulator {
   _verifyIntegrity() {
     let previous = SEED_SIGNATURE;
     for (const movement of this.movements) {
-      const payload = [movement.seqGlobal, movement.tipoMovimiento, movement.importeTotal, movement.baseImponible, movement.cuotaIva, movement.transactionId, movement.prevHash].join('|');
+      const payload = [movement.seqGlobal, movement.tipoMovimiento, movement.importeTotal, movement.baseImponible, movement.cuotaIva, movement.tratamientoIva, JSON.stringify(movement.detalleLineas), movement.transactionId, movement.prevHash].join('|');
       if (movement.prevHash !== previous || movement.hashCadena !== sha256(`${previous}|${payload}`)) return false;
       previous = movement.hashCadena;
     }
@@ -119,6 +130,7 @@ class AdministrationClosingSimulator {
     let baseImponibleNeta = 0;
     let cuotaIvaNeta = 0;
     let totalVentas = 0;
+    let totalPropinas = 0;
     for (const movement of this.movements) {
       byPayment[movement.formaPago] = roundMoney((byPayment[movement.formaPago] || 0) + movement.importeContable);
       byType[movement.tipoMovimiento] = roundMoney((byType[movement.tipoMovimiento] || 0) + movement.importeContable);
@@ -130,7 +142,8 @@ class AdministrationClosingSimulator {
       byVat[vatKey].operaciones++;
       baseImponibleNeta = roundMoney(baseImponibleNeta + movement.baseImponible);
       cuotaIvaNeta = roundMoney(cuotaIvaNeta + movement.cuotaIva);
-      totalVentas = roundMoney(totalVentas + movement.importeContable);
+      if (movement.tipoMovimiento === 'PROPINA') totalPropinas = roundMoney(totalPropinas + movement.importeContable);
+      else totalVentas = roundMoney(totalVentas + movement.importeContable);
     }
 
     const first = this.movements[0] || null;
@@ -152,6 +165,7 @@ class AdministrationClosingSimulator {
       totalOnline: roundMoney(byPayment.ONLINE),
       totalVentas,
       totalReembolsos: 0,
+      totalPropinas,
       totalAjustes: 0,
       baseImponibleNeta,
       cuotaIvaNeta,
@@ -201,7 +215,8 @@ test('ADMINISTRACION completes a daily X and Z close with detailed immutable evi
   const cash = sim.registerTpvTransaction({ amount: 41.5, paymentMethod: 'EFECTIVO', concept: 'Venta local simulada', traceId: 'trace-admin-001' });
   const card = sim.registerTpvTransaction({ amount: 25, paymentMethod: 'TARJETA', concept: 'Venta tarjeta simulada', traceId: 'trace-admin-002' });
   const bizum = sim.registerTpvTransaction({ amount: 10, paymentMethod: 'BIZUM', concept: 'Venta Bizum simulada', traceId: 'trace-admin-003' });
-  const xCount = sim.registerXCount({ metalicoCaja: 41.5, traceId: 'trace-admin-x' });
+  const tip = sim.registerTpvTransaction({ amount: 8, paymentMethod: 'EFECTIVO', kind: 'PROPINA', concept: 'Propina local simulada', traceId: 'trace-admin-004' });
+  const xCount = sim.registerXCount({ metalicoCaja: 49.5, traceId: 'trace-admin-x' });
   const zClosing = sim.registerZClosing({ traceId: 'trace-admin-z' });
   const retry = sim.registerZClosing({ traceId: 'trace-admin-z-retry' });
 
@@ -209,30 +224,39 @@ test('ADMINISTRACION completes a daily X and Z close with detailed immutable evi
   assert.equal(cash.prevHash, SEED_SIGNATURE);
   assert.equal(card.prevHash, cash.hashCadena);
   assert.equal(bizum.prevHash, card.hashCadena);
+  assert.equal(tip.prevHash, bizum.hashCadena);
+  assert.equal(card.tipoMovimiento, 'VENTA_TARJETA');
+  assert.equal(bizum.tipoMovimiento, 'VENTA_BIZUM');
+  assert.equal(tip.tipoMovimiento, 'PROPINA');
+  assert.equal(tip.tratamientoIva, 'PROPINA_PENDIENTE_GESTORIA');
+  assert.equal(tip.baseImponible, 0);
+  assert.equal(tip.cuotaIva, 0);
   assert.equal(xCount.estadoCuadre, 'CUADRADO');
   assert.equal(xCount.descuadre, 0);
   assert.equal(zClosing.idempotent, false);
   assert.equal(retry.idempotent, true);
   assert.equal(zClosing.estado, 'CERRADA');
   assert.equal(zClosing.source, 'ADMIN');
-  assert.equal(zClosing.numOperaciones, 3);
-  assert.equal(zClosing.totalRegistrosVerificados, 3);
+  assert.equal(zClosing.numOperaciones, 4);
+  assert.equal(zClosing.totalRegistrosVerificados, 4);
   assert.equal(zClosing.integridadVerificada, true);
-  assert.equal(zClosing.totalEfectivo, 41.5);
+  assert.equal(zClosing.totalEfectivo, 49.5);
   assert.equal(zClosing.totalTarjeta, 25);
   assert.equal(zClosing.totalBizum, 10);
-  assert.equal(zClosing.totalGeneral, 76.5);
+  assert.equal(zClosing.totalGeneral, 84.5);
   assert.equal(zClosing.totalVentas, 76.5);
+  assert.equal(zClosing.totalPropinas, 8);
   assert.equal(zClosing.totalReembolsos, 0);
   assert.equal(zClosing.totalAjustes, 0);
   assert.equal(zClosing.seqInicio, 1);
-  assert.equal(zClosing.seqFin, 3);
+  assert.equal(zClosing.seqFin, 4);
   assert.equal(zClosing.ticketInicio, 'SIM-20260825-0001');
-  assert.equal(zClosing.ticketFin, 'SIM-20260825-0003');
+  assert.equal(zClosing.ticketFin, 'SIM-20260825-0004');
   assert.match(zClosing.hashCierre, /^[0-9a-f]{64}$/);
   assert.match(zClosing.firmaCierre, /^[0-9a-f]{64}$/);
-  assert.deepEqual(Object.keys(zClosing.resumenTiposMovimiento).sort(), ['VENTA_BIZUM', 'VENTA_EFECTIVO', 'VENTA_TARJETA']);
+  assert.deepEqual(Object.keys(zClosing.resumenTiposMovimiento).sort(), ['PROPINA', 'VENTA_BIZUM', 'VENTA_EFECTIVO', 'VENTA_TARJETA']);
   assert.equal(zClosing.resumenTipoIva['0.21'].operaciones, 3);
+  assert.equal(zClosing.resumenTipoIva['0'].operaciones, 1);
 });
 
 for (const result of tests) {

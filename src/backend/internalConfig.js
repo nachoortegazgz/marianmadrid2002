@@ -123,6 +123,14 @@ export const SDK_CONFIG = Object.freeze({
         HMAC_MAX_CLOCK_SKEW_SECONDS: 60,
         CORS_ALLOWED_ORIGINS: ["https://www.marianmadrid.es", "https://marianmadrid.es"],
     }),
+    DOCUMENTS: Object.freeze({
+        DEFAULT_MANAGER_EMAIL: "gestion@marianmadrid.es",
+        MAX_EMAIL_ATTACHMENT_BYTES: 3 * 1024 * 1024,
+        MAX_EMAIL_ATTEMPTS: 3,
+    }),
+    M365: Object.freeze({
+        ENABLED: false,
+    }),
 });
 
 export const CONCURRENCY = Object.freeze({
@@ -161,6 +169,7 @@ export const TIPO_MOVIMIENTO = Object.freeze({
     VENTA_TARJETA: "VENTA_TARJETA",
     VENTA_BIZUM: "VENTA_BIZUM",
     VENTA_ONLINE: "VENTA_ONLINE",
+    PROPINA: "PROPINA",
     REEMBOLSO: "REEMBOLSO",
     AJUSTE: "AJUSTE",
 });
