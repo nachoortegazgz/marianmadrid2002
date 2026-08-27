@@ -5,7 +5,7 @@
 **Rama de referencia:** `main`.
 **Versión técnica más avanzada identificada:** `c0aafbc99eca3661c0fda2efdee5e2ce6e377243` (`fix: harden concurrency privacy and external projection`).
 **Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático, `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales y `c0aafbc` refuerza concurrencia, privacidad, inmutabilidad y proyecciones externas minimizadas.
-**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33121400012`; código publicado en Wix tras vista previa.
+**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33121400012`; código publicado en Wix tras vista previa. El 27 de agosto se ejecutó adicionalmente una QA real nativa, reversible y sin cargo; su evidencia y límites de cobertura constan en `docs/EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md`.
 
 ## Propósito de este documento
 
@@ -121,7 +121,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | --- | --- |
 | Sincronizar el widget de documentos en el HTML Component vivo `#htmlAdministracion` | Editor Wix estable y revisión previa de cambios de diseño recientes. |
 | Corregir el bloque de inicio «Nada que reservar ahora» | Edición visual cuidadosa en Wix y comprobación posterior de inicio y `/reserva-online`. |
-| QA real de reservas | Servicio, recurso y ventana de QA aislados; ningún cliente ni cargo real. |
+| QA real nativa de agenda | Ejecutada el 27-08-2026 y totalmente cancelada; cinco anotaciones para cuatro escenarios, sin cobro, checkout, orden eCommerce ni movimiento de caja. La evidencia está en `docs/EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md`. |
+| QA real de la saga Velo | Pendiente de un canal que invoque `processDualBooking` publicado y permita comprobar `CitasF2`, `BookingTransactions`, locks y `MM_AUDIT_LOG` sin cargo ni cliente real. |
 | Sincronizar la lista visual de PDF preparados | Editor Wix estable y revisión previa de cambios de diseño recientes; el HTML canónico ya está actualizado. |
 | Configurar el email de gestoría | Dominio y remitente autenticados, secretos Wix, prueba sin datos reales y confirmación manual de cada envío. |
 | Activar M365 | Cierre formal de Fase 1 y autorización expresa del usuario. |
@@ -156,7 +157,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/MATRIZ_ALINEACION_CODIGO_GITHUB_WIX_2026-08-27.md` | Comparativa de la instantánea desarrollada, GitHub y Wix; criterio de consolidación de la versión avanzada. |
 | `docs/ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md` | Hallazgos confirmados, correcciones y límites diferidos de concurrencia, privacidad e inmutabilidad. |
 | `docs/EVIDENCIA_PUBLICACION_ENDURECIMIENTO_2026-08-27.md` | Resultado de pruebas, CI, publicación Wix y comprobación pública de la versión endurecida. |
+| `docs/EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md` | Creación, confirmación presencial pendiente, recuperación por revisión, cancelación y comprobación de ausencia de caja/checkout de la QA nativa. |
 
 ## Declaración final de continuidad
 
-La versión funcional de referencia para continuar el proyecto es **`c0aafbc`**, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático, las operaciones protegidas de ONLY STAFF y correcciones de concurrencia, privacidad e inmutabilidad. El código está publicado en Wix. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión funcional de referencia para continuar el proyecto es **`c0aafbc`**, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático, las operaciones protegidas de ONLY STAFF y correcciones de concurrencia, privacidad e inmutabilidad. El código está publicado en Wix. La QA real nativa del 27 de agosto añadió evidencia de agenda para dual con hueco, simples con y sin selección, confirmación `NOT_PAID` y cancelación; no cubrió la saga Velo ni sus colecciones propias. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA Velo/visual aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
