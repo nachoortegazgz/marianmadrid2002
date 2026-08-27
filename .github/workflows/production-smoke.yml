@@ -1,0 +1,66 @@
+name: Monitor de produccion
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy Wix Production
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-smoke-${{ github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Comprobar rutas publicas esenciales
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Esperar propagacion de produccion
+        run: sleep 30
+
+      - name: Verificar disponibilidad y contenido HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          check_url() {
+            local url="$1"
+            local name="$2"
+            local headers
+            local body
+            headers="$(mktemp)"
+            body="$(mktemp)"
+
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              --max-redirs 3 \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --dump-header "$headers" \
+              --output "$body" \
+              "$url"
+
+            grep -qi '^content-type: text/html' "$headers"
+            test "$(wc -c < "$body")" -ge 128
+            rm -f "$headers" "$body"
+            echo "OK: $name"
+          }
+
+          check_url "https://www.marianmadrid.es/" "Inicio"
+          check_url "https://www.marianmadrid.es/reserva-online" "Reserva online"
+          check_url "https://www.marianmadrid.es/politica-privacidad-texto" "Politica de privacidad"
+
+      - name: Nota de alerta
+        if: failure()
+        run: |
+          echo "La comprobacion de produccion ha fallado. GitHub marcara esta ejecucion como fallida y notificara a los suscriptores configurados del repositorio."
