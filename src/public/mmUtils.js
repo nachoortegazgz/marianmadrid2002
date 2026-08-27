@@ -1,7 +1,7 @@
 /**
  * =============================================================================
  * MODULE: public/mmUtils.js
- * VERSION: v19.6.14-widget-handshake-window
+ * VERSION: v19.6.15-privacy-route-fix
  * RESPONSIBILITY: SSOT constants, timezones, validators, PII masking,
  * and retry logic (PUBLIC SAFE).
  * STANDARDS: G10 ASCII Strict (0 non-ASCII characters).
@@ -10,6 +10,7 @@
  * - Keep public module limited to non-sensitive constants and pure utilities.
  * - Do NOT keep STAFF catalogs with IDs in public. Staff names/ids must be resolved in backend.
  * HISTORIAL:
+ * - v19.6.15-privacy-route-fix: Aligns the public consent route with the published legal page.
  * - v19.6.14-widget-handshake-window: Extends the nonce-free widget READY retry window for delayed iframe initialization.
  * - v19.6.12-final-debt-cleanup: Removes unconsumed browser limiter, masking helpers, validators, and response helpers with no consumers.
  * - v19.6.11-public-config-boundary: Moves backend-only IDs, collections, states, and runtime configuration to backend/internalConfig.js.
@@ -29,7 +30,7 @@
  * =============================================================================*/
 
 export const VERSION = Object.freeze({
-  CORE: "v19.6.14-widget-handshake-window",
+  CORE: "v19.6.15-privacy-route-fix",
   API_V2: true,
   COMPLIANCE_ES: "2026",
 });
@@ -70,7 +71,7 @@ export const URLS = Object.freeze({
   SERVICIOS: "/reserva-online",
   CALENDARIO_2: "/booking-calendar/calendario-2",
   DETALLE_SERVICIO: "/servicio-2",
-  PRIVACY_POLICY: "/politica-de-privacidad",
+  PRIVACY_POLICY: "/politica-privacidad-texto",
   TPV_PANEL: "/onlystaff",
 });
 

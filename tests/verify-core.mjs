@@ -61,6 +61,12 @@ check('ADMINISTRACION reutiliza el controlador exclusivo de Marian', () => {
   assert.ok(administration.includes('#htmlAdministracion'));
 });
 
+check('Ruta legal de consentimiento coincide con la pagina publicada', () => {
+  const utils = read('src/public/mmUtils.js');
+  assert.ok(utils.includes('PRIVACY_POLICY: "/politica-privacidad-texto"'));
+  assert.equal(utils.includes('PRIVACY_POLICY: "/politica-de-privacidad"'), false);
+});
+
 check('Contrato CMS: colecciones SSOT y campos canónicos', () => {
   const config = read('src/backend/internalConfig.js');
   for (const [key, value] of Object.entries(contract.collections)) {
