@@ -1,7 +1,7 @@
 # Auditoría de arquitectura y limpieza del ecosistema Wix/Velo
 
-**Fecha:** 27 de agosto de 2026.  
-**Ámbito:** arquitectura de archivos, límites de módulos, dependencias, duplicación y mantenibilidad del repositorio `marianmadrid2002`.  
+**Fecha:** 27 de agosto de 2026.
+**Ámbito:** arquitectura de archivos, límites de módulos, dependencias, duplicación y mantenibilidad del repositorio `marianmadrid2002`.
 **Criterio de intervención:** no eliminar rutas, colecciones, servicios ni ficheros vinculados a Wix por inferencia. Las modificaciones de esta revisión se limitaron a consolidaciones internas verificables y correcciones de documentación técnica.
 
 ## Conclusión ejecutiva

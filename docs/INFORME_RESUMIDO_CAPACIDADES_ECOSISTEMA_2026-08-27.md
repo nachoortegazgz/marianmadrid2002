@@ -1,7 +1,7 @@
 # Informe resumido de capacidades del ecosistema Marian Madrid
 
-**Fecha de referencia:** 27 de agosto de 2026.  
-**Entorno:** sitio Wix/Velo `marianmadrid.es`, Wix Bookings, eCommerce y CMS.  
+**Fecha de referencia:** 27 de agosto de 2026.
+**Entorno:** sitio Wix/Velo `marianmadrid.es`, Wix Bookings, eCommerce y CMS.
 **Estado:** el código de Fase 1 se ha validado, versionado y publicado. Microsoft 365 y los envíos de documentos al exterior permanecen deliberadamente desactivados.
 
 ## Visión ejecutiva
