@@ -99,7 +99,7 @@ Dependabot propone semanalmente solo actualizaciones de parches y menores. La CI
 
 ## Estado de la arquitectura y limpieza
 
-La arquitectura se ha revisado y la mejora estructural más reciente quedó integrada en los commits `4aeb43a` y `b14731a`. La auditoría completa está disponible en `docs/AUDITORIA_ARQUITECTURA_Y_LIMPIEZA_2026-08-27.md`.
+La arquitectura se ha revisado y la mejora estructural más reciente quedó integrada en los commits `4aeb43a` y `b14731a`. La auditoría de duplicados y nombres canónicos Wix queda en `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md`; la limpieza elimina solo tres alias exactos y conserva los identificadores del Editor.
 
 | Nivel | Acción | Estado |
 | --- | --- | --- |
@@ -111,7 +111,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | Alta | Corregir fallback de `withTimeout()` en utilidades comunes. | Diferido; requiere prueba unitaria específica. |
 | Media | Extraer escritor común para consumo y recepción de inventario. | Diferido; requiere pruebas de concurrencia. |
 | Media | Dividir utilidades puras de configuración de UI en `mmUtils.js`. | Diferido; migración por fases con compatibilidad. |
-| Diferido | Inspeccionar pares de páginas duplicadas de Wix. | Solo desde el Editor; no borrar ficheros por inferencia. |
+| Aplicado | Retirar tres alias exactos de páginas Wix y conservar sus nombres canónicos con identificador interno. | Comparativa byte a byte, rastreo de referencias y sanitización correctos; ver auditoría de duplicados. |
+| Diferido | Inspeccionar visualmente el mapeo de páginas restantes de Wix. | Solo desde el Editor; no borrar ficheros con identificadores distintos por similitud de plantilla. |
 
 ## Puntos pendientes y condiciones previas
 
@@ -149,6 +150,7 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/EVIDENCIA_ESQUEMA_LEDGER_2026-08-27.md` | Evidencia del esquema ampliado de `movimientoCaja`. |
 | `docs/PREPARACION_DOCUMENTAL_PDF_PROGRAMADA.md` | Cadencia, límites, controles y procedimiento de revisión manual de los paquetes PDF. |
 | `docs/EVIDENCIA_PUBLICACION_PREPARACION_PDF_2026-08-27.md` | Evidencia de publicación Wix y comprobación de rutas públicas asociada a esta mejora. |
+| `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md` | Comparativa de duplicados, alias retirados y nombres canónicos conservados. |
 
 ## Declaración final de continuidad
 
