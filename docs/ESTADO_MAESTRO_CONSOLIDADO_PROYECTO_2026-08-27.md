@@ -5,7 +5,7 @@
 **Rama de referencia:** `main`.
 **Versión técnica más avanzada identificada:** `03ce7d1ddc61eb80710fc5a0dbca9e0c34eea6b4` (`feat: prepare manager PDFs on schedule`).
 **Cambios posteriores relevantes:** `55dade6` incorpora el monitor de disponibilidad postdespliegue y `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático.
-**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub pendiente de la subida de esta versión.
+**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33114654808`.
 
 ## Propósito de este documento
 
@@ -17,9 +17,9 @@ Este documento sustituye la dispersión operativa de los chats por una **única 
 
 | Elemento | Estado consolidado | Evidencia o criterio |
 | --- | --- | --- |
-| Sitio público | `https://www.marianmadrid.es/` publicado durante el cierre de Fase 1. | Wix confirmó el despliegue de la versión de interfaz `14544`; la evidencia consta en el repositorio. |
-| Repositorio | `main` incorpora localmente hasta `03ce7d1`; queda pendiente de subir y confirmar la CI de esta versión. | Monitor postdespliegue en `55dade6` y preparación documental PDF en `03ce7d1`. |
-| Validación continua | Activa y correcta para `9e73c4b`; validación local completa para `03ce7d1`. | Ejecuta formato de cambios, análisis estático y batería de Fase 1; la CI debe confirmarse tras la subida. |
+| Sitio público | `https://www.marianmadrid.es/` tiene publicado el código de preparación documental. | Wix confirmó la publicación sobre la interfaz `14544`; la evidencia de rutas públicas consta en el repositorio. |
+| Repositorio | `main` está actualizado en GitHub hasta `126e075`. | Monitor postdespliegue en `55dade6` y preparación documental PDF en `03ce7d1`. |
+| Validación continua | Activa y correcta para `126e075`. | La ejecución `33114654808` validó formato, análisis estático y batería de Fase 1. |
 | Monitor de producción | Incorporado en GitHub. | Comprueba inicio, reserva online y privacidad cuando exista un despliegue automatizado compatible o se ejecute manualmente. |
 | Despliegue automático | Solicitado, todavía no configurado. | Pendiente de seleccionar el modo de liberación a producción. |
 | Diseño del Editor Wix | Debe preservarse. | Wix informó que el Editor contenía cambios de diseño más recientes que una sincronización de código anterior. |
@@ -148,7 +148,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/EVIDENCIA_PANEL_WIX_CONFIGURACION_2026-08-27.md` | Evidencia de configuraciones observadas en Wix. |
 | `docs/EVIDENCIA_ESQUEMA_LEDGER_2026-08-27.md` | Evidencia del esquema ampliado de `movimientoCaja`. |
 | `docs/PREPARACION_DOCUMENTAL_PDF_PROGRAMADA.md` | Cadencia, límites, controles y procedimiento de revisión manual de los paquetes PDF. |
+| `docs/EVIDENCIA_PUBLICACION_PREPARACION_PDF_2026-08-27.md` | Evidencia de publicación Wix y comprobación de rutas públicas asociada a esta mejora. |
 
 ## Declaración final de continuidad
 
-La versión de referencia para continuar el proyecto es **`03ce7d1` en `main` local**, pendiente de subir y de confirmar la CI; incorpora el monitor postdespliegue previamente integrado en `55dade6` y la preparación automática de PDF sin envío automático. La Fase 1 queda técnicamente madura en su código y controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión funcional de referencia para continuar el proyecto es **`03ce7d1`**, documentada y validada en GitHub hasta `126e075`; incorpora el monitor postdespliegue previamente integrado en `55dade6` y la preparación automática de PDF sin envío automático. El código correspondiente está publicado en Wix. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
