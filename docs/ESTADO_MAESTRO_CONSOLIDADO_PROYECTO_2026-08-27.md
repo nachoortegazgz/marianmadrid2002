@@ -3,8 +3,9 @@
 **Fecha de consolidación:** 27 de agosto de 2026.
 **Repositorio:** `nachoortegazgz/marianmadrid2002`.
 **Rama de referencia:** `main`.
-**Versión técnica más avanzada identificada:** `5e69a68ebec6ac4117815d746cbaf375d14faa17` (`fix: align consent route with published privacy page`).
-**Estado de validación de esta versión:** validación continua de Fase 1 correcta en GitHub.
+**Versión técnica más avanzada identificada:** `03ce7d1ddc61eb80710fc5a0dbca9e0c34eea6b4` (`feat: prepare manager PDFs on schedule`).
+**Cambios posteriores relevantes:** `55dade6` incorpora el monitor de disponibilidad postdespliegue y `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático.
+**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub pendiente de la subida de esta versión.
 
 ## Propósito de este documento
 
@@ -17,9 +18,9 @@ Este documento sustituye la dispersión operativa de los chats por una **única 
 | Elemento | Estado consolidado | Evidencia o criterio |
 | --- | --- | --- |
 | Sitio público | `https://www.marianmadrid.es/` publicado durante el cierre de Fase 1. | Wix confirmó el despliegue de la versión de interfaz `14544`; la evidencia consta en el repositorio. |
-| Repositorio | `main` está actualizado localmente y en GitHub hasta `5e69a68`. | Avance rápido desde la referencia remota, sin conflictos ni cambios locales pendientes. |
-| Validación continua | Activa y correcta para la última versión conocida. | Ejecuta formato de cambios, análisis estático y batería de Fase 1. |
-| Última corrección remota | La ruta de consentimiento apunta a `/politica-privacidad-texto`. | Commit `5e69a68` y contrato estático específico. |
+| Repositorio | `main` incorpora localmente hasta `03ce7d1`; queda pendiente de subir y confirmar la CI de esta versión. | Monitor postdespliegue en `55dade6` y preparación documental PDF en `03ce7d1`. |
+| Validación continua | Activa y correcta para `9e73c4b`; validación local completa para `03ce7d1`. | Ejecuta formato de cambios, análisis estático y batería de Fase 1; la CI debe confirmarse tras la subida. |
+| Monitor de producción | Incorporado en GitHub. | Comprueba inicio, reserva online y privacidad cuando exista un despliegue automatizado compatible o se ejecute manualmente. |
 | Despliegue automático | Solicitado, todavía no configurado. | Pendiente de seleccionar el modo de liberación a producción. |
 | Diseño del Editor Wix | Debe preservarse. | Wix informó que el Editor contenía cambios de diseño más recientes que una sincronización de código anterior. |
 
@@ -31,7 +32,7 @@ La última modificación de privacidad está **versionada y validada en GitHub**
 | --- | --- |
 | Fase 1 | Se mantiene como prioridad: Wix Bookings, eCommerce, caja, inventario, documentos internos y seguridad. |
 | Fase 2 / Microsoft 365 | Aplazada y técnicamente pausada. No habilitar Entra, SharePoint, OneDrive, Power Automate, Excel, Copilot ni Graph sin autorización expresa posterior. |
-| Correos a gestoría | El flujo está preparado, pero no se configura ni se envía sin dominio autenticado, remitente válido, secreto `RESEND_API_KEY` en Wix y confirmación específica de cada envío. |
+| Correos a gestoría | La preparación de PDF es automática y local; el envío sigue siendo manual, confirmado por Marian y bloqueado sin dominio autenticado, remitente válido y secretos Wix de correo. |
 | Datos productivos | No borrar, renombrar ni migrar servicios, complementos, colecciones o registros por inferencia. Usar una QA aislada y evidencia previa. |
 | Credenciales | No reutilizar credenciales ni tokens compartidos en conversaciones. Deben rotarse o revocarse si fueron expuestos. |
 | Cumplimiento | Los controles técnicos son evidencia de apoyo; la gestoría y los responsables competentes validan el uso fiscal, contable, laboral y de datos real. |
@@ -48,12 +49,12 @@ El sistema usa una arquitectura de proyecciones y fuentes de verdad separadas. `
 | Agenda | `reservas.web.js`, `bookingCore.js`, `bookingSaga.js` | Disponibilidad, revalidación exacta, locks, reservas simples, duales y liberación controlada del hueco de exposición. |
 | Citas | `CitasF2`, `citasManager.web.js`, `events.js` | Proyección de reservas, estado de pago, confirmación tras pedido pagado, reprogramación y compensación. |
 | Caja | `cajas.web.js` | Ledger inmutable, cadena de hashes, pagos online/presenciales, arqueo X, cierre Z y recuperación de errores. |
-| Fiscalidad de apoyo | `fiscalAggregator.web.js`, `fiscalDocuments.web.js` | Borradores de IVA, libro de apoyo, paquetes versionados para gestoría y trazabilidad; no genera declaraciones oficiales. |
+| Fiscalidad de apoyo | `fiscalAggregator.web.js`, `fiscalDocuments.web.js` | Borradores de IVA, libro de apoyo y paquetes PDF mensuales/trimestrales versionados para gestoría; no genera declaraciones oficiales. |
 | Inventario | `inventario.web.js`, `events.js` | Consumo interno, recepción, movimientos online y trazabilidad de devoluciones con reabastecimiento confirmado. |
 | Laboral | `horario.web.js`, `REGISTRO_HORARIO` | Registro de jornada vinculado al actor de la sesión. |
 | Administración | `ADMINISTRACION.mvf3f.js`, `marianAdministrationController.js` | Superficie exclusiva de Marian para caja, fiscalidad de apoyo, inventario, documentos y gestoría. |
 | Seguridad | `security.js`, `securityEngine.js`, `mmSecrets.js` | RBAC, allowlists en secretos, rate limiting, HMAC y límites de datos sensibles. |
-| Operación | `crons.js`, `jobs.config`, `.github/` | Limpieza, recuperación, salud, sincronización interna, CI y actualización conservadora de dependencias. |
+| Operación | `crons.js`, `jobs.config`, `.github/` | Limpieza, recuperación, salud, preparación de PDF el día 5, monitor postdespliegue, CI y actualización conservadora de dependencias. |
 
 ## Funcionalidades verificadas en Fase 1
 
@@ -69,7 +70,7 @@ Las pruebas del repositorio cubren controles estáticos, simulaciones determinis
 | Venta presencial | Validado por contrato y simulación administrativa. | Tipo de movimiento coherente con efectivo, tarjeta o Bizum. |
 | Propina | Validada como flujo separado. | Excluida de IVA y proyección contable automática hasta validación profesional. |
 | Cierre X/Z | Validado por simulación administrativa. | Cadena de integridad, resumen firmado y una única ruta de creación de cierre Z. |
-| Documento para gestoría | Validado por simulación. | Marian-only, versión, hash, descarga consistente e idempotencia de envío. |
+| Documento para gestoría | Validado por simulación. | Marian-only, versión, PDF con doble huella, preparación mensual/trimestral idempotente y envío exclusivamente manual. |
 | Integración M365 | Pausada deliberadamente. | Bandera `SDK_CONFIG.M365.ENABLED = false`, sin cron ni encolado activo. |
 
 ## Controles y mejoras incorporadas
@@ -86,9 +87,9 @@ El cierre Z manual y el job de cierre usan la misma implementación `_registerZC
 
 ### Documentación y gestoría
 
-El servicio `fiscalDocuments.web.js` permite preparar vista previa, crear una versión de paquete, descargarla, consultar historial y preparar un envío controlado. Todo el flujo exige administrador y verificación de correspondencia con el recurso de Marian. El destinatario por defecto es `gestion@marianmadrid.es`, editable antes de cualquier envío y auditable en la operación.
+El servicio `fiscalDocuments.web.js` permite preparar vista previa, crear una versión de paquete, descargarla en PDF, consultar historial y preparar un envío controlado. Cada día 5, la tarea `prepareManagerPackagesJob` crea el PDF del mes anterior y, cuando corresponde, el del trimestre terminado; nunca envía correo ni consulta secretos de correo. Todo el flujo de consulta, descarga y remisión exige administrador y verificación de correspondencia con el recurso de Marian. El destinatario por defecto es `gestion@marianmadrid.es`, editable antes de cualquier envío y auditable en la operación.
 
-El envío no está habilitado porque no existe una configuración de proveedor segura. La arquitectura está deliberadamente preparada para un proveedor transaccional con adjuntos, con secreto Wix, dominio autenticado, remitente verificado, clave de idempotencia y confirmación explícita previa.
+El envío permanece deshabilitado mientras no exista una configuración de proveedor segura. Incluso cuando se configure, será una acción manual con confirmación explícita. La arquitectura usa un proveedor transaccional con adjuntos, secreto Wix, dominio autenticado, remitente verificado y clave de idempotencia. El procedimiento completo está en `docs/PREPARACION_DOCUMENTAL_PDF_PROGRAMADA.md`.
 
 ### Seguridad, mantenimiento y dependencias
 
@@ -119,7 +120,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | Sincronizar el widget de documentos en el HTML Component vivo `#htmlAdministracion` | Editor Wix estable y revisión previa de cambios de diseño recientes. |
 | Corregir el bloque de inicio «Nada que reservar ahora» | Edición visual cuidadosa en Wix y comprobación posterior de inicio y `/reserva-online`. |
 | QA real de reservas | Servicio, recurso y ventana de QA aislados; ningún cliente ni cargo real. |
-| Configurar el email de gestoría | Dominio y remitente autenticados, secreto Wix, pruebas sin datos reales y confirmación del envío. |
+| Sincronizar la lista visual de PDF preparados | Editor Wix estable y revisión previa de cambios de diseño recientes; el HTML canónico ya está actualizado. |
+| Configurar el email de gestoría | Dominio y remitente autenticados, secretos Wix, prueba sin datos reales y confirmación manual de cada envío. |
 | Activar M365 | Cierre formal de Fase 1 y autorización expresa del usuario. |
 | Despliegue automatizado de producción | Elegir entre publicación automática al superar CI o aprobación manual en entorno de producción después de CI. |
 
@@ -145,7 +147,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/AUDITORIA_ARQUITECTURA_Y_LIMPIEZA_2026-08-27.md` | Hallazgos de arquitectura y optimizaciones diferidas. |
 | `docs/EVIDENCIA_PANEL_WIX_CONFIGURACION_2026-08-27.md` | Evidencia de configuraciones observadas en Wix. |
 | `docs/EVIDENCIA_ESQUEMA_LEDGER_2026-08-27.md` | Evidencia del esquema ampliado de `movimientoCaja`. |
+| `docs/PREPARACION_DOCUMENTAL_PDF_PROGRAMADA.md` | Cadencia, límites, controles y procedimiento de revisión manual de los paquetes PDF. |
 
 ## Declaración final de continuidad
 
-La versión de referencia para continuar el proyecto es **`5e69a68` en `main`**, con CI correcta. La Fase 1 queda técnicamente madura en su código y controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 y toda comunicación externa permanecen bloqueadas. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión de referencia para continuar el proyecto es **`03ce7d1` en `main` local**, pendiente de subir y de confirmar la CI; incorpora el monitor postdespliegue previamente integrado en `55dade6` y la preparación automática de PDF sin envío automático. La Fase 1 queda técnicamente madura en su código y controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
