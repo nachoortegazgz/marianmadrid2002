@@ -151,6 +151,7 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/PREPARACION_DOCUMENTAL_PDF_PROGRAMADA.md` | Cadencia, límites, controles y procedimiento de revisión manual de los paquetes PDF. |
 | `docs/EVIDENCIA_PUBLICACION_PREPARACION_PDF_2026-08-27.md` | Evidencia de publicación Wix y comprobación de rutas públicas asociada a esta mejora. |
 | `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md` | Comparativa de duplicados, alias retirados y nombres canónicos conservados. |
+| `docs/EVIDENCIA_AUDITORIA_PUBLICACION_2026-08-27.md` | Estado local/remoto, nombres canónicos y comprobación de publicación y rutas públicas. |
 
 ## Declaración final de continuidad
 
