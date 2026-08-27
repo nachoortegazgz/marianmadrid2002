@@ -1,7 +1,7 @@
 # Auditoría de duplicados y nombres canónicos Wix
 
-**Fecha:** 27 de agosto de 2026.  
-**Repositorio:** `nachoortegazgz/marianmadrid2002`, rama `main`.  
+**Fecha:** 27 de agosto de 2026.
+**Repositorio:** `nachoortegazgz/marianmadrid2002`, rama `main`.
 **Método:** inventario de 148 archivos versionados, comparación SHA-256, comparación normalizada de texto, rastreo de referencias, revisión de historial Git y comprobación de contratos existentes.
 
 ## Criterio aplicado
