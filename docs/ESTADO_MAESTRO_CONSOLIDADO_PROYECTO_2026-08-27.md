@@ -3,9 +3,9 @@
 **Fecha de consolidación:** 27 de agosto de 2026.
 **Repositorio:** `nachoortegazgz/marianmadrid2002`.
 **Rama de referencia:** `main`.
-**Versión técnica más avanzada identificada:** `5d465c1ccd1f7a22d8dc4597b3a767934198a37f` (`fix: restore canonical staff page operations`).
-**Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático, `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales y la siguiente revisión refuerza concurrencia, privacidad, inmutabilidad y proyecciones externas minimizadas.
-**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33117824072`.
+**Versión técnica más avanzada identificada:** `c0aafbc99eca3661c0fda2efdee5e2ce6e377243` (`fix: harden concurrency privacy and external projection`).
+**Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático, `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales y `c0aafbc` refuerza concurrencia, privacidad, inmutabilidad y proyecciones externas minimizadas.
+**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33121400012`; código publicado en Wix tras vista previa.
 
 ## Propósito de este documento
 
@@ -155,7 +155,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/EVIDENCIA_AUDITORIA_PUBLICACION_2026-08-27.md` | Estado local/remoto, nombres canónicos y comprobación de publicación y rutas públicas. |
 | `docs/MATRIZ_ALINEACION_CODIGO_GITHUB_WIX_2026-08-27.md` | Comparativa de la instantánea desarrollada, GitHub y Wix; criterio de consolidación de la versión avanzada. |
 | `docs/ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md` | Hallazgos confirmados, correcciones y límites diferidos de concurrencia, privacidad e inmutabilidad. |
+| `docs/EVIDENCIA_PUBLICACION_ENDURECIMIENTO_2026-08-27.md` | Resultado de pruebas, CI, publicación Wix y comprobación pública de la versión endurecida. |
 
 ## Declaración final de continuidad
 
-La versión funcional de referencia para continuar el proyecto será el siguiente commit de endurecimiento, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático, las operaciones protegidas de ONLY STAFF y correcciones de concurrencia, privacidad e inmutabilidad. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión funcional de referencia para continuar el proyecto es **`c0aafbc`**, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático, las operaciones protegidas de ONLY STAFF y correcciones de concurrencia, privacidad e inmutabilidad. El código está publicado en Wix. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
