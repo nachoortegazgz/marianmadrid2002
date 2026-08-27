@@ -42,3 +42,9 @@ La comprobación confirma que la fuente local utiliza nombres canónicos, que Gi
 ## Referencias
 
 [1] [Wix — Working with the Velo sidebar](https://support.wix.com/en/article/velo-working-with-the-velo-sidebar)
+
+## Evidencia de validación y publicación
+
+La consolidación se validó localmente con sincronización de tipos Wix, sanitización, batería completa, análisis estático, comprobación de formato y comparación de manifiestos de Jobs. La validación continua de GitHub para el commit de consolidación terminó correctamente en la ejecución `33117824072`.
+
+Wix creó una vista previa y confirmó la publicación correcta del código consolidado. Tras la publicación, las rutas públicas de inicio, catálogo de reserva y privacidad respondieron correctamente. La comprobación no realizó reservas, cobros, cambios de CMS, envíos de correo ni llamadas autenticadas.

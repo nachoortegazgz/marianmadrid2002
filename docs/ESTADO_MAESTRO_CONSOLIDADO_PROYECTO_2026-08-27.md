@@ -3,9 +3,9 @@
 **Fecha de consolidación:** 27 de agosto de 2026.
 **Repositorio:** `nachoortegazgz/marianmadrid2002`.
 **Rama de referencia:** `main`.
-**Versión técnica más avanzada identificada:** `03ce7d1ddc61eb80710fc5a0dbca9e0c34eea6b4` (`feat: prepare manager PDFs on schedule`).
-**Cambios posteriores relevantes:** `55dade6` incorpora el monitor de disponibilidad postdespliegue y `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático.
-**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33114654808`.
+**Versión técnica más avanzada identificada:** `5d465c1ccd1f7a22d8dc4597b3a767934198a37f` (`fix: restore canonical staff page operations`).
+**Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático y `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales.
+**Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33117824072`.
 
 ## Propósito de este documento
 
@@ -157,4 +157,4 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 
 ## Declaración final de continuidad
 
-La versión funcional de referencia para continuar el proyecto es **`03ce7d1`**, documentada y validada en GitHub hasta `126e075`; incorpora el monitor postdespliegue previamente integrado en `55dade6` y la preparación automática de PDF sin envío automático. El código correspondiente está publicado en Wix. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión funcional de referencia para continuar el proyecto es **`5d465c1`**, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático y las operaciones protegidas de la página canónica ONLY STAFF. El código correspondiente está publicado en Wix y la validación continua del commit de consolidación fue correcta. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
