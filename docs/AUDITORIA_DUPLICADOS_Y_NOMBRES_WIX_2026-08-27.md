@@ -45,3 +45,16 @@ Antes de retirar los alias se confirmó que los contenidos eran idénticos, que 
 Se repitió el inventario sobre `src/pages` después de la limpieza anterior. El estado de trabajo estaba limpio y no aparecieron alias con nombres simples equivalentes a páginas con identificador interno. Persisten dos grupos de plantillas idénticas entre páginas con **nombres e identificadores Wix diferentes**; se conservan íntegramente porque sus identificadores son parte del vínculo con el Editor y no permiten demostrar que representen la misma página.
 
 El resultado operativo es que ya no queda ningún duplicado de `src/pages` que pueda retirarse sin riesgo conforme a la convención Wix. La versión con más optimizaciones se mantiene en el nombre canónico del Editor, y no se ha aplicado ninguna eliminación adicional por similitud de código de plantilla.
+
+## Revisión integral adicional de módulos Wix
+
+Se repitió el inventario sobre toda la base versionada después de consolidar las páginas canónicas. No se han encontrado nuevas versiones obsoletas que sea seguro retirar.
+
+| Grupo detectado | Resultado de la comparativa | Decisión |
+| --- | --- | --- |
+| `jobs.config` y `src/backend/jobs.config` | Son idénticos y el contrato de Jobs de este proyecto comprueba que se mantengan alineados; la configuración publicada se documenta desde `src/backend/jobs.config`. | Conservar ambos sincronizados. |
+| 22 páginas con plantilla JavaScript idéntica | Todos los nombres contienen un identificador interno Wix distinto. La convención Wix asocia el fichero a la página por ese nombre. | Conservar todas. |
+| 9 archivos de página vacíos | Son los ficheros de código de páginas sin lógica Velo personalizada; no son copias de otro módulo. | Conservar todas. |
+| Resto del repositorio | Sin grupos exactos adicionales ni archivos casi idénticos al 97 % o más. | No requiere eliminación. |
+
+Por tanto, las únicas copias obsoletas demostradas siguen siendo los tres alias sin identificador interno retirados anteriormente: `administracion.js`, `calendario-2.js` y `only-staff.js`. Esta revisión no borra archivos de página ni manifiestos requeridos por Wix por similitud visual o textual, evitando que el Editor genere archivos nuevos o pierda asociaciones de código.
