@@ -283,6 +283,8 @@ export function _toDateSafe(val) {
 }
 
 export function withTimeout(promise, timeoutMs, label = "operation") {
+  // The underlying Wix promise is not abortable. A timeout only stops waiting,
+  // so mutation callers must not retry it unless their write is idempotent.
   const ms = Number.isFinite(timeoutMs) ? timeoutMs : SDK_CONFIG.TIMEOUTS.API_MS;
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
@@ -301,7 +303,8 @@ function _extractStatusCode(err) {
   return null;
 }
 
-export async function _executeWithRetry(fn, retries = 3, delay = 500) {
+export async function _executeWithRetry(fn, retries = 3, delay = 500, options = {}) {
+  const retryUncertainOutcome = options?.retryUncertainOutcome === true;
   let lastError;
   for (let i = 0; i < retries; i++) {
     try {
@@ -311,19 +314,17 @@ export async function _executeWithRetry(fn, retries = 3, delay = 500) {
 
       const msg = String(error && error.message ? error.message : "").toUpperCase();
       const code = _extractStatusCode(error);
-
-      const retryable =
+      const uncertainOutcome =
         msg.includes("TIMEOUT") ||
         msg.includes("ETIMEDOUT") ||
         msg.includes("ECONNRESET") ||
-        msg.includes("429") ||
         msg.includes("502") ||
         msg.includes("503") ||
         msg.includes("504") ||
-        code === 429 ||
         code === 502 ||
         code === 503 ||
         code === 504;
+      const retryable = msg.includes("429") || code === 429 || (retryUncertainOutcome && uncertainOutcome);
 
       if (!retryable) throw error;
 

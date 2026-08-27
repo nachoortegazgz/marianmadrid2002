@@ -66,6 +66,7 @@ import {
 import {
     COLLECTIONS,
     SDK_CONFIG,
+    RATE_LIMIT,
     SLOT_SEARCH,
     API,
     SERVICE_CATALOG,
@@ -154,6 +155,36 @@ function _rateLimitOrThrow(surface, key, traceId) {
         e.code = "RATE_LIMITED";
         e.meta = { retryAfter: rl.retryAfter, surface, traceId };
         throw e;
+    }
+}
+
+function _availabilityRequesterKey(requesterId, resourceKey) {
+    const cleanRequester = _safeTrim(requesterId).replace(/[^a-zA-Z0-9:_-]/g, "").slice(0, 96);
+    return cleanRequester.length >= 12 ? `requester:${cleanRequester}` : `resource:${resourceKey}`;
+}
+
+function _rateLimitPublicAvailability(surface, requesterId, resourceKey, traceId) {
+    const windowMs = Number(RATE_LIMIT?.AVAILABILITY_WINDOW_MS) || 5000;
+    const requesterLimit = Number(RATE_LIMIT?.AVAILABILITY_REQUESTER_MAX_REQUESTS) || 12;
+    const globalLimit = Number(RATE_LIMIT?.AVAILABILITY_GLOBAL_MAX_REQUESTS) || 120;
+    const global = rateLimiter({ surface: `${surface}:global`, key: "all" }, globalLimit, windowMs);
+    if (!global.allowed) {
+        const error = new Error("RATE_LIMITED");
+        error.code = "RATE_LIMITED";
+        error.meta = { retryAfter: global.retryAfter, surface, traceId };
+        throw error;
+    }
+
+    const requester = rateLimiter(
+        { surface: `${surface}:requester`, key: _availabilityRequesterKey(requesterId, resourceKey) },
+        requesterLimit,
+        windowMs,
+    );
+    if (!requester.allowed) {
+        const error = new Error("RATE_LIMITED");
+        error.code = "RATE_LIMITED";
+        error.meta = { retryAfter: requester.retryAfter, surface, traceId };
+        throw error;
     }
 }
 
@@ -1147,10 +1178,15 @@ export const resolveServiceId = webMethod(Permissions.Anyone, async (serviceIdRe
     }
 });
 
-export const getAvailableDays = webMethod(Permissions.Anyone, async (serviceId, resourceId, year, month, addonIds = []) => {
+export const getAvailableDays = webMethod(Permissions.Anyone, async (serviceId, resourceId, year, month, addonIds = [], requesterId = "") => {
     const traceId = makeTraceId("wm-days");
     try {
-        _rateLimitOrThrow("reservas.getAvailableDays", `${_safeTrim(serviceId)}|${String(year)}|${String(month)}`, traceId);
+        _rateLimitPublicAvailability(
+            "reservas.getAvailableDays",
+            requesterId,
+            `${_safeTrim(serviceId)}|${String(year)}|${String(month)}`,
+            traceId,
+        );
 
         const resolved = await _resolveServiceIdInternal(serviceId);
         if (!resolved) return { status: "ERROR", data: null, error: { code: "SERVICE_NOT_FOUND", message: "Service ID not found" } };
@@ -1204,10 +1240,15 @@ export const getAvailableDays = webMethod(Permissions.Anyone, async (serviceId, 
     }
 });
 
-export const getCertifiedDualSlots = webMethod(Permissions.Anyone, async (serviceId, resourceId, dateYMD, addonIds = []) => {
+export const getCertifiedDualSlots = webMethod(Permissions.Anyone, async (serviceId, resourceId, dateYMD, addonIds = [], requesterId = "") => {
     const traceId = makeTraceId("wm-dual");
     try {
-        _rateLimitOrThrow("reservas.getCertifiedDualSlots", `${_safeTrim(serviceId)}|${_safeTrim(dateYMD)}`, traceId);
+        _rateLimitPublicAvailability(
+            "reservas.getCertifiedDualSlots",
+            requesterId,
+            `${_safeTrim(serviceId)}|${_safeTrim(dateYMD)}`,
+            traceId,
+        );
         return await _getCertifiedDualSlotsInternal(serviceId, resourceId, dateYMD, addonIds);
     } catch (err) {
         return { status: "ERROR", data: null, error: _toPublicError(err, "DUAL_SLOTS_FAILED") };

@@ -30,7 +30,8 @@
     "test:documents": "node tests/simulate-manager-documents.mjs",
     "test:automation": "node tests/verify-dependency-automation.mjs",
     "test:production-monitor": "node tests/verify-production-monitor.mjs",
-    "test": "npm run test:sanitization && npm run test:core && npm run test:widget && npm run test:sim && npm run test:integration && npm run test:admin && npm run test:documents && npm run test:automation && npm run test:production-monitor",
+    "test:hardening": "node tests/verify-diagnostic-hardening.mjs",
+    "test": "npm run test:sanitization && npm run test:core && npm run test:hardening && npm run test:widget && npm run test:sim && npm run test:integration && npm run test:admin && npm run test:documents && npm run test:automation && npm run test:production-monitor",
     "validate": "npm run sync:types && npm run test"
   }
 }

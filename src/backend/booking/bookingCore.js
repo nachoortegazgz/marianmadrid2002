@@ -211,6 +211,35 @@ function _buildLockDocument(slotKey, lockOwnerId, ttlMs, existing = null) {
     };
 }
 
+async function _reclaimExpiredLock(slotKey, lockOwnerId, ttlMs, observed) {
+    const observedExpiry = _toDateSafe(observed?.expiresAt);
+    if (!observedExpiry || observedExpiry.getTime() >= Date.now()) {
+        return { ok: false, message: "LOCK_HELD_BY_ANOTHER_OWNER" };
+    }
+
+    // Re-read before removal so a renewed or replaced lease is never removed.
+    const current = await _getLock(slotKey);
+    const currentExpiry = _toDateSafe(current?.expiresAt);
+    if (!current || current.traceId !== observed.traceId || !currentExpiry || currentExpiry.getTime() >= Date.now()) {
+        return { ok: false, message: "LOCK_HELD_BY_ANOTHER_OWNER" };
+    }
+
+    try {
+        await wixData.remove(LOCKS_COL, current._id, { suppressAuth: true });
+    } catch (error) {
+        return { ok: false, message: "LOCK_RECLAIM_RACE" };
+    }
+
+    try {
+        await wixData.insert(LOCKS_COL, _buildLockDocument(slotKey, lockOwnerId, ttlMs, current), { suppressAuth: true });
+        return { ok: true, reclaimed: true };
+    } catch (error) {
+        if (_isDuplicateItemError(error)) return { ok: false, message: "LOCK_RECLAIM_RACE" };
+        log.error("Expired lock reclaim failed", { slotKey, lockOwnerId, error: error?.message });
+        return { ok: false, message: "LOCK_RECLAIM_FAILED" };
+    }
+}
+
 export async function _lockSlotKeyOrFail(slotKey, lockOwnerId, ttlMs) {
     const k = String(slotKey || "");
     const owner = String(lockOwnerId || "").trim();
@@ -234,11 +263,16 @@ export async function _lockSlotKeyOrFail(slotKey, lockOwnerId, ttlMs) {
 
         const expiresAt = _toDateSafe(existing?.expiresAt);
         const expired = expiresAt ? expiresAt.getTime() < Date.now() : false;
-        return {
-            ok: false,
-            message: expired ? "LOCK_EXPIRED_PENDING_CLEANUP" : "LOCK_HELD_BY_ANOTHER_OWNER",
-            retryAfterMs: expired ? Number(CONCURRENCY?.LOCK_CLEANUP_GRACE_MS) || 60000 : 0,
-        };
+        if (expired) {
+            const reclaimed = await _reclaimExpiredLock(k, owner, ttlMs, existing);
+            if (reclaimed.ok) return reclaimed;
+            return {
+                ok: false,
+                message: reclaimed.message || "LOCK_RECLAIM_RACE",
+                retryAfterMs: Number(CONCURRENCY?.LOCK_CLEANUP_GRACE_MS) || 60000,
+            };
+        }
+        return { ok: false, message: "LOCK_HELD_BY_ANOTHER_OWNER", retryAfterMs: 0 };
     }
 }
 
@@ -257,6 +291,8 @@ export async function _renewLock(slotKey, lockOwnerId, ttlMs) {
         const owner = String(lockOwnerId || "").trim();
         const existing = await _getLock(slotKey);
         if (!existing || !owner || existing.traceId !== owner) return { ok: false };
+        const expiresAt = _toDateSafe(existing.expiresAt);
+        if (!expiresAt || expiresAt.getTime() < Date.now()) return { ok: false, expired: true };
 
         const updated = _buildLockDocument(slotKey, owner, ttlMs, existing);
         await wixData.update(LOCKS_COL, updated, { suppressAuth: true });
@@ -580,6 +616,12 @@ const PII_KEYS = new Set([
     "identity",
 ]);
 
+function _isPiiKey(key) {
+    const normalized = String(key || "").toLowerCase().replace(/[\\s_-]/g, "");
+    if (PII_KEYS.has(normalized)) return true;
+    return /(?:email|mail|telefono|phone|movil|mobile|address|direccion|dni|nif|nombre|name|apellido|surname|contact)$/i.test(normalized);
+}
+
 function _sanitizeDetails(details) {
     if (!details) return details;
     if (Array.isArray(details)) return details.map((v) => _sanitizeDetails(v));
@@ -587,8 +629,7 @@ function _sanitizeDetails(details) {
 
     const sanitized = {};
     for (const [key, value] of Object.entries(details)) {
-        const k = String(key || "").toLowerCase();
-        if (PII_KEYS.has(k)) sanitized[key] = "[REDACTED]";
+        if (_isPiiKey(key)) sanitized[key] = "[REDACTED]";
         else if (typeof value === "object" && value !== null) sanitized[key] = _sanitizeDetails(value);
         else sanitized[key] = value;
     }

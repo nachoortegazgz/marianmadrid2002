@@ -26,11 +26,9 @@ const STAFF_COL = COLLECTIONS.MAPA_STAFF;
 let staffCache = { loadedAt: 0, items: [] };
 
 function _canonicalStaffDisplayName(rawName) {
-    const normalized = _safeTrim(rawName).toUpperCase();
-    if (normalized.includes("MARIAN")) return "MARIAN MADRID";
-    if (normalized.includes("ALBA")) return "ALBA STAFF";
-    if (normalized.includes("ANDREA")) return "ANDREA STAFF";
-    return "PROFESIONAL SEGUN HORARIO";
+    // nombreVisible is required and length-bounded by the MapaStaff CMS hook.
+    // Do not hardcode staff identities: the private catalog is the source of truth.
+    return _safeTrim(rawName) || "PROFESIONAL SEGUN HORARIO";
 }
 
 function _normalizeStaffRecord(raw) {

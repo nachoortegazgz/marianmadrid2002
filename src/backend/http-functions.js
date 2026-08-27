@@ -101,6 +101,26 @@ function _toExternalScheduleItem(item) {
     };
 }
 
+function _toExternalMovement(item) {
+    // Keep the external contract to accounting-relevant, non-cryptographic data.
+    // Hashes, signatures, trace IDs, customer fields, and detailed internal lines stay in Wix.
+    return {
+        movementId: _safeTrim(item?._id),
+        documentNumber: _safeTrim(item?.numTicketFactura),
+        date: _safeTrim(item?.diaKey),
+        createdAt: item?.fechaCreacion || item?._createdDate || null,
+        movementType: _safeTrim(item?.tipoMovimiento),
+        operationNature: _safeTrim(item?.naturalezaOperacion),
+        taxTreatment: _safeTrim(item?.tratamientoIva),
+        paymentMethod: _safeTrim(item?.formaPago),
+        taxRate: Number(item?.tasaIva) || 0,
+        taxableBase: Number(item?.baseImponible) || 0,
+        taxAmount: Number(item?.cuotaIva) || 0,
+        totalAmount: Number(item?.importeTotal ?? item?.importeContable) || 0,
+        correctiveReference: _safeTrim(item?.referenciaRectificativa) || null,
+    };
+}
+
 async function _logSyncEvent(endpoint, status, recordsCount, traceId) {
     try {
         await withTimeout(
@@ -298,7 +318,7 @@ export async function get_getMovements(request) {
             'queryMovimientos'
         );
 
-        const items = res?.items || [];
+        const items = (res?.items || []).map(_toExternalMovement);
         await _logSyncEvent('get_getMovements', 'SUCCESS', items.length, traceId);
 
         return ok({

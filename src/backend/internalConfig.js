@@ -96,6 +96,9 @@ export const SDK_CONFIG = Object.freeze({
         WINDOW_MS: 5000,
         BOOKING_MAX_REQUESTS: 5,
         BOOKING_WINDOW_MS: 10000,
+        AVAILABILITY_REQUESTER_MAX_REQUESTS: 12,
+        AVAILABILITY_GLOBAL_MAX_REQUESTS: 120,
+        AVAILABILITY_WINDOW_MS: 5000,
     }),
     JOBS: Object.freeze({
         TIMEOUT_MS: 30000,

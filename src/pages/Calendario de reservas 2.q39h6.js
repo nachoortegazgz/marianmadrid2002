@@ -56,12 +56,14 @@ let serviceId = null;
 let currentServiceSlugUrl = null;
 let staffDisplayByResourceId = new Map();
 let currentServicePresentation = null;
+const availabilityRequesterId = makeTraceId("availability-session");
 
 function _retry(promiseFactory, label) {
     return _executeWithRetry(
         () => withTimeout(promiseFactory(), UI.FRONTEND_API_TIMEOUT_MS, label),
         UI.FRONTEND_RETRY_ATTEMPTS,
-        UI.FRONTEND_RETRY_BASE_BACKOFF_MS
+        UI.FRONTEND_RETRY_BASE_BACKOFF_MS,
+        { retryUncertainOutcome: true },
     );
 }
 
@@ -274,7 +276,14 @@ $w.onReady(async function () {
                     try {
                         const addonIds = Array.isArray(p.addonIds) ? p.addonIds.map((id) => _safeTrim(id)).filter(Boolean) : [];
                         const result = await _retry(
-                            () => getAvailableDays(serviceId, p.resourceId || null, p.year, p.month, addonIds),
+                            () => getAvailableDays(
+                                serviceId,
+                                p.resourceId || null,
+                                p.year,
+                                p.month,
+                                addonIds,
+                                availabilityRequesterId,
+                            ),
                             "getAvailableDays"
                         );
                         post(MESSAGE_TYPES.AVAIL, _withAvailabilityRequestSequence(result, p.requestSequence, "days"), messageId);
@@ -288,7 +297,13 @@ $w.onReady(async function () {
                     try {
                         const addonIds = Array.isArray(p.addonIds) ? p.addonIds.map((id) => _safeTrim(id)).filter(Boolean) : [];
                         const result = await _retry(
-                            () => getCertifiedDualSlots(serviceId, p.resourceId || null, p.dateYMD || p.date || null, addonIds),
+                            () => getCertifiedDualSlots(
+                                serviceId,
+                                p.resourceId || null,
+                                p.dateYMD || p.date || null,
+                                addonIds,
+                                availabilityRequesterId,
+                            ),
                             "getCertifiedDualSlots"
                         );
                         post(MESSAGE_TYPES.AVAIL, _withAvailabilityRequestSequence(result, p.requestSequence, "slots"), messageId);

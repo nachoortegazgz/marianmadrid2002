@@ -281,14 +281,7 @@ export function cajaActual_beforeUpdate(item) {
     return item;
 }
 
-function _isAuthorizedMigration(context) {
-    return context?._migration === true &&
-           context?.suppressAuth === true &&
-           (context?.userRole === "admin" || context?.authContext?.role === "admin");
-}
-
-export function cajaActual_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function cajaActual_beforeRemove(_itemId) {
     throw new Error("SINGLETON_PROTECTED: Direct deletion of cajaActual is forbidden.");
 }
 
@@ -360,13 +353,11 @@ export function movimientoCaja_beforeInsert(item, context) {
     return item;
 }
 
-export function movimientoCaja_beforeUpdate(item, context) {
-    if (_isAuthorizedMigration(context)) return item;
+export function movimientoCaja_beforeUpdate(_item) {
     throw new Error("FISCAL_VIOLATION: Direct updates to movimientoCaja are forbidden.");
 }
 
-export function movimientoCaja_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function movimientoCaja_beforeRemove(_itemId) {
     throw new Error("FISCAL_VIOLATION: Direct removals from movimientoCaja are forbidden.");
 }
 
@@ -404,13 +395,11 @@ export async function REGISTRO_HORARIO_beforeInsert(item, context) {
     return item;
 }
 
-export function REGISTRO_HORARIO_beforeUpdate(item, context) {
-    if (_isAuthorizedMigration(context)) return item;
+export function REGISTRO_HORARIO_beforeUpdate(_item) {
     throw new Error("LABOR_LOG_VIOLATION: Direct updates to REGISTRO_HORARIO are forbidden.");
 }
 
-export function REGISTRO_HORARIO_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function REGISTRO_HORARIO_beforeRemove(_itemId) {
     throw new Error("LABOR_LOG_VIOLATION: Direct removals from REGISTRO_HORARIO are forbidden.");
 }
 
@@ -452,13 +441,11 @@ export function ASIENTOS_CONTABLES_beforeInsert(item, context) {
     return item;
 }
 
-export function ASIENTOS_CONTABLES_beforeUpdate(item, context) {
-    if (_isAuthorizedMigration(context)) return item;
+export function ASIENTOS_CONTABLES_beforeUpdate(_item) {
     throw new Error("ACCOUNTING_VIOLATION: Direct updates to ASIENTOS_CONTABLES are forbidden.");
 }
 
-export function ASIENTOS_CONTABLES_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function ASIENTOS_CONTABLES_beforeRemove(_itemId) {
     throw new Error("ACCOUNTING_VIOLATION: Direct removals from ASIENTOS_CONTABLES are forbidden.");
 }
 
@@ -485,22 +472,18 @@ export function LINEAS_ASIENTO_CONTABLE_beforeInsert(item, context) {
     return item;
 }
 
-export function LINEAS_ASIENTO_CONTABLE_beforeUpdate(item, context) {
-    if (_isAuthorizedMigration(context)) return item;
+export function LINEAS_ASIENTO_CONTABLE_beforeUpdate(_item) {
     throw new Error("ACCOUNTING_VIOLATION: Direct updates to LINEAS_ASIENTO_CONTABLE are forbidden.");
 }
 
-export function LINEAS_ASIENTO_CONTABLE_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function LINEAS_ASIENTO_CONTABLE_beforeRemove(_itemId) {
     throw new Error("ACCOUNTING_VIOLATION: Direct removals from LINEAS_ASIENTO_CONTABLE are forbidden.");
 }
 
-export function EVENTOS_SISTEMA_FACTURACION_beforeUpdate(item, context) {
-    if (_isAuthorizedMigration(context)) return item;
+export function EVENTOS_SISTEMA_FACTURACION_beforeUpdate(_item) {
     throw new Error("ACCOUNTING_VIOLATION: Direct updates to EVENTOS_SISTEMA_FACTURACION are forbidden.");
 }
 
-export function EVENTOS_SISTEMA_FACTURACION_beforeRemove(itemId, context) {
-    if (_isAuthorizedMigration(context)) return itemId;
+export function EVENTOS_SISTEMA_FACTURACION_beforeRemove(_itemId) {
     throw new Error("ACCOUNTING_VIOLATION: Direct removals from EVENTOS_SISTEMA_FACTURACION are forbidden.");
 }

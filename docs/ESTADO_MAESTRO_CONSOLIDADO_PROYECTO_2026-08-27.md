@@ -4,7 +4,7 @@
 **Repositorio:** `nachoortegazgz/marianmadrid2002`.
 **Rama de referencia:** `main`.
 **Versión técnica más avanzada identificada:** `5d465c1ccd1f7a22d8dc4597b3a767934198a37f` (`fix: restore canonical staff page operations`).
-**Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático y `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales.
+**Cambios relevantes consolidados:** `55dade6` incorpora el monitor de disponibilidad postdespliegue, `03ce7d1` añade la preparación mensual/trimestral de PDF para gestoría sin envío automático, `5d465c1` restaura el panel canónico de personal con sus controles de rol actuales y la siguiente revisión refuerza concurrencia, privacidad, inmutabilidad y proyecciones externas minimizadas.
 **Estado de validación de esta versión:** batería completa local, análisis estático, sanitización y sincronización de tipos Wix correctos; validación continua de GitHub correcta en la ejecución `33117824072`.
 
 ## Propósito de este documento
@@ -154,7 +154,8 @@ La arquitectura se ha revisado y la mejora estructural más reciente quedó inte
 | `docs/AUDITORIA_DUPLICADOS_Y_NOMBRES_WIX_2026-08-27.md` | Comparativa de duplicados, alias retirados y nombres canónicos conservados. |
 | `docs/EVIDENCIA_AUDITORIA_PUBLICACION_2026-08-27.md` | Estado local/remoto, nombres canónicos y comprobación de publicación y rutas públicas. |
 | `docs/MATRIZ_ALINEACION_CODIGO_GITHUB_WIX_2026-08-27.md` | Comparativa de la instantánea desarrollada, GitHub y Wix; criterio de consolidación de la versión avanzada. |
+| `docs/ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md` | Hallazgos confirmados, correcciones y límites diferidos de concurrencia, privacidad e inmutabilidad. |
 
 ## Declaración final de continuidad
 
-La versión funcional de referencia para continuar el proyecto es **`5d465c1`**, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático y las operaciones protegidas de la página canónica ONLY STAFF. El código correspondiente está publicado en Wix y la validación continua del commit de consolidación fue correcta. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
+La versión funcional de referencia para continuar el proyecto será el siguiente commit de endurecimiento, que consolida el monitor postdespliegue, la preparación automática de PDF sin envío automático, las operaciones protegidas de ONLY STAFF y correcciones de concurrencia, privacidad e inmutabilidad. La Fase 1 queda técnicamente madura en sus controles, con pendientes explícitos de QA visual/aislada y de sincronización del widget vivo. La Fase 2 permanece bloqueada. Toda comunicación externa de documentación continúa siendo una acción manual y confirmada. Cualquier nueva conversación debe usar este documento como punto de partida y conservar sus límites de seguridad.
