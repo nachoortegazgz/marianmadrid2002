@@ -30,6 +30,7 @@ import {
     createManagerPackageVersion,
     downloadManagerPackageVersion,
     getManagerPackageHistory,
+    getPreparedManagerPackages,
     emailManagerPackageVersion,
 } from "backend/fiscalDocuments.web";
 import {
@@ -71,7 +72,7 @@ function _readEmail(value) {
 
 function _readDocumentId(value) {
     const id = _safeTrim(value);
-    return /^DOC_GESTORIA_(20\d{2}|21\d{2})_T[1-4]_PAQUETE_GESTORIA_V\d{4}$/.test(id) ? id : null;
+    return /^DOC_GESTORIA_(20\d{2}|21\d{2})_(T[1-4]|M(0[1-9]|1[0-2]))_PAQUETE_GESTORIA_V\d{4}$/.test(id) ? id : null;
 }
 
 export async function initMarianAdministration(widget, slug = "administracion") {
@@ -230,6 +231,11 @@ export async function initMarianAdministration(widget, slug = "administracion") 
                     return;
                 }
                 post("DOCUMENT_HISTORY_RES", await getManagerPackageHistory(input), messageId);
+                return;
+            }
+
+            if (type === "DOCUMENT_PREPARED") {
+                post("DOCUMENT_PREPARED_RES", await getPreparedManagerPackages(), messageId);
                 return;
             }
 

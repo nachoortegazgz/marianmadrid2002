@@ -48,6 +48,7 @@ import { _cleanExpiredDualSlotsInternal } from 'backend/reservas.web';
 import { _verifyIntegrityInternal, _registerZClosingInternal, processPendingFiscalRecoveries } from 'backend/cajas.web';
 import { SECRETS } from 'backend/mmSecrets';
 import { processBookingsServiceSyncQueue } from 'backend/bookingsServiceSync';
+import { prepareScheduledManagerPackages } from 'backend/fiscalDocuments.web';
 
 const log = logger;
 const JOB_TIMEOUT_MS = SDK_CONFIG.JOBS.TIMEOUT_MS;
@@ -346,6 +347,27 @@ export async function processBookingsServiceSyncJob() {
     } catch (_) {
         log.error('[CRON] Bookings service sync job failed', { traceId, errorCode: 'BOOKINGS_SERVICE_SYNC_JOB_FAILED' });
         return { status: 'ERROR', data: null, error: { code: 'BOOKINGS_SERVICE_SYNC_JOB_FAILED', message: 'Bookings service synchronization failed.' } };
+    }
+}
+
+export async function prepareManagerPackagesJob() {
+    const traceId = makeTraceId('cron-manager-packages');
+    try {
+        return await withTimeout(
+            prepareScheduledManagerPackages({ traceId }),
+            JOB_TIMEOUT_MS,
+            'cron-prepareManagerPackages'
+        );
+    } catch (error) {
+        log.error('[CRON] Scheduled manager-package preparation failed', {
+            traceId,
+            message: error?.message || String(error),
+        });
+        return {
+            status: 'ERROR',
+            data: null,
+            error: { code: 'MANAGER_PACKAGE_CRON_FAIL', message: 'Document preparation failed.' },
+        };
     }
 }
 
