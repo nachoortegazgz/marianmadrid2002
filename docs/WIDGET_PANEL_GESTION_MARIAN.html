@@ -248,6 +248,13 @@
       window.parent.postMessage(message, parentOrigin || '*');
     }
     function request(type, payload = {}) { post(type, payload); }
+    function enableStandalonePreview() {
+      if (window.parent !== window) return;
+      $('app').hidden = false;
+      $('subtitle').textContent = 'Vista previa visual sin conexion. Las operaciones permanecen desactivadas.';
+      show('info', 'Vista previa local: conecta este HTML al componente #htmlAdministracion de Wix para activar la sesion autorizada de Marian.');
+      ['refreshOverview', 'refreshCash', 'registerManualTx', 'registerXCount', 'registerZClosing', 'loadFiscalSummary', 'loadLedgerBook', 'downloadManagerCsv', 'loadPreparedManagerPackages', 'previewManagerPackage', 'createManagerPackage', 'downloadManagerPackage', 'emailManagerPackage', 'assistantSend'].forEach((id) => { const element = $(id); if (element) element.disabled = true; });
+    }
     function show(kind, message) {
       ['infoAlert', 'warnAlert', 'errorAlert'].forEach((id) => { $(id).style.display = 'none'; });
       const target = kind === 'error' ? $('errorAlert') : kind === 'warn' ? $('warnAlert') : $('infoAlert');
@@ -480,6 +487,7 @@
     $('assistantClose').addEventListener('click', () => { $('assistantDialog').classList.remove('open'); $('assistantFab').setAttribute('aria-expanded', 'false'); });
     $('assistantForm').addEventListener('submit', (event) => { event.preventDefault(); const message = $('assistantInput').value.trim(); if (!message) return; const history = chatHistory.slice(-8); addChatMessage('user', message); chatHistory.push({ role: 'user', content: message }); $('assistantInput').value = ''; renderAssistantActions([]); setLoading($('assistantSend'), true, 'Pensando...'); request(TYPES.AI_CHAT, { message, history }); });
     window.addEventListener('message', (event) => { const message = event?.data || {}; const type = String(message.type || '').trim().toUpperCase(); if (!VALID_TYPES.has(type)) return; const payload = message.payload || {}; const readyAck = type === TYPES.READY && String(payload.status || '').toUpperCase() === 'ACK'; if (!parentOrigin) { if (!readyAck || event.source !== window.parent || !event.origin || event.origin === 'null') return; parentOrigin = event.origin; } if (event.origin !== parentOrigin || event.source !== window.parent) return; if (type === TYPES.READY) return; if (type === TYPES.CONTEXT) { applyContext(payload); return; } handleResponse(type, payload); });
+    enableStandalonePreview();
     post(TYPES.READY, { traceId }, true);
   </script>
 </body>
