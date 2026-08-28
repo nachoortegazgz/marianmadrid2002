@@ -1,0 +1,1838 @@
+{
+  "summary": {
+    "codeFiles": 63,
+    "codeLines": 13304,
+    "backendFiles": 24,
+    "publicFiles": 4,
+    "pageFiles": 35,
+    "tests": 13,
+    "testLines": 1848,
+    "testChecks": 331,
+    "collections": 37,
+    "exportedFunctions": 220
+  },
+  "backend": [
+    {
+      "file": "src/backend/booking/bookingCore.js",
+      "lines": 694,
+      "exports": [
+        {
+          "name": "logger",
+          "params": ""
+        },
+        {
+          "name": "ERROR_CODES",
+          "params": ""
+        },
+        {
+          "name": "createBookingElevated",
+          "params": ""
+        },
+        {
+          "name": "cancelBookingElevated",
+          "params": ""
+        },
+        {
+          "name": "confirmOrDeclineBookingElevated",
+          "params": ""
+        },
+        {
+          "name": "rescheduleBookingElevated",
+          "params": ""
+        },
+        {
+          "name": "createCheckoutElevated",
+          "params": ""
+        },
+        {
+          "name": "getCheckoutUrlElevated",
+          "params": ""
+        },
+        {
+          "name": "_projectWriterSlotFromAvailability",
+          "params": "slot, resourceId, expectedServiceId"
+        },
+        {
+          "name": "_extractCheckoutId",
+          "params": "checkoutSession"
+        },
+        {
+          "name": "getCheckoutUrlSafe",
+          "params": "checkoutSessionOrId"
+        },
+        {
+          "name": "_safeLockId",
+          "params": "key"
+        },
+        {
+          "name": "_lockSlotKeyOrFail",
+          "params": "slotKey, lockOwnerId, ttlMs"
+        },
+        {
+          "name": "_unlockSlotKey",
+          "params": "slotKey, lockOwnerId"
+        },
+        {
+          "name": "_renewLock",
+          "params": "slotKey, lockOwnerId, ttlMs"
+        },
+        {
+          "name": "_getDualPairFromCache",
+          "params": "pairToken, traceId"
+        },
+        {
+          "name": "_generateSlotKey",
+          "params": "serviceId, resourceId, startDate, endDate"
+        },
+        {
+          "name": "_buildLockKeys",
+          "params": "phases, resourceId"
+        },
+        {
+          "name": "TRANSACTIONS_COL",
+          "params": ""
+        },
+        {
+          "name": "_initTransaction",
+          "params": "pairToken, payloadHash, traceId"
+        },
+        {
+          "name": "_completeTransaction",
+          "params": "pairToken, result"
+        },
+        {
+          "name": "_failTransaction",
+          "params": "pairToken, errorMessage"
+        },
+        {
+          "name": "_persistBooking",
+          "params": "params, traceId"
+        },
+        {
+          "name": "_sumAddons",
+          "params": "addons"
+        },
+        {
+          "name": "createBookingError",
+          "params": "code, message, details"
+        },
+        {
+          "name": "normalizeError",
+          "params": "err"
+        },
+        {
+          "name": "_handleError",
+          "params": "error, context, traceId, logFn"
+        }
+      ],
+      "wixModules": [
+        "@wix/bookings",
+        "wix-auth",
+        "wix-data",
+        "wix-ecom-backend"
+      ],
+      "collectionTokens": [
+        "CITAS",
+        "DUAL_CACHE",
+        "LOCKS",
+        "TRANSACTIONS"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": true,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/booking/bookingSaga.js",
+      "lines": 949,
+      "exports": [
+        {
+          "name": "executeBookingSaga",
+          "params": "unsafePayload"
+        }
+      ],
+      "wixModules": [
+        "wix-data"
+      ],
+      "collectionTokens": [
+        "CITAS",
+        "COMPENSATIONS"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/bookingsServiceSync.js",
+      "lines": 319,
+      "exports": [
+        {
+          "name": "enqueueBookingsServiceSync",
+          "params": "sourceItem"
+        },
+        {
+          "name": "processBookingsServiceSyncQueue",
+          "params": "options = {}"
+        }
+      ],
+      "wixModules": [
+        "wix-auth",
+        "wix-bookings.v2",
+        "wix-data"
+      ],
+      "collectionTokens": [
+        "BOOKINGS_SERVICE_SYNC_QUEUE",
+        "SERVICIOS_CITA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": true,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/cajas.web.js",
+      "lines": 1111,
+      "exports": [
+        {
+          "name": "_verifyIntegrityInternal",
+          "params": "diaKey, options = {}"
+        },
+        {
+          "name": "registerBookingPayment",
+          "params": "bookingId, amount, paymentMethod, options = {}"
+        },
+        {
+          "name": "_registerZClosingInternal",
+          "params": "diaKey, options = {}"
+        },
+        {
+          "name": "queueFiscalRecovery",
+          "params": "payload = {}"
+        },
+        {
+          "name": "processPendingFiscalRecoveries",
+          "params": "options = {}"
+        },
+        {
+          "name": "registerManualTransaction",
+          "params": ""
+        },
+        {
+          "name": "registerXCount",
+          "params": ""
+        },
+        {
+          "name": "registerZClosing",
+          "params": ""
+        },
+        {
+          "name": "verifyIntegrity",
+          "params": ""
+        },
+        {
+          "name": "getCashierState",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-secrets-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "AUDIT_LOG",
+        "CAJA_ACTUAL",
+        "CITAS",
+        "COMPENSATIONS",
+        "CONTADORES_FISCALES",
+        "CONTEOS_X",
+        "HISTORICO_CIERRES_Z",
+        "MOVIMIENTOS_CAJA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/citasManager.web.js",
+      "lines": 755,
+      "exports": [
+        {
+          "name": "processDualBooking",
+          "params": ""
+        },
+        {
+          "name": "confirmPayment",
+          "params": ""
+        },
+        {
+          "name": "rescheduleExistingBooking",
+          "params": ""
+        },
+        {
+          "name": "rescheduleDualBookings",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-auth",
+        "wix-data",
+        "wix-ecom-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "AUDIT_LOG",
+        "CITAS"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": true,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/contabilidad.js",
+      "lines": 252,
+      "exports": [
+        {
+          "name": "projectLedgerMovementToAccounting",
+          "params": "movimiento"
+        },
+        {
+          "name": "isAccountingProjectionError",
+          "params": "error"
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [
+        "ASIENTOS_CONTABLES",
+        "LINEAS_ASIENTO_CONTABLE",
+        "PLAN_CUENTAS_CONTABLES"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/crons.js",
+      "lines": 555,
+      "exports": [
+        {
+          "name": "runPendingCompensationsJob",
+          "params": ""
+        },
+        {
+          "name": "cleanExpiredLocks",
+          "params": ""
+        },
+        {
+          "name": "cleanupExpiredDualCache",
+          "params": ""
+        },
+        {
+          "name": "cleanExpiredDaysCache",
+          "params": ""
+        },
+        {
+          "name": "cleanExpiredSlotsCache",
+          "params": ""
+        },
+        {
+          "name": "processFiscalRecoveryQueue",
+          "params": ""
+        },
+        {
+          "name": "processBookingsServiceSyncJob",
+          "params": ""
+        },
+        {
+          "name": "prepareManagerPackagesJob",
+          "params": ""
+        },
+        {
+          "name": "verifyNightlyZClosing",
+          "params": ""
+        },
+        {
+          "name": "cleanAuditLogs",
+          "params": ""
+        },
+        {
+          "name": "systemHealthCheck",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "@wix/bookings",
+        "wix-auth",
+        "wix-data",
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [
+        "AUDIT_LOG",
+        "CITAS",
+        "COMPENSATIONS",
+        "DAYS_CACHE",
+        "HISTORICO_CIERRES_Z",
+        "LOCKS",
+        "M365_GRAPH_SYNC_QUEUE",
+        "SLOTS_CACHE",
+        "TRANSACTIONS"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": true,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/data.js",
+      "lines": 490,
+      "exports": [
+        {
+          "name": "Import2_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "Import2_beforeUpdate",
+          "params": "item, context"
+        },
+        {
+          "name": "MapaStaff_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "MapaStaff_beforeUpdate",
+          "params": "item, context"
+        },
+        {
+          "name": "MapaStaff_afterInsert",
+          "params": "item"
+        },
+        {
+          "name": "MapaStaff_afterUpdate",
+          "params": "item"
+        },
+        {
+          "name": "MapaStaff_afterRemove",
+          "params": "itemId"
+        },
+        {
+          "name": "CitasF2_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "Import2_afterInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "Import2_afterUpdate",
+          "params": "item, context"
+        },
+        {
+          "name": "DualSlotCache_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "cajaActual_beforeInsert",
+          "params": "item"
+        },
+        {
+          "name": "cajaActual_beforeUpdate",
+          "params": "item"
+        },
+        {
+          "name": "cajaActual_beforeRemove",
+          "params": "_itemId"
+        },
+        {
+          "name": "movimientoCaja_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "movimientoCaja_beforeUpdate",
+          "params": "_item"
+        },
+        {
+          "name": "movimientoCaja_beforeRemove",
+          "params": "_itemId"
+        },
+        {
+          "name": "REGISTRO_HORARIO_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "REGISTRO_HORARIO_beforeUpdate",
+          "params": "_item"
+        },
+        {
+          "name": "REGISTRO_HORARIO_beforeRemove",
+          "params": "_itemId"
+        },
+        {
+          "name": "ASIENTOS_CONTABLES_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "ASIENTOS_CONTABLES_beforeUpdate",
+          "params": "_item"
+        },
+        {
+          "name": "ASIENTOS_CONTABLES_beforeRemove",
+          "params": "_itemId"
+        },
+        {
+          "name": "LINEAS_ASIENTO_CONTABLE_beforeInsert",
+          "params": "item, context"
+        },
+        {
+          "name": "LINEAS_ASIENTO_CONTABLE_beforeUpdate",
+          "params": "_item"
+        },
+        {
+          "name": "LINEAS_ASIENTO_CONTABLE_beforeRemove",
+          "params": "_itemId"
+        },
+        {
+          "name": "EVENTOS_SISTEMA_FACTURACION_beforeUpdate",
+          "params": "_item"
+        },
+        {
+          "name": "EVENTOS_SISTEMA_FACTURACION_beforeRemove",
+          "params": "_itemId"
+        }
+      ],
+      "wixModules": [
+        "wix-data"
+      ],
+      "collectionTokens": [
+        "DAYS_CACHE",
+        "DUAL_CACHE",
+        "SLOTS_CACHE"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/events.js",
+      "lines": 398,
+      "exports": [
+        {
+          "name": "wixBookingsV2_onBookingConfirmed",
+          "params": "event"
+        },
+        {
+          "name": "wixBookingsV2_onBookingCanceled",
+          "params": "event"
+        },
+        {
+          "name": "wixEcom_onOrderPaymentStatusUpdated",
+          "params": "event"
+        },
+        {
+          "name": "wixEcom_onOrderRefunded",
+          "params": "event"
+        },
+        {
+          "name": "wixEcom_onOrderCanceled",
+          "params": "event"
+        }
+      ],
+      "wixModules": [
+        "wix-data"
+      ],
+      "collectionTokens": [
+        "AUDIT_LOG",
+        "CITAS",
+        "MOVIMIENTOS_CAJA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/fiscalAggregator.web.js",
+      "lines": 308,
+      "exports": [
+        {
+          "name": "getQuarterlyTaxSummary",
+          "params": ""
+        },
+        {
+          "name": "getLibroRegistroFacturasExpedidas",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "MOVIMIENTOS_CAJA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/fiscalDocuments.web.js",
+      "lines": 699,
+      "exports": [
+        {
+          "name": "prepareScheduledManagerPackages",
+          "params": "{ now = new Date("
+        },
+        {
+          "name": "previewManagerPackage",
+          "params": ""
+        },
+        {
+          "name": "createManagerPackageVersion",
+          "params": ""
+        },
+        {
+          "name": "downloadManagerPackageVersion",
+          "params": ""
+        },
+        {
+          "name": "getManagerPackageHistory",
+          "params": ""
+        },
+        {
+          "name": "getPreparedManagerPackages",
+          "params": ""
+        },
+        {
+          "name": "emailManagerPackageVersion",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-secrets-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "AUDIT_LOG",
+        "MOVIMIENTOS_CAJA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/horario.web.js",
+      "lines": 511,
+      "exports": [
+        {
+          "name": "getMyStaffContext",
+          "params": ""
+        },
+        {
+          "name": "getStaffOptionsForAdmin",
+          "params": ""
+        },
+        {
+          "name": "registrarFichaje",
+          "params": ""
+        },
+        {
+          "name": "getEstadoJornada",
+          "params": ""
+        },
+        {
+          "name": "getHistorialFichajes",
+          "params": ""
+        },
+        {
+          "name": "calcularHorasTrabajadas",
+          "params": ""
+        },
+        {
+          "name": "registrarAjusteHorario",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-members-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "REGISTRO_HORARIO"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/http-functions.js",
+      "lines": 494,
+      "exports": [
+        {
+          "name": "options_getAvailability",
+          "params": "request"
+        },
+        {
+          "name": "options_getMovements",
+          "params": "request"
+        },
+        {
+          "name": "options_getZClosings",
+          "params": "request"
+        },
+        {
+          "name": "options_getSchedule",
+          "params": "request"
+        },
+        {
+          "name": "get_getAvailability",
+          "params": "request"
+        },
+        {
+          "name": "get_getMovements",
+          "params": "request"
+        },
+        {
+          "name": "get_getZClosings",
+          "params": "request"
+        },
+        {
+          "name": "get_getSchedule",
+          "params": "request"
+        },
+        {
+          "name": "options_getTaxSummary",
+          "params": "request"
+        },
+        {
+          "name": "get_getTaxSummary",
+          "params": "request"
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-http-functions",
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [
+        "HISTORICO_CIERRES_Z",
+        "MOVIMIENTOS_CAJA",
+        "REGISTRO_HORARIO",
+        "SYNC_LOG"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": true
+    },
+    {
+      "file": "src/backend/internalConfig.js",
+      "lines": 231,
+      "exports": [
+        {
+          "name": "COLLECTIONS",
+          "params": ""
+        },
+        {
+          "name": "SERVICE_CATALOG",
+          "params": ""
+        },
+        {
+          "name": "APP_IDS",
+          "params": ""
+        },
+        {
+          "name": "SDK_CONFIG",
+          "params": ""
+        },
+        {
+          "name": "CONCURRENCY",
+          "params": ""
+        },
+        {
+          "name": "SLOT_SEARCH",
+          "params": ""
+        },
+        {
+          "name": "API",
+          "params": ""
+        },
+        {
+          "name": "STAFF_ACCESS",
+          "params": ""
+        },
+        {
+          "name": "TIPO_FICHAJE",
+          "params": ""
+        },
+        {
+          "name": "TIPO_MOVIMIENTO",
+          "params": ""
+        },
+        {
+          "name": "FORMA_PAGO",
+          "params": ""
+        },
+        {
+          "name": "IVA_RATES",
+          "params": ""
+        },
+        {
+          "name": "CAJA_STATUS",
+          "params": ""
+        },
+        {
+          "name": "SINGLETONS",
+          "params": ""
+        },
+        {
+          "name": "CITA_FIELDS",
+          "params": ""
+        },
+        {
+          "name": "ESTADO_CITA",
+          "params": ""
+        },
+        {
+          "name": "ESTADO_PAGO",
+          "params": ""
+        },
+        {
+          "name": "COLLAB_ROLES",
+          "params": ""
+        },
+        {
+          "name": "JWT",
+          "params": ""
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/inventario.web.js",
+      "lines": 404,
+      "exports": [
+        {
+          "name": "getInventoryDashboard",
+          "params": ""
+        },
+        {
+          "name": "registerInternalInventoryUse",
+          "params": ""
+        },
+        {
+          "name": "registerInventoryReceipt",
+          "params": ""
+        },
+        {
+          "name": "getInventoryReconciliationQueue",
+          "params": ""
+        },
+        {
+          "name": "markInventoryReconciliationApplied",
+          "params": ""
+        },
+        {
+          "name": "recordOnlineInventoryRefundInternal",
+          "params": "order, refund, restockInfo, traceId"
+        },
+        {
+          "name": "recordOnlineInventoryOrderInternal",
+          "params": "order, traceId"
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-members-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "CONCILIACION_STOCK_WIX",
+        "MOVIMIENTO_INVENTARIO",
+        "PRODUCTOS_VENTA"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/m365GraphSync.js",
+      "lines": 334,
+      "exports": [
+        {
+          "name": "enqueueM365LedgerRecord",
+          "params": "movement, traceId"
+        },
+        {
+          "name": "processM365GraphSyncQueue",
+          "params": "options = {}"
+        }
+      ],
+      "wixModules": [
+        "wix-data",
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [
+        "M365_GRAPH_SYNC_QUEUE",
+        "SYNC_LOG"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/marianAssistant.web.js",
+      "lines": 191,
+      "exports": [
+        {
+          "name": "askMarianAssistant",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-secrets-backend",
+        "wix-web-module"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/mmSecrets.js",
+      "lines": 29,
+      "exports": [
+        {
+          "name": "SECRETS",
+          "params": ""
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/reservas.web.js",
+      "lines": 1356,
+      "exports": [
+        {
+          "name": "revalidateExactAvailabilitySlot",
+          "params": "{ serviceId, localStartDate, localEndDate, resourceId, nativeAddonIds = [], traceId }"
+        },
+        {
+          "name": "_cleanExpiredDualSlotsInternal",
+          "params": "{ limit = 100, traceId = null } = {}"
+        },
+        {
+          "name": "_getCertifiedDualSlotsInternal",
+          "params": "serviceId, resourceId, dateYMD, requestedAddonIds = []"
+        },
+        {
+          "name": "_invalidateCachesInternal",
+          "params": "serviceId, dateYMD, resourceId, traceId = null"
+        },
+        {
+          "name": "invalidateCachesInternal",
+          "params": ""
+        },
+        {
+          "name": "getServiceForBookingInternal",
+          "params": "serviceId, traceId = null"
+        },
+        {
+          "name": "getServiceBySlugOrId",
+          "params": ""
+        },
+        {
+          "name": "resolveServiceId",
+          "params": ""
+        },
+        {
+          "name": "getAvailableDays",
+          "params": ""
+        },
+        {
+          "name": "getCertifiedDualSlots",
+          "params": ""
+        },
+        {
+          "name": "resolveStaffForSlot",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "@wix/bookings",
+        "wix-data",
+        "wix-web-module"
+      ],
+      "collectionTokens": [
+        "CITAS",
+        "DAYS_CACHE",
+        "DUAL_CACHE",
+        "SERVICIOS_CITA",
+        "SERVICIOS_OPCIONES_ADDON"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/responseUtils.js",
+      "lines": 167,
+      "exports": [
+        {
+          "name": "successResponse",
+          "params": "data, metaExtra = {}"
+        },
+        {
+          "name": "errorResponse",
+          "params": "code, message, metaExtra = {}"
+        },
+        {
+          "name": "isSuccess",
+          "params": "res"
+        },
+        {
+          "name": "extractError",
+          "params": "err, maxLen = MAX_ERROR_MESSAGE_LENGTH"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/security.js",
+      "lines": 319,
+      "exports": [
+        {
+          "name": "rateLimiter",
+          "params": "key, maxRequests, windowMs"
+        },
+        {
+          "name": "clearRateLimitCache",
+          "params": ""
+        },
+        {
+          "name": "isAdmin",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "isCajero",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "isMarianManager",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "requireMarianManager",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "isStaffCollaborator",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "requireAdmin",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "requireCajero",
+          "params": "traceId = 'unknown'"
+        },
+        {
+          "name": "requireStaffCollaborator",
+          "params": "traceId = 'unknown'"
+        }
+      ],
+      "wixModules": [
+        "wix-members-backend",
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/security.web.js",
+      "lines": 75,
+      "exports": [
+        {
+          "name": "checkStaffCollaboratorAccess",
+          "params": ""
+        },
+        {
+          "name": "requireAdmin",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-web-module"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": true,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/securityEngine.js",
+      "lines": 227,
+      "exports": [
+        {
+          "name": "hmacSha256Hex",
+          "params": "secretKey, payload"
+        },
+        {
+          "name": "timingSafeEqual",
+          "params": "a, b"
+        },
+        {
+          "name": "verifyHMAC",
+          "params": "secretKey, payload, signature"
+        },
+        {
+          "name": "hashSHA256",
+          "params": "data"
+        },
+        {
+          "name": "hashChain",
+          "params": "previousHash, currentData"
+        },
+        {
+          "name": "generarToken",
+          "params": "payload, traceId"
+        },
+        {
+          "name": "verificarToken",
+          "params": "token, traceId"
+        },
+        {
+          "name": "requireValidToken",
+          "params": "token, traceId"
+        }
+      ],
+      "wixModules": [
+        "wix-secrets-backend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/backend/staff.js",
+      "lines": 118,
+      "exports": [
+        {
+          "name": "findStaff",
+          "params": "identifier"
+        },
+        {
+          "name": "resolveStaffResourceIds",
+          "params": "selection"
+        },
+        {
+          "name": "getAllStaff",
+          "params": ""
+        },
+        {
+          "name": "clearStaffCache",
+          "params": ""
+        }
+      ],
+      "wixModules": [
+        "wix-data"
+      ],
+      "collectionTokens": [
+        "MAPA_STAFF"
+      ],
+      "usesWixData": true,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    }
+  ],
+  "public": [
+    {
+      "file": "src/public/marianAdministrationController.js",
+      "lines": 297,
+      "exports": [
+        {
+          "name": "initMarianAdministration",
+          "params": "widget, slug = \"administracion\""
+        }
+      ],
+      "wixModules": [
+        "wix-location",
+        "wix-members-frontend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/mmUtils.js",
+      "lines": 414,
+      "exports": [
+        {
+          "name": "VERSION",
+          "params": ""
+        },
+        {
+          "name": "SDK_CONFIG",
+          "params": ""
+        },
+        {
+          "name": "MONEY",
+          "params": ""
+        },
+        {
+          "name": "BOOKINGS_ADDON_CONFIG",
+          "params": ""
+        },
+        {
+          "name": "MESSAGE_TYPES",
+          "params": ""
+        },
+        {
+          "name": "URLS",
+          "params": ""
+        },
+        {
+          "name": "UI",
+          "params": ""
+        },
+        {
+          "name": "STAFF_DEFAULT_NAME",
+          "params": ""
+        },
+        {
+          "name": "makeTraceId",
+          "params": "prefix = \"mm\""
+        },
+        {
+          "name": "_safeTrim",
+          "params": "v"
+        },
+        {
+          "name": "_cloneDeep",
+          "params": "value"
+        },
+        {
+          "name": "_safeEmail",
+          "params": "email"
+        },
+        {
+          "name": "_safePhone",
+          "params": "phone"
+        },
+        {
+          "name": "_normalizeIdPart",
+          "params": "v, maxLen = 80"
+        },
+        {
+          "name": "_looksLikeGuid",
+          "params": "v"
+        },
+        {
+          "name": "_safeSlugOrId",
+          "params": "raw"
+        },
+        {
+          "name": "_normalizeLocalIsoStr",
+          "params": "rawStr"
+        },
+        {
+          "name": "getUtcDateFromMadridLocal",
+          "params": "localStr"
+        },
+        {
+          "name": "getMadridLocalStringNoZ",
+          "params": "utcDate"
+        },
+        {
+          "name": "_toDateSafe",
+          "params": "val"
+        },
+        {
+          "name": "withTimeout",
+          "params": "promise, timeoutMs, label = \"operation\""
+        },
+        {
+          "name": "_executeWithRetry",
+          "params": "fn, retries = 3, delay = 500, options = {}"
+        },
+        {
+          "name": "_maskEmail",
+          "params": "email"
+        },
+        {
+          "name": "_maskIp",
+          "params": "ip"
+        },
+        {
+          "name": "_hashKey",
+          "params": "input"
+        },
+        {
+          "name": "_generateUUID",
+          "params": ""
+        },
+        {
+          "name": "_isValidEmail",
+          "params": "email"
+        },
+        {
+          "name": "_normType",
+          "params": "type"
+        },
+        {
+          "name": "_maskPhone",
+          "params": "phone"
+        },
+        {
+          "name": "_maskName",
+          "params": "name"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/qrHelper.js",
+      "lines": 73,
+      "exports": [
+        {
+          "name": "extractHuella8",
+          "params": "hashCadena"
+        },
+        {
+          "name": "generateVerifactuUrl",
+          "params": "params = {}"
+        },
+        {
+          "name": "buildVerifactuReceiptMeta",
+          "params": "movimiento = {}"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/widgetBridge.js",
+      "lines": 241,
+      "exports": [
+        {
+          "name": "createWidgetBridge",
+          "params": "widgetElement, options = {}"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    }
+  ],
+  "pages": [
+    {
+      "file": "src/pages/ADMINISTRACION.mvf3f.js",
+      "lines": 17,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Blog.b3z7b.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Calendario de reservas 2.q39h6.js",
+      "lines": 439,
+      "exports": [],
+      "wixModules": [
+        "wix-location",
+        "wix-window-frontend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Calendario de reservas.zfv13.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Carrito lateral.m1jxs.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/ConfirmacionReserva.q5vps.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Entrada.an12i.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Fidelización.is9jt.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Formulario de reserva.yfzoa.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Fullscreen Page.p92dv.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Inicio.cjg9.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/MUY PRONTO.ly4ej.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Mis datos.v8dmj.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Mis pedidos.obpcx.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Mis recompensas.bzbee.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Mis reservas.ecd7l.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Mis suscripciones.pg23n.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Notificaciones.iy7gn.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Notifications.l8son.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/ONLY STAFF.mvf3f.js",
+      "lines": 325,
+      "exports": [],
+      "wixModules": [
+        "wix-location",
+        "wix-members-frontend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/PROMOCIONES.s7ap5.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Pagina de servicio 2.xnfr4.js",
+      "lines": 270,
+      "exports": [],
+      "wixModules": [
+        "wix-location",
+        "wix-window-frontend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Perfil.l4yzd.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Privacidad y Cookies.vd6cx.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página de agradecimiento.zhpcj.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página de categoría.clfx1.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página de pago.exnty.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página de servicio.af54v.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página del carrito.twv9b.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Página del producto.deb1u.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Servicios.d4fc7.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/TARJETAS REGALO.sodym.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Ventana emergente de seguidores_seguimiento.v135g.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/Ventana emergente de éxito.drixh.js",
+      "lines": 11,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/pages/masterPage.js",
+      "lines": 0,
+      "exports": [],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    }
+  ]
+}
