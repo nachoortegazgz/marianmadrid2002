@@ -1,10 +1,17 @@
 # Biblia técnica del ecosistema Wix/Velo — Fase 1
 
-**Fecha de corte:** 28 de agosto de 2026, 01:40 UTC.  
-**Autor:** Manus AI.  
-**Repositorio y rama:** `nachoortegazgz/marianmadrid2002`, `main`.  
-**Commit de referencia:** `d46e7cf2c4864af8c3566feb3c21706197d31496`.  
-**Sitio:** [marianmadrid.es](https://www.marianmadrid.es/).  
+**Fecha de corte:** 28 de agosto de 2026, 01:40 UTC.
+
+**Autor:** Manus AI.
+
+**Repositorio y rama:** `nachoortegazgz/marianmadrid2002`, `main`.
+
+**Código de referencia analizado:** `d46e7cf2c4864af8c3566feb3c21706197d31496`.
+
+**Revisión documental base:** `f8ed32cecf8bf60d7e54fd49922c98f8fee989e1`.
+
+**Sitio:** [marianmadrid.es](https://www.marianmadrid.es/).
+
 **Sitio Wix:** `188bed94-177c-4bc9-a9f0-35080d874f3e`.
 
 ## 1. Propósito, alcance y regla de interpretación
@@ -14,6 +21,21 @@ Esta biblia técnica consolida el estado diseñado, versionado y observado del e
 > **Regla de evidencia.** Toda afirmación se clasifica como **implementada y validada en pruebas**, **observada en producción mediante consultas de solo lectura**, o **pendiente de QA end-to-end**. Una capacidad implementada no debe confundirse con certificación legal, fiscal, contable, laboral o de protección de datos.
 
 La Fase 1 cubre reservas online simples y duales, disponibilidad nativa, huecos de exposición, pagos y ventas, caja, devoluciones, propinas, inventario, jornada, trazabilidad operativa, paquetes de apoyo para gestoría y control de acceso. La Fase 2 de integración externa con Microsoft 365 se conserva preparada en código, pero está **bloqueada por configuración** y no genera tráfico.
+
+### 1.1 Reconciliación con la biblia adjunta `biblia2000.txt`
+
+La biblia original es un historial útil de la arquitectura, pero no era la fuente factual final: contiene referencias a módulos, TTL, índices, configuraciones y cumplimiento que han variado o no han quedado verificados en el esquema CMS activo. Esta edición sustituye esas afirmaciones por la evidencia del commit actual, el contexto del sitio Wix y la consulta API de colecciones del 28 de agosto.
+
+| Tema del documento adjunto | Estado actualizado y comprobado |
+|---|---|
+| “Solo SDK V2; cero APIs V1” | **No aplicable en sentido absoluto:** Wix Bookings usa contratos V2, pero Wix Stores instalado expone catálogo **V1**. No usar endpoints de Stores V3. |
+| M365 / Power Automate | **Pausado:** `SDK_CONFIG.M365.ENABLED` es `false`; no debe haber tráfico ni ejecución de cola hasta autorización formal de Fase 2. |
+| Veri*Factu, AEAT o cumplimiento final | **No certificado:** el ledger y los documentos son controles y evidencias de apoyo; requieren validación profesional antes de uso fiscal/legal real. |
+| Índices CMS críticos activos | **No verificado / no presente en respuesta API:** las 34 colecciones del ecosistema devolvieron `indexes: []`; no afirmar índices hasta que el CMS los muestre. |
+| Campo canónico de personal | `resourceId` es el identificador operativo de Bookings, pero los esquemas históricos conservan campos de compatibilidad como `staffMemberId` y `empleada`. No borrarlos por inferencia. |
+| Secretos y personal | No se listan valores de secretos, ni emails/teléfonos/identificadores de empleados; `MapaStaff` permanece privado y es la autoridad de personal. |
+| Cachés | Los TTL vigentes son servicios 10 min, slots 2 min, dual 15 min y personal 5 min; sustituyen valores anteriores no coincidentes. |
+| Excepción de migración de inmutabilidad | Eliminada: no existe una excepción genérica que habilite editar o borrar ledger, asientos o líneas inmutables. |
 
 ## 2. Instantánea del entorno real
 
