@@ -44,6 +44,12 @@
     .tab { min-height: 38px; padding: 8px 13px; border: 1px solid #bac1ca; border-radius: 999px; background: var(--surface); color: #34404d; font-size: 12px; font-weight: 800; letter-spacing: .03em; }
     .tab[aria-selected="true"] { border-color: var(--navy); background: var(--navy); color: #fff; }
     .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .quick-actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
+    .quick-action { display: grid; gap: 7px; min-height: 116px; padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); text-align: left; box-shadow: 0 8px 20px rgba(31,40,52,.03); transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+    .quick-action:hover { border-color: var(--accent); box-shadow: 0 12px 25px rgba(31,40,52,.08); transform: translateY(-1px); }
+    .quick-action strong { font-size: 13px; }
+    .quick-action span { color: var(--muted); font-size: 11px; line-height: 1.42; }
+    .quick-action .quick-icon { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; background: var(--accent-soft); color: #725226; font-size: 14px; font-weight: 900; }
     .metric { min-height: 132px; padding: 19px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: 0 8px 20px rgba(31,40,52,.03); }
     .metric.primary { background: var(--success-soft); border-color: #d5ecdf; }
     .metric.cash { background: #edf3fb; border-color: #dbe5f2; }
@@ -114,9 +120,9 @@
     .access-denied { display: none; max-width: 720px; margin: 48px auto; padding: 30px; border: 1px solid #ffd6d6; border-radius: 16px; background: var(--danger-soft); color: var(--danger); text-align: center; box-shadow: var(--shadow); }
     .access-denied h2 { margin: 0 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; }
     .access-denied p { margin: 0; line-height: 1.5; }
-    @media (max-width: 960px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 960px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid-3 { grid-template-columns: 1fr; } }
     @media (max-width: 760px) { .hero { flex-direction: column; align-items: flex-start; } .grid-2, .form-row { grid-template-columns: 1fr; } }
-    @media (max-width: 480px) { .app { padding: 12px; } .metrics { grid-template-columns: 1fr; } .btn-row { flex-direction: column; } .btn-row .btn { width: 100%; } .assistant-fab { right: 12px; bottom: 12px; } .assistant-dialog { right: 12px; bottom: 72px; } }
+    @media (max-width: 480px) { .app { padding: 12px; } .metrics, .quick-actions { grid-template-columns: 1fr; } .btn-row { flex-direction: column; } .btn-row .btn { width: 100%; } .assistant-fab { right: 12px; bottom: 12px; } .assistant-dialog { right: 12px; bottom: 72px; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   </style>
 </head>
@@ -150,6 +156,12 @@
         <article class="metric warn"><p class="metric-label">Conciliaciones</p><strong id="pendingReconciliation" class="metric-value">--</strong><p class="metric-detail">Ajustes internos pendientes en Wix.</p></article>
         <article class="metric"><p class="metric-label">Stock bajo</p><strong id="lowStock" class="metric-value">--</strong><p class="metric-detail">Productos que requieren revision.</p></article>
       </div>
+      <section class="quick-actions" aria-label="Acciones principales">
+        <button class="quick-action" type="button" data-tab-target="cash"><span class="quick-icon" aria-hidden="true">€</span><strong>Control de caja</strong><span>Ver saldo, registrar venta presencial y preparar X/Z.</span></button>
+        <button class="quick-action" type="button" data-tab-target="fiscal"><span class="quick-icon" aria-hidden="true">F</span><strong>Fiscalidad y libro</strong><span>Calcular resumen y cargar el libro de facturas.</span></button>
+        <button class="quick-action" type="button" data-tab-target="documents"><span class="quick-icon" aria-hidden="true">D</span><strong>Documentos de gestoria</strong><span>Revisar, versionar, descargar y enviar manualmente.</span></button>
+        <button id="openAssistant" class="quick-action" type="button"><span class="quick-icon" aria-hidden="true">IA</span><strong>Asistente de Marian</strong><span>Consultar operativa y abrir procesos disponibles.</span></button>
+      </section>
       <div class="grid-2">
         <article class="panel"><h2 class="panel-title">Prioridades operativas <small>Actualizadas bajo demanda</small></h2><ul id="priorityList" class="checklist"></ul></article>
         <article class="panel soft"><h2 class="panel-title">Control rapido</h2><p class="notice">Los informes se preparan en este panel y se descargan en tu dispositivo. No se envian automaticamente a gestoria ni se presenta ningun modelo ante la Administracion.</p><div class="btn-row" style="margin-top:14px;"><button id="refreshOverview" class="btn outline" type="button">Actualizar resumen</button><button class="btn" type="button" data-tab-target="fiscal">Preparar informe fiscal</button></div></article>
@@ -452,7 +464,7 @@
     }
     document.querySelectorAll('.tab').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tab)));
     document.querySelectorAll('[data-tab-target]').forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.tabTarget)));
-    $('refreshOverview').addEventListener('click', loadOverview); $('refreshCash').addEventListener('click', () => request(TYPES.CASHIER_STATE, {}));
+    $('refreshOverview').addEventListener('click', loadOverview); $('refreshCash').addEventListener('click', () => request(TYPES.CASHIER_STATE, {})); $('openAssistant').addEventListener('click', () => { $('assistantDialog').classList.add('open'); $('assistantFab').setAttribute('aria-expanded', 'true'); $('assistantInput').focus(); });
     $('registerManualTx').addEventListener('click', () => { const amount = Number($('manualAmount').value); const paymentMethod = $('paymentMethod').value; const transactionKind = $('transactionKind').value; const concept = $('manualConcept').value.trim(); if (!Number.isFinite(amount) || amount <= 0 || !concept || concept.length < 3 || !['EFECTIVO', 'TARJETA', 'BIZUM'].includes(paymentMethod) || !['VENTA', 'PROPINA'].includes(transactionKind)) { show('warn', 'Indica un importe positivo, una forma de pago, una naturaleza valida y un concepto de al menos 3 caracteres.'); return; } const label = transactionKind === 'PROPINA' ? 'propina' : 'venta presencial'; if (!confirmAction(`Registrar ${label} de ${money(amount)} por ${paymentMethod}.`)) return; setLoading($('registerManualTx'), true); request(TYPES.TPV_TX, { amount, paymentMethod, transactionKind, concept }); });
     $('registerXCount').addEventListener('click', () => { const amount = Number($('cashCount').value); const diaKey = $('countDate').value; if (!diaKey || !Number.isFinite(amount) || amount < 0) { show('warn', 'Indica una fecha y un efectivo contado valido.'); return; } if (!confirmAction(`Registrar conteo X de ${money(amount)} para ${diaKey}.`)) return; setLoading($('registerXCount'), true); request(TYPES.X_COUNT, { diaKey, metalicoCaja: amount }); });
     $('registerZClosing').addEventListener('click', () => { const diaKey = $('closingDate').value; if (!diaKey) { show('warn', 'Selecciona la fecha de cierre.'); return; } if (!confirmAction(`Generar cierre Z para ${diaKey}.`)) return; setLoading($('registerZClosing'), true); request(TYPES.Z_CLOSING, { diaKey }); });
