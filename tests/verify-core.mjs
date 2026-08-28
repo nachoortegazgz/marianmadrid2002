@@ -232,7 +232,9 @@ check('Ledger eCommerce cubre pedidos sin reservas y evita devoluciones huerfana
 
 check('Proyeccion contable solo se activa con mapa validado y preserva partida doble', () => {
   const accounting = read('src/backend/contabilidad.js');
-  for (const token of ['PLAN_CUENTAS_CONTABLES', 'ASIENTOS_CONTABLES', 'LINEAS_ASIENTO_CONTABLE', 'NO_APPROVED_ACCOUNT_MAP', 'ACCOUNTING_PROJECTION_UNBALANCED', 'totalDebe', 'totalHaber', 'hashAsiento', 'firmaAsiento', 'TIP_TREATMENT_PENDING_PROFESSIONAL_REVIEW']) assert.ok(accounting.includes(token), token);
+  const config = read('src/backend/internalConfig.js');
+  for (const token of ['PLAN_CUENTAS_CONTABLES', 'ASIENTOS_CONTABLES', 'LINEAS_ASIENTO_CONTABLE', 'NO_APPROVED_ACCOUNT_MAP', 'ACCOUNTING_PROJECTION_UNBALANCED', 'ACCOUNTING_DISABLED', 'totalDebe', 'totalHaber', 'hashAsiento', 'firmaAsiento', 'TIP_TREATMENT_PENDING_PROFESSIONAL_REVIEW']) assert.ok(accounting.includes(token), token);
+  assert.match(config, /ACCOUNTING:\s*Object\.freeze\(\{\s*ENABLED:\s*false/);
   const dataHooks = read('src/backend/data.js');
   for (const token of ['ASIENTOS_CONTABLES_beforeInsert', 'ASIENTOS_CONTABLES_beforeUpdate', 'LINEAS_ASIENTO_CONTABLE_beforeInsert', 'LINEAS_ASIENTO_CONTABLE_beforeUpdate']) assert.ok(dataHooks.includes(token), token);
 });

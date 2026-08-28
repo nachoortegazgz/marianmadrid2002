@@ -203,6 +203,7 @@ La última sanitización disponible fue correcta: siete de siete controles aprob
 | Ventana de búsqueda | 14 días; tolerancia 10 min | Limita coste de disponibilidad y criterio de encaje. |
 | Retención de auditoría | 90 días | Parámetro de limpieza programada; no reemplaza una política legal de conservación. |
 | M365 | `ENABLED: false` | Bloquea tráfico, Jobs y sincronización externa de Fase 2. |
+| Contabilidad | `ENABLED: false` | Evita consultas y proyecciones hasta disponer de un mapa de cuentas aprobado por gestoría. |
 
 Los estados principales son: citas `CONFIRMED`, `PENDING_PAYMENT`, `CANCELED`, `REFUNDED`; pagos `UNPAID`, `PENDING_PAYMENT`, `PENDING_LEDGER`, `PAID`, `REFUNDED`, `PARTIALLY_REFUNDED`; movimientos `VENTA_EFECTIVO`, `VENTA_TARJETA`, `VENTA_BIZUM`, `VENTA_ONLINE`, `PROPINA`, `REEMBOLSO`, `AJUSTE`; y formas de pago `EFECTIVO`, `TARJETA`, `BIZUM`, `ONLINE`.
 
@@ -265,6 +266,7 @@ El esquema se obtuvo de la API de Wix CMS el 28 de agosto. Las 34 colecciones de
 | [`ANEXO_IDENTIFICADORES_Y_CONSTANTES_2026-08-28.md`](ANEXO_IDENTIFICADORES_Y_CONSTANTES_2026-08-28.md) | IDs de sitio, apps, colecciones, constantes, límites, estados, roles, dependencias y comandos. |
 | [`ANEXO_INTERFACES_PUBLICAS_2026-08-28.json`](ANEXO_INTERFACES_PUBLICAS_2026-08-28.json) | Inventario mecánico de ficheros, exportaciones, parámetros, módulos Wix y colecciones referenciadas. |
 | [`AUDITORIA_IDS_CANONICOS_Y_DUPLICIDADES_2026-08-28.md`](AUDITORIA_IDS_CANONICOS_Y_DUPLICIDADES_2026-08-28.md) | Decisión y evidencia de aliases/IDs retirados y elementos conservados por contrato. |
+| [`EVALUACION_PLAN_REFACTORIZACION_ADJUNTO_2026-08-28.md`](EVALUACION_PLAN_REFACTORIZACION_ADJUNTO_2026-08-28.md) | Contraste profesional del plan adjunto, corrección contable aplicada y propuestas aplazadas por riesgo. |
 | [`EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md`](EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md) | QA real nativa de Bookings, recuperación por revisión y limpieza. |
 | [`ESTADO_MAESTRO_CONSOLIDADO_PROYECTO_2026-08-27.md`](ESTADO_MAESTRO_CONSOLIDADO_PROYECTO_2026-08-27.md) | Fuente de continuidad de decisiones, publicación y límites de fase. |
 | [`ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md`](ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md) | Correcciones de concurrencia, PII, inmutabilidad y API externa. |

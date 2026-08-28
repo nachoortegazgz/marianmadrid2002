@@ -128,6 +128,9 @@ export const SDK_CONFIG = Object.freeze({
     M365: Object.freeze({
         ENABLED: false,
     }),
+    ACCOUNTING: Object.freeze({
+        ENABLED: false,
+    }),
 });
 
 export const CONCURRENCY = Object.freeze({

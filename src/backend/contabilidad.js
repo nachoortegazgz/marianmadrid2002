@@ -208,6 +208,9 @@ export async function projectLedgerMovementToAccounting(movimiento) {
     if (movimiento?.tipoMovimiento === TIPO_MOVIMIENTO.PROPINA || movimiento?.tratamientoIva === "PROPINA_PENDIENTE_GESTORIA") {
         return { status: "SKIPPED", reason: "TIP_TREATMENT_PENDING_PROFESSIONAL_REVIEW" };
     }
+    if (SDK_CONFIG?.ACCOUNTING?.ENABLED !== true) {
+        return { status: "SKIPPED", reason: "ACCOUNTING_DISABLED" };
+    }
 
     const base = _buildBase(movimiento);
     const existing = await _getExisting(base.idAsiento);
