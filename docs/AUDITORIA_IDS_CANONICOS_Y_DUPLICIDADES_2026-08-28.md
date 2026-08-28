@@ -1,7 +1,9 @@
 # Auditoría de IDs canónicos, aliases y funciones duplicadas
 
-**Fecha:** 28 de agosto de 2026.  
-**Alcance:** Código de `main`, configuración `internalConfig.js`, contrato CMS, utilidades de prueba y esquema CMS consultado desde Wix.  
+**Fecha:** 28 de agosto de 2026.
+
+**Alcance:** Código de `main`, configuración `internalConfig.js`, contrato CMS, utilidades de prueba y esquema CMS consultado desde Wix.
+
 **Criterio de decisión:** reducir solo las duplicidades con identidad semántica y física demostrada, sin renombrar IDs CMS, recursos de Bookings, páginas Wix con ID interno, datos productivos ni contratos públicos.
 
 ## Resultado ejecutivo
