@@ -1,17 +1,220 @@
 {
+  "generatedAt": "2026-08-28T01:59:28.607Z",
+  "project": {
+    "package": {
+      "devDependencies": {
+        "@wix/cli": "^1.0.0",
+        "eslint": "8.57.1",
+        "react": "16.14.0"
+      },
+      "dependencies": {
+        "@wix/bookings": "^1.0.1634",
+        "wix-web-module": "^1.0.0",
+        "wix-data": "^1.0.0",
+        "wix-location": "^1.0.0",
+        "wix-http-functions": "^1.0.0",
+        "wix-ecom-backend": "^1.0.0",
+        "wix-members-backend": "^1.0.0",
+        "wix-auth": "^1.0.0",
+        "wix-members-frontend": "^1.0.0",
+        "wix-window-frontend": "^1.0.0",
+        "wix-secrets-backend": "^1.0.0"
+      },
+      "scripts": {
+        "dev": "npx --yes @wix/cli dev",
+        "sync:types": "npx --yes @wix/cli sync-types",
+        "lint": "npx --yes eslint@8.57.1 .",
+        "test:core": "node tests/verify-core.mjs",
+        "test:sanitization": "node tests/verify-sanitization.mjs",
+        "test:sim": "node tests/simulate-critical-flows.mjs",
+        "test:integration": "node tests/simulate-realistic-wix-flow.mjs",
+        "test:admin": "node tests/simulate-administration-closing.mjs",
+        "test:widget": "node tests/verify-administration-widget.mjs",
+        "test:documents": "node tests/simulate-manager-documents.mjs",
+        "test:automation": "node tests/verify-dependency-automation.mjs",
+        "test:production-monitor": "node tests/verify-production-monitor.mjs",
+        "test:hardening": "node tests/verify-diagnostic-hardening.mjs",
+        "test": "npm run test:sanitization && npm run test:core && npm run test:hardening && npm run test:widget && npm run test:sim && npm run test:integration && npm run test:admin && npm run test:documents && npm run test:automation && npm run test:production-monitor",
+        "validate": "npm run sync:types && npm run test"
+      }
+    },
+    "wixConfig": {
+      "siteId": "188bed94-177c-4bc9-a9f0-35080d874f3e",
+      "uiVersion": "14544"
+    }
+  },
   "summary": {
     "codeFiles": 63,
-    "codeLines": 13304,
+    "codeLines": 13298,
     "backendFiles": 24,
     "publicFiles": 4,
     "pageFiles": 35,
     "tests": 13,
-    "testLines": 1848,
+    "testLines": 1849,
     "testChecks": 331,
-    "collections": 37,
+    "collections": 34,
     "exportedFunctions": 220
   },
-  "backend": [
+  "collections": [
+    {
+      "key": "SERVICIOS_CITA",
+      "id": "Import2"
+    },
+    {
+      "key": "EXTRAS_CATALOGO",
+      "id": "AddonsCatalogo"
+    },
+    {
+      "key": "MAPA_STAFF",
+      "id": "MapaStaff"
+    },
+    {
+      "key": "DUAL_CACHE",
+      "id": "DualSlotCache"
+    },
+    {
+      "key": "DAYS_CACHE",
+      "id": "AvailabilityDaysCache"
+    },
+    {
+      "key": "SLOTS_CACHE",
+      "id": "AvailabilitySlotsCache"
+    },
+    {
+      "key": "CITAS",
+      "id": "CitasF2"
+    },
+    {
+      "key": "TRANSACTIONS",
+      "id": "BookingTransactions"
+    },
+    {
+      "key": "LOCKS",
+      "id": "MM_LOCKS"
+    },
+    {
+      "key": "COMPENSATIONS",
+      "id": "PendingCompensations"
+    },
+    {
+      "key": "BOOKINGS_SERVICE_SYNC_QUEUE",
+      "id": "BookingsServiceSyncQueue"
+    },
+    {
+      "key": "M365_GRAPH_SYNC_QUEUE",
+      "id": "M365GraphSyncQueue"
+    },
+    {
+      "key": "MOVIMIENTOS_CAJA",
+      "id": "movimientoCaja"
+    },
+    {
+      "key": "CAJA_ACTUAL",
+      "id": "cajaActual"
+    },
+    {
+      "key": "HISTORICO_CIERRES_Z",
+      "id": "HISTORICO_CIERRES_Z"
+    },
+    {
+      "key": "CONTEOS_X",
+      "id": "RESUMEN_CONTEO_X"
+    },
+    {
+      "key": "CONTADORES_FISCALES",
+      "id": "SecuenciaTickets"
+    },
+    {
+      "key": "REGISTRO_HORARIO",
+      "id": "REGISTRO_HORARIO"
+    },
+    {
+      "key": "PRODUCTOS_VENTA",
+      "id": "InventarioProductos"
+    },
+    {
+      "key": "MOVIMIENTO_INVENTARIO",
+      "id": "movimientoInventario"
+    },
+    {
+      "key": "CONCILIACION_STOCK_WIX",
+      "id": "ConciliacionStockWix"
+    },
+    {
+      "key": "AUDIT_LOG",
+      "id": "MM_AUDIT_LOG"
+    },
+    {
+      "key": "SYNC_LOG",
+      "id": "m365SyncLog"
+    },
+    {
+      "key": "CONFIGURACION_FISCAL",
+      "id": "CONFIGURACION_FISCAL"
+    },
+    {
+      "key": "PLAN_CUENTAS_CONTABLES",
+      "id": "PLAN_CUENTAS_CONTABLES"
+    },
+    {
+      "key": "ASIENTOS_CONTABLES",
+      "id": "ASIENTOS_CONTABLES"
+    },
+    {
+      "key": "LINEAS_ASIENTO_CONTABLE",
+      "id": "LINEAS_ASIENTO_CONTABLE"
+    },
+    {
+      "key": "LIBRO_IVA_FACTURAS_EXPEDIDAS",
+      "id": "LIBRO_IVA_FACTURAS_EXPEDIDAS"
+    },
+    {
+      "key": "LIBRO_IVA_FACTURAS_RECIBIDAS",
+      "id": "LIBRO_IVA_FACTURAS_RECIBIDAS"
+    },
+    {
+      "key": "LIBRO_IVA_BIENES_INVERSION",
+      "id": "LIBRO_IVA_BIENES_INVERSION"
+    },
+    {
+      "key": "LIBRO_IVA_INTRACOMUNITARIO",
+      "id": "LIBRO_IVA_INTRACOMUNITARIO"
+    },
+    {
+      "key": "MAYOR_CONTABLE_SALDOS",
+      "id": "MAYOR_CONTABLE_SALDOS"
+    },
+    {
+      "key": "LIBRO_INVENTARIO_CIERRE",
+      "id": "LIBRO_INVENTARIO_CIERRE"
+    },
+    {
+      "key": "EVENTOS_SISTEMA_FACTURACION",
+      "id": "EVENTOS_SISTEMA_FACTURACION"
+    }
+  ],
+  "configExports": [
+    "COLLECTIONS",
+    "SERVICE_CATALOG",
+    "APP_IDS",
+    "SDK_CONFIG",
+    "CONCURRENCY",
+    "SLOT_SEARCH",
+    "API",
+    "STAFF_ACCESS",
+    "TIPO_FICHAJE",
+    "TIPO_MOVIMIENTO",
+    "FORMA_PAGO",
+    "IVA_RATES",
+    "CAJA_STATUS",
+    "SINGLETONS",
+    "CITA_FIELDS",
+    "ESTADO_CITA",
+    "ESTADO_PAGO",
+    "COLLAB_ROLES",
+    "JWT"
+  ],
+  "files": [
     {
       "file": "src/backend/booking/bookingCore.js",
       "lines": 694,
@@ -751,7 +954,7 @@
     },
     {
       "file": "src/backend/internalConfig.js",
-      "lines": 231,
+      "lines": 225,
       "exports": [
         {
           "name": "COLLECTIONS",
@@ -1009,8 +1212,8 @@
         "CITAS",
         "DAYS_CACHE",
         "DUAL_CACHE",
-        "SERVICIOS_CITA",
-        "SERVICIOS_OPCIONES_ADDON"
+        "EXTRAS_CATALOGO",
+        "SERVICIOS_CITA"
       ],
       "usesWixData": true,
       "usesWebMethod": true,
@@ -1205,206 +1408,7 @@
       "usesElevate": false,
       "usesSecrets": false,
       "usesHttp": false
-    }
-  ],
-  "public": [
-    {
-      "file": "src/public/marianAdministrationController.js",
-      "lines": 297,
-      "exports": [
-        {
-          "name": "initMarianAdministration",
-          "params": "widget, slug = \"administracion\""
-        }
-      ],
-      "wixModules": [
-        "wix-location",
-        "wix-members-frontend"
-      ],
-      "collectionTokens": [],
-      "usesWixData": false,
-      "usesWebMethod": false,
-      "usesElevate": false,
-      "usesSecrets": false,
-      "usesHttp": false
     },
-    {
-      "file": "src/public/mmUtils.js",
-      "lines": 414,
-      "exports": [
-        {
-          "name": "VERSION",
-          "params": ""
-        },
-        {
-          "name": "SDK_CONFIG",
-          "params": ""
-        },
-        {
-          "name": "MONEY",
-          "params": ""
-        },
-        {
-          "name": "BOOKINGS_ADDON_CONFIG",
-          "params": ""
-        },
-        {
-          "name": "MESSAGE_TYPES",
-          "params": ""
-        },
-        {
-          "name": "URLS",
-          "params": ""
-        },
-        {
-          "name": "UI",
-          "params": ""
-        },
-        {
-          "name": "STAFF_DEFAULT_NAME",
-          "params": ""
-        },
-        {
-          "name": "makeTraceId",
-          "params": "prefix = \"mm\""
-        },
-        {
-          "name": "_safeTrim",
-          "params": "v"
-        },
-        {
-          "name": "_cloneDeep",
-          "params": "value"
-        },
-        {
-          "name": "_safeEmail",
-          "params": "email"
-        },
-        {
-          "name": "_safePhone",
-          "params": "phone"
-        },
-        {
-          "name": "_normalizeIdPart",
-          "params": "v, maxLen = 80"
-        },
-        {
-          "name": "_looksLikeGuid",
-          "params": "v"
-        },
-        {
-          "name": "_safeSlugOrId",
-          "params": "raw"
-        },
-        {
-          "name": "_normalizeLocalIsoStr",
-          "params": "rawStr"
-        },
-        {
-          "name": "getUtcDateFromMadridLocal",
-          "params": "localStr"
-        },
-        {
-          "name": "getMadridLocalStringNoZ",
-          "params": "utcDate"
-        },
-        {
-          "name": "_toDateSafe",
-          "params": "val"
-        },
-        {
-          "name": "withTimeout",
-          "params": "promise, timeoutMs, label = \"operation\""
-        },
-        {
-          "name": "_executeWithRetry",
-          "params": "fn, retries = 3, delay = 500, options = {}"
-        },
-        {
-          "name": "_maskEmail",
-          "params": "email"
-        },
-        {
-          "name": "_maskIp",
-          "params": "ip"
-        },
-        {
-          "name": "_hashKey",
-          "params": "input"
-        },
-        {
-          "name": "_generateUUID",
-          "params": ""
-        },
-        {
-          "name": "_isValidEmail",
-          "params": "email"
-        },
-        {
-          "name": "_normType",
-          "params": "type"
-        },
-        {
-          "name": "_maskPhone",
-          "params": "phone"
-        },
-        {
-          "name": "_maskName",
-          "params": "name"
-        }
-      ],
-      "wixModules": [],
-      "collectionTokens": [],
-      "usesWixData": false,
-      "usesWebMethod": false,
-      "usesElevate": false,
-      "usesSecrets": false,
-      "usesHttp": false
-    },
-    {
-      "file": "src/public/qrHelper.js",
-      "lines": 73,
-      "exports": [
-        {
-          "name": "extractHuella8",
-          "params": "hashCadena"
-        },
-        {
-          "name": "generateVerifactuUrl",
-          "params": "params = {}"
-        },
-        {
-          "name": "buildVerifactuReceiptMeta",
-          "params": "movimiento = {}"
-        }
-      ],
-      "wixModules": [],
-      "collectionTokens": [],
-      "usesWixData": false,
-      "usesWebMethod": false,
-      "usesElevate": false,
-      "usesSecrets": false,
-      "usesHttp": false
-    },
-    {
-      "file": "src/public/widgetBridge.js",
-      "lines": 241,
-      "exports": [
-        {
-          "name": "createWidgetBridge",
-          "params": "widgetElement, options = {}"
-        }
-      ],
-      "wixModules": [],
-      "collectionTokens": [],
-      "usesWixData": false,
-      "usesWebMethod": false,
-      "usesElevate": false,
-      "usesSecrets": false,
-      "usesHttp": false
-    }
-  ],
-  "pages": [
     {
       "file": "src/pages/ADMINISTRACION.mvf3f.js",
       "lines": 17,
@@ -1833,6 +1837,278 @@
       "usesElevate": false,
       "usesSecrets": false,
       "usesHttp": false
+    },
+    {
+      "file": "src/public/marianAdministrationController.js",
+      "lines": 297,
+      "exports": [
+        {
+          "name": "initMarianAdministration",
+          "params": "widget, slug = \"administracion\""
+        }
+      ],
+      "wixModules": [
+        "wix-location",
+        "wix-members-frontend"
+      ],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/mmUtils.js",
+      "lines": 414,
+      "exports": [
+        {
+          "name": "VERSION",
+          "params": ""
+        },
+        {
+          "name": "SDK_CONFIG",
+          "params": ""
+        },
+        {
+          "name": "MONEY",
+          "params": ""
+        },
+        {
+          "name": "BOOKINGS_ADDON_CONFIG",
+          "params": ""
+        },
+        {
+          "name": "MESSAGE_TYPES",
+          "params": ""
+        },
+        {
+          "name": "URLS",
+          "params": ""
+        },
+        {
+          "name": "UI",
+          "params": ""
+        },
+        {
+          "name": "STAFF_DEFAULT_NAME",
+          "params": ""
+        },
+        {
+          "name": "makeTraceId",
+          "params": "prefix = \"mm\""
+        },
+        {
+          "name": "_safeTrim",
+          "params": "v"
+        },
+        {
+          "name": "_cloneDeep",
+          "params": "value"
+        },
+        {
+          "name": "_safeEmail",
+          "params": "email"
+        },
+        {
+          "name": "_safePhone",
+          "params": "phone"
+        },
+        {
+          "name": "_normalizeIdPart",
+          "params": "v, maxLen = 80"
+        },
+        {
+          "name": "_looksLikeGuid",
+          "params": "v"
+        },
+        {
+          "name": "_safeSlugOrId",
+          "params": "raw"
+        },
+        {
+          "name": "_normalizeLocalIsoStr",
+          "params": "rawStr"
+        },
+        {
+          "name": "getUtcDateFromMadridLocal",
+          "params": "localStr"
+        },
+        {
+          "name": "getMadridLocalStringNoZ",
+          "params": "utcDate"
+        },
+        {
+          "name": "_toDateSafe",
+          "params": "val"
+        },
+        {
+          "name": "withTimeout",
+          "params": "promise, timeoutMs, label = \"operation\""
+        },
+        {
+          "name": "_executeWithRetry",
+          "params": "fn, retries = 3, delay = 500, options = {}"
+        },
+        {
+          "name": "_maskEmail",
+          "params": "email"
+        },
+        {
+          "name": "_maskIp",
+          "params": "ip"
+        },
+        {
+          "name": "_hashKey",
+          "params": "input"
+        },
+        {
+          "name": "_generateUUID",
+          "params": ""
+        },
+        {
+          "name": "_isValidEmail",
+          "params": "email"
+        },
+        {
+          "name": "_normType",
+          "params": "type"
+        },
+        {
+          "name": "_maskPhone",
+          "params": "phone"
+        },
+        {
+          "name": "_maskName",
+          "params": "name"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/qrHelper.js",
+      "lines": 73,
+      "exports": [
+        {
+          "name": "extractHuella8",
+          "params": "hashCadena"
+        },
+        {
+          "name": "generateVerifactuUrl",
+          "params": "params = {}"
+        },
+        {
+          "name": "buildVerifactuReceiptMeta",
+          "params": "movimiento = {}"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    },
+    {
+      "file": "src/public/widgetBridge.js",
+      "lines": 241,
+      "exports": [
+        {
+          "name": "createWidgetBridge",
+          "params": "widgetElement, options = {}"
+        }
+      ],
+      "wixModules": [],
+      "collectionTokens": [],
+      "usesWixData": false,
+      "usesWebMethod": false,
+      "usesElevate": false,
+      "usesSecrets": false,
+      "usesHttp": false
+    }
+  ],
+  "tests": [
+    {
+      "file": "tests/build-electronic-books-cms-request.mjs",
+      "lines": 114,
+      "checks": 0
+    },
+    {
+      "file": "tests/simulate-administration-closing.mjs",
+      "lines": 269,
+      "checks": 47
+    },
+    {
+      "file": "tests/simulate-critical-flows.mjs",
+      "lines": 207,
+      "checks": 24
+    },
+    {
+      "file": "tests/simulate-manager-documents.mjs",
+      "lines": 216,
+      "checks": 47
+    },
+    {
+      "file": "tests/simulate-realistic-wix-flow.mjs",
+      "lines": 291,
+      "checks": 41
+    },
+    {
+      "file": "tests/update-electronic-books-contracts.mjs",
+      "lines": 61,
+      "checks": 0
+    },
+    {
+      "file": "tests/verify-administration-widget.mjs",
+      "lines": 39,
+      "checks": 2
+    },
+    {
+      "file": "tests/verify-core.mjs",
+      "lines": 301,
+      "checks": 103
+    },
+    {
+      "file": "tests/verify-dependency-automation.mjs",
+      "lines": 51,
+      "checks": 14
+    },
+    {
+      "file": "tests/verify-diagnostic-hardening.mjs",
+      "lines": 83,
+      "checks": 23
+    },
+    {
+      "file": "tests/verify-electronic-books-schema.mjs",
+      "lines": 43,
+      "checks": 9
+    },
+    {
+      "file": "tests/verify-production-monitor.mjs",
+      "lines": 56,
+      "checks": 7
+    },
+    {
+      "file": "tests/verify-sanitization.mjs",
+      "lines": 118,
+      "checks": 14
+    }
+  ],
+  "workflows": [
+    {
+      "file": ".github/workflows/production-smoke.yml",
+      "content": "name: Monitor de produccion\n\non:\n  workflow_run:\n    workflows:\n      - Deploy Wix Production\n    types:\n      - completed\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: production-smoke-${{ github.event.workflow_run.id || github.run_id }}\n  cancel-in-progress: false\n\njobs:\n  smoke:\n    name: Comprobar rutas publicas esenciales\n    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    steps:\n      - name: Esperar propagacion de produccion\n        run: sleep 30\n\n      - name: Verificar disponibilidad y contenido HTML\n        shell: bash\n        run: |\n          set -euo pipefail\n\n          check_url() {\n            local url=\"$1\"\n            local name=\"$2\"\n            local headers\n            local body\n            headers=\"$(mktemp)\"\n            body=\"$(mktemp)\"\n\n            curl \\\n              --fail \\\n              --silent \\\n              --show-error \\\n              --location \\\n              --max-redirs 3 \\\n              --connect-timeout 10 \\\n              --max-time 20 \\\n              --dump-header \"$headers\" \\\n              --output \"$body\" \\\n              \"$url\"\n\n            grep -qi '^content-type: text/html' \"$headers\"\n            test \"$(wc -c < \"$body\")\" -ge 128\n            rm -f \"$headers\" \"$body\"\n            echo \"OK: $name\"\n          }\n\n          check_url \"https://www.marianmadrid.es/\" \"Inicio\"\n          check_url \"https://www.marianmadrid.es/reserva-online\" \"Reserva online\"\n          check_url \"https://www.marianmadrid.es/politica-privacidad-texto\" \"Politica de privacidad\"\n\n      - name: Nota de alerta\n        if: failure()\n        run: |\n          echo \"La comprobacion de produccion ha fallado. GitHub marcara esta ejecucion como fallida y notificara a los suscriptores configurados del repositorio.\"\n"
+    },
+    {
+      "file": ".github/workflows/validate.yml",
+      "content": "name: Validate Fase 1\n\non:\n  pull_request:\n    branches:\n      - main\n  push:\n    branches:\n      - main\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\nconcurrency:\n  group: fase1-validation-${{ github.workflow }}-${{ github.ref }}\n  cancel-in-progress: true\n\njobs:\n  validate:\n    name: Validar codigo y contratos\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    steps:\n      - name: Obtener codigo\n        uses: actions/checkout@v4\n        with:\n          fetch-depth: 2\n\n      - name: Preparar Node.js\n        uses: actions/setup-node@v4\n        with:\n          node-version: \"22\"\n\n      - name: Comprobar formato de cambios\n        run: git diff --check HEAD^ HEAD\n\n      - name: Ejecutar analisis estatico\n        run: npm run lint\n\n      - name: Ejecutar bateria de Fase 1\n        run: npm test\n"
     }
   ]
 }

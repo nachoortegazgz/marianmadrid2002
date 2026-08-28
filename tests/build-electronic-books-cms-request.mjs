@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const wixConfig = JSON.parse(fs.readFileSync(path.join(root, 'wix.config.json'), 'utf8'));
 const schema = JSON.parse(fs.readFileSync(path.join(root, 'docs', 'cms-schema-libros-electronicos-qa.json'), 'utf8'));
 
 const displayOverrides = {
@@ -99,7 +100,7 @@ const executionCode = [
 ].join('\n');
 
 const request = {
-  siteId: '188bed94-177c-4bc9-a9f0-35080d874f3e',
+  siteId: wixConfig.siteId,
   hasMutations: true,
   reason: 'La usuaria autorizó editar y publicar en el editor. Se reconcilia de forma idempotente el contrato de colecciones CMS para libros electrónicos y los campos de trazabilidad de movimientoCaja, sin eliminar ni actualizar registros existentes.',
   sourceDocUrls: [

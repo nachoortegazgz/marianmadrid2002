@@ -12,9 +12,6 @@ export const COLLECTIONS = Object.freeze({
     SERVICIOS_CITA: "Import2",
     EXTRAS_CATALOGO: "AddonsCatalogo",
     MAPA_STAFF: "MapaStaff",
-    // Temporary compatibility alias: new code must use EXTRAS_CATALOGO.
-    ADDONS_CATALOGO: "AddonsCatalogo",
-    SERVICIOS_OPCIONES_ADDON: "AddonsCatalogo",
     DUAL_CACHE: "DualSlotCache",
     DAYS_CACHE: "AvailabilityDaysCache",
     SLOTS_CACHE: "AvailabilitySlotsCache",
@@ -31,7 +28,6 @@ export const COLLECTIONS = Object.freeze({
     CONTADORES_FISCALES: "SecuenciaTickets",
     REGISTRO_HORARIO: "REGISTRO_HORARIO",
     PRODUCTOS_VENTA: "InventarioProductos",
-    INVENTARIO_PRODUCTOS: "InventarioProductos", // Alias de compatibilidad para stock esperado.
     MOVIMIENTO_INVENTARIO: "movimientoInventario",
     CONCILIACION_STOCK_WIX: "ConciliacionStockWix",
     AUDIT_LOG: "MM_AUDIT_LOG",
@@ -61,8 +57,6 @@ export const SERVICE_CATALOG = Object.freeze({
 
 export const APP_IDS = Object.freeze({
     BOOKINGS: "13d21c63-b5ec-5912-8397-c3a5ddb27a97",
-    STORES: "1380b703-ce81-ff05-f115-39571d94eab3",
-    EVENTS: "140603ad-af8d-84fb-9004-ee174e35054d",
 });
 
 export const SDK_CONFIG = Object.freeze({

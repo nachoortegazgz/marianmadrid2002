@@ -1,6 +1,6 @@
 # Anexo — identificadores y constantes canónicas
 
-**Fuente:** `src/backend/internalConfig.js` en el commit `d46e7cf` y contexto de sitio consultado en Wix el 28 de agosto de 2026. No contiene secretos, tokens, contraseñas ni datos de clientes.
+**Fuente:** `src/backend/internalConfig.js` tras la consolidación de IDs canónicos y contexto de sitio consultado en Wix el 28 de agosto de 2026. No contiene secretos, tokens, contraseñas ni datos de clientes.
 
 ## Contexto de sitio y aplicaciones
 
@@ -13,8 +13,6 @@
 | Recurso de gestión Marian | `e556070a-6d6a-402e-8422-11133033ea76` | Identificador de recurso usado como control de administración de Marian. |
 | Wix Bookings | `13d21c63-b5ec-5912-8397-c3a5ddb27a97` | App instalada; coincide con `APP_IDS.BOOKINGS`. |
 | Wix Stores instalado | `215238eb-22a5-4c36-9e7b-e7c08025e04e` | App observada en el contexto Wix; catálogo V1. |
-| Wix Stores en `APP_IDS` | `1380b703-ce81-ff05-f115-39571d94eab3` | Identificador interno histórico; su uso requiere verificación previa porque difiere de la app instalada devuelta por Wix. |
-| Wix Events en `APP_IDS` | `140603ad-af8d-84fb-9004-ee174e35054d` | Constante de integración de eventos. |
 | Wix Forms & Payments | `14ce1214-b278-a7e4-1373-00cebd1bef7c` | App instalada observada. |
 | Wix Invoices | `13ee94c1-b635-8505-3391-97919052c16f` | App instalada observada. |
 | Wix Members Area | `14cc59bc-f0b7-15b8-e1c7-89ce41d0e0c9` | App instalada observada. |
@@ -27,10 +25,8 @@
 | Clave en código | ID físico CMS | Estado y definición |
 |---|---|---|
 | `SERVICIOS_CITA` | `Import2` | Fuente comercial de servicios y fases de cita. |
-| `EXTRAS_CATALOGO` | `AddonsCatalogo` | Alias canónico visible del catálogo de addons. |
+| `EXTRAS_CATALOGO` | `AddonsCatalogo` | Clave canónica del catálogo visible de addons. |
 | `MAPA_STAFF` | `MapaStaff` | Directorio privado de personal y recursos Bookings. |
-| `ADDONS_CATALOGO` | `AddonsCatalogo` | Alias de compatibilidad; no usar en código nuevo. |
-| `SERVICIOS_OPCIONES_ADDON` | `AddonsCatalogo` | Referencia de compatibilidad a los addons. |
 | `DUAL_CACHE` | `DualSlotCache` | Caché de parejas de slots duales certificadas. |
 | `DAYS_CACHE` | `AvailabilityDaysCache` | Caché mensual de días disponibles. |
 | `SLOTS_CACHE` | `AvailabilitySlotsCache` | Caché de slots de disponibilidad. |
@@ -46,8 +42,7 @@
 | `CONTEOS_X` | `RESUMEN_CONTEO_X` | Arqueos X y descuadres. |
 | `CONTADORES_FISCALES` | `SecuenciaTickets` | Contadores de secuencia de tickets. |
 | `REGISTRO_HORARIO` | `REGISTRO_HORARIO` | Fichajes, pausas y ajustes de jornada. |
-| `PRODUCTOS_VENTA` | `InventarioProductos` | Alias para producto de venta. |
-| `INVENTARIO_PRODUCTOS` | `InventarioProductos` | Alias de compatibilidad para stock esperado. |
+| `PRODUCTOS_VENTA` | `InventarioProductos` | Clave canónica del inventario cuyo nombre visible es `PRODUCTOS_VENTA`. |
 | `MOVIMIENTO_INVENTARIO` | `movimientoInventario` | Movimientos de stock, consumo, recepción y eventos online. |
 | `CONCILIACION_STOCK_WIX` | `ConciliacionStockWix` | Cola/estado de conciliación con Wix Stores. |
 | `AUDIT_LOG` | `MM_AUDIT_LOG` | Bitácora técnica y operativa. |

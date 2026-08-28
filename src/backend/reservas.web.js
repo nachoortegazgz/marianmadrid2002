@@ -79,7 +79,7 @@ import { requireAdmin, rateLimiter } from "backend/security";
 const log = logger;
 
 const SERVICIOS_COL = COLLECTIONS.SERVICIOS_CITA;
-const SERVICE_ADDON_OPTIONS_COL = COLLECTIONS.SERVICIOS_OPCIONES_ADDON;
+const EXTRAS_CATALOGO_COL = COLLECTIONS.EXTRAS_CATALOGO;
 const DUAL_CACHE_COL = COLLECTIONS.DUAL_CACHE;
 const DAYS_CACHE_COL = COLLECTIONS.DAYS_CACHE;
 const CITAS_COL = COLLECTIONS.CITAS;
@@ -307,7 +307,7 @@ async function _resolveEditorialAddonOption(optionRef, traceId) {
     const hasNativeBinding = optionRef && typeof optionRef === "object" &&
         (_safeTrim(optionRef.bookingsAddonId) || _safeTrim(optionRef.bookingsAddonGroupId));
     const option = hasNativeBinding ? optionRef : await withTimeout(
-        wixData.get(SERVICE_ADDON_OPTIONS_COL, optionId, { suppressAuth: true }),
+        wixData.get(EXTRAS_CATALOGO_COL, optionId, { suppressAuth: true }),
         WATCHDOG_TIMEOUT_MS,
         "resolveEditorialAddonOption"
     );

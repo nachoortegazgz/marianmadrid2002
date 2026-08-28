@@ -19,7 +19,6 @@
     "CONTADORES_FISCALES": "SecuenciaTickets",
     "REGISTRO_HORARIO": "REGISTRO_HORARIO",
     "PRODUCTOS_VENTA": "InventarioProductos",
-    "INVENTARIO_PRODUCTOS": "InventarioProductos",
     "MOVIMIENTO_INVENTARIO": "movimientoInventario",
     "CONCILIACION_STOCK_WIX": "ConciliacionStockWix",
     "AUDIT_LOG": "MM_AUDIT_LOG",

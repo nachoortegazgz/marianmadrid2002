@@ -60,15 +60,15 @@ Las métricas de esta sección se obtuvieron de un inventario estático del comm
 | Familia | Métrica | Valor observado | Lectura correcta |
 |---|---:|---:|---|
 | Código mantenido | Ficheros JavaScript bajo `src/` | **63** | Incluye backend, páginas y módulos públicos; no cuenta tipos generados de Wix. |
-| Código mantenido | Líneas de código fuente | **13.304** | Medida de tamaño, no indicador de calidad aislado. |
+| Código mantenido | Líneas de código fuente | **13.298** | Medida de tamaño, no indicador de calidad aislado. |
 | Backend | Módulos backend | **24** | Separación por dominio: reservas, caja, inventario, fiscalidad, seguridad, eventos y Jobs. |
 | Interfaz | Páginas Wix versionadas | **35** | Los sufijos internos Wix se preservan para mantener el mapeo del Editor. |
 | Pruebas | Scripts de prueba `.mjs` | **13** | El comando `npm test` encadena sanitización, núcleo, endurecimiento, widget, simulación, integración, administración, documentos, automatización y monitor. |
-| Pruebas | Líneas de pruebas | **1.848** | La cobertura es por contrato y escenario; no es un porcentaje de cobertura de ramas. |
+| Pruebas | Líneas de pruebas | **1.849** | La cobertura es por contrato y escenario; no es un porcentaje de cobertura de ramas. |
 | Controles explícitos | Aserciones/comprobaciones estáticas detectadas | **331** | Indicador aproximado, útil para dimensionar contratos, no un KPI de defectos. |
 | Interfaces | Exportaciones de módulos detectadas | **220** | Incluye fachadas públicas, hooks Wix, funciones internas exportadas y constantes. |
 | CMS | Colecciones Wix existentes | **55** | Inventario real de la API de colecciones. |
-| CMS del ecosistema | Colecciones reconocidas por la SSOT | **34** | Conjunto definido en `COLLECTIONS`; tres claves son alias intencionados que apuntan a un ID ya contado. |
+| CMS del ecosistema | Colecciones reconocidas por la SSOT | **34** | Conjunto definido en `COLLECTIONS`; cada clave representa un ID físico distinto. |
 | Cifrado CMS | Campos marcados `encrypted` en esas 34 colecciones | **0** | La protección actual procede de permisos, RBAC, minimización de respuesta y secretos; no de cifrado de campo configurado por el CMS. |
 | Índices CMS | Índices explícitos devueltos por API | **0** | Cada colección admite hasta 3 índices regulares y 1 único, pero no constan índices declarados. Es un riesgo de rendimiento a vigilar al crecer el volumen. |
 
@@ -255,7 +255,7 @@ El esquema se obtuvo de la API de Wix CMS el 28 de agosto. Las 34 colecciones de
 | Media | No hay índices CMS explícitos en el esquema consultado. | Riesgo de latencia en colecciones con crecimiento, especialmente agenda y ledger. | Medir primero las consultas reales; diseñar como máximo los índices necesarios, respetando cuota 3+1. |
 | Media | Cierres Z usan `CLOSED` y `CERRADA`. | Heterogeneidad histórica de estados. | Tratar ambas como cierre completo en lector; normalizar solo con migración aprobada y trazable. |
 | Media | Cero campos CMS se declaran cifrados. | PII y datos fiscales dependen de permisos/higiene de acceso. | Revisar permisos, minimización de respuesta, retención y necesidad de cada campo antes de ampliar uso. |
-| Baja | Divergencia de IDs de Stores entre el contexto de aplicación Wix y `APP_IDS.STORES` interno. | Puede inducir una llamada futura al identificador equivocado. | Verificar procedencia/uso de `APP_IDS.STORES` antes de cualquier modificación; no sustituirlo por inferencia. |
+| Baja | La configuración de aplicaciones conserva únicamente `APP_IDS.BOOKINGS`, que es el único ID de app consumido por runtime. | Se evita confundir IDs históricos de Stores/Events sin consumidor. | Mantener IDs de aplicación futuros solo cuando una llamada de producción los consuma y su origen esté verificado. |
 
 ## 11. Referencias y anexos
 
@@ -264,6 +264,7 @@ El esquema se obtuvo de la API de Wix CMS el 28 de agosto. Las 34 colecciones de
 | [`ANEXO_ESQUEMA_CMS_VIGENTE_2026-08-28.md`](ANEXO_ESQUEMA_CMS_VIGENTE_2026-08-28.md) | Campos, tipos, permisos, límites e índices de las 34 colecciones reconocidas. |
 | [`ANEXO_IDENTIFICADORES_Y_CONSTANTES_2026-08-28.md`](ANEXO_IDENTIFICADORES_Y_CONSTANTES_2026-08-28.md) | IDs de sitio, apps, colecciones, constantes, límites, estados, roles, dependencias y comandos. |
 | [`ANEXO_INTERFACES_PUBLICAS_2026-08-28.json`](ANEXO_INTERFACES_PUBLICAS_2026-08-28.json) | Inventario mecánico de ficheros, exportaciones, parámetros, módulos Wix y colecciones referenciadas. |
+| [`AUDITORIA_IDS_CANONICOS_Y_DUPLICIDADES_2026-08-28.md`](AUDITORIA_IDS_CANONICOS_Y_DUPLICIDADES_2026-08-28.md) | Decisión y evidencia de aliases/IDs retirados y elementos conservados por contrato. |
 | [`EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md`](EVIDENCIA_PRUEBA_REAL_QA_2026-08-27.md) | QA real nativa de Bookings, recuperación por revisión y limpieza. |
 | [`ESTADO_MAESTRO_CONSOLIDADO_PROYECTO_2026-08-27.md`](ESTADO_MAESTRO_CONSOLIDADO_PROYECTO_2026-08-27.md) | Fuente de continuidad de decisiones, publicación y límites de fase. |
 | [`ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md`](ENDURECIMIENTO_CONCURRENCIA_PRIVACIDAD_2026-08-27.md) | Correcciones de concurrencia, PII, inmutabilidad y API externa. |
